@@ -26,6 +26,8 @@ jobs:
       - run: pnpm install --frozen-lockfile
       # The site imports gloss-format from its dist/, so lint and typecheck need it built.
       - run: pnpm --filter gloss-format build
+      # astro:content gets its types from .astro/, which only a sync or a build writes.
+      - run: pnpm --filter gloss-site exec astro sync
       - run: pnpm format:check
       - run: pnpm lint
       - run: pnpm typecheck

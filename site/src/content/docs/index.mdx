@@ -1,6 +1,17 @@
 ---
-title: Gloss
-description: An open JSON format for PDF annotations.
+title: An open JSON format for PDF annotations
+description: Gloss is an open JSON format for PDF annotations, covering highlights, notes, shapes and redactions, with a JSON Schema and TypeScript types for every field.
+head:
+  - tag: title
+    content: 'Gloss: an open JSON format for PDF annotations'
+  - tag: meta
+    attrs:
+      property: og:title
+      content: 'Gloss: an open JSON format for PDF annotations'
+  - tag: script
+    attrs:
+      type: application/ld+json
+    content: '{"@context":"https://schema.org","@graph":[{"@type":"WebSite","name":"Gloss","url":"https://gloss-format.org/","description":"An open JSON format for PDF annotations."},{"@type":"SoftwareSourceCode","name":"gloss-format","description":"The Gloss JSON Schema, with zod schemas and TypeScript types for every definition.","codeRepository":"https://github.com/inkbar/gloss","programmingLanguage":"TypeScript","license":"https://opensource.org/licenses/MIT","url":"https://www.npmjs.com/package/gloss-format"}]}'
 ---
 
 import Glossed from '../../components/Glossed.astro'
@@ -11,7 +22,7 @@ Gloss is an open JSON format for PDF annotations. A Gloss document lists the hig
 
 ## Gloss and XFDF
 
-XFDF is the XML format for PDF annotations, standardised as ISO 19444-1. Gloss has the same annotation types and uses the same coordinates. Where XFDF has a name for something, Gloss uses it: a sticky note is `text`, as in XFDF. A few fields read better in JSON under another name, such as `author` for XFDF's `title`. The reference gives the XFDF name of every field that has one.
+XFDF is the XML format for PDF annotations, standardised as ISO 19444-1. Gloss has the same annotation types and uses the same coordinates. Where XFDF has a name for something, Gloss uses it: a sticky note is `text`, as in XFDF. A few fields read better in JSON under another name, such as `author` for XFDF's `title`. The reference gives the XFDF name of every field that has one, and [Gloss and XFDF](xfdf/) maps them all on one page.
 
 Gloss also adds what XFDF lacks: fields for suggested redactions, and `custom` for data of your own.
 

@@ -12,9 +12,11 @@ const reference = join(dist, 'reference')
 describe('the built site under a preview base', () => {
   beforeAll(() => {
     // The links validator runs as part of the build, so a broken absolute link fails here.
+    // vitest sets BASE_URL in its own environment, and a child build would take it as the base.
+    const { BASE_URL: _vitestBase, ...env } = process.env
     execFileSync('pnpm', ['exec', 'astro', 'build'], {
       cwd: site,
-      env: { ...process.env, SITE_BASE: '/pr-preview/pr-1/' },
+      env: { ...env, SITE_BASE: '/pr-preview/pr-1/' },
       stdio: 'pipe',
     })
   }, 120_000)
@@ -45,7 +47,7 @@ describe('the built site under a preview base', () => {
 
   it('resolves every relative link on the hand-written pages', () => {
     const broken: string[] = []
-    for (const page of ['', 'using-gloss']) {
+    for (const page of ['', 'using-gloss', 'xfdf']) {
       const dir = join(dist, page)
       const html = readFileSync(join(dir, 'index.html'), 'utf8')
       const hrefs = [...html.matchAll(/href="([^"#]*)/g)]
@@ -59,6 +61,37 @@ describe('the built site under a preview base', () => {
       }
     }
     expect(broken).toEqual([])
+  })
+
+  it('gives every page its own social card', () => {
+    const missing: string[] = []
+    for (const page of [
+      '',
+      'using-gloss',
+      'xfdf',
+      'reference/redact',
+      'reference/rect',
+    ]) {
+      const html = readFileSync(join(dist, page, 'index.html'), 'utf8')
+      const image = /<meta property="og:image" content="([^"]+)"/.exec(html)?.[1]
+      const expected = `https://gloss-format.org/pr-preview/pr-1/og/${page || 'index'}.png`
+      if (image !== expected) missing.push(`/${page}: ${image}`)
+      else if (!existsSync(join(dist, 'og', `${page || 'index'}.png`)))
+        missing.push(`/${page}: no file`)
+    }
+    expect(missing).toEqual([])
+  })
+
+  it('keeps a preview out of search results', () => {
+    const html = readFileSync(join(dist, 'index.html'), 'utf8')
+    expect(html).toContain('<meta name="robots" content="noindex"')
+  })
+
+  it('publishes robots.txt and llms.txt', () => {
+    expect(readFileSync(join(dist, 'robots.txt'), 'utf8')).toContain(
+      'Sitemap: https://gloss-format.org/sitemap-index.xml'
+    )
+    expect(readFileSync(join(dist, 'llms.txt'), 'utf8')).toMatch(/^# Gloss\n/)
   })
 
   it('publishes the schema', () => {

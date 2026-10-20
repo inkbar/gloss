@@ -11,3 +11,5 @@ site/.astro
 !docs
 # Generated from the schema on every build.
 site/src/content/docs/reference/
+site/src/content/docs/xfdf.md
+site/public/llms.txt

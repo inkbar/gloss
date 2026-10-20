@@ -1,3 +1,5 @@
+import { writeFileSync } from 'node:fs'
+
 import { satteri } from '@astrojs/markdown-satteri'
 import starlight from '@astrojs/starlight'
 import { defineConfig } from 'astro/config'
@@ -7,6 +9,8 @@ import schema from 'gloss-format/schema.json' with { type: 'json' }
 
 import { baseLinks } from './src/markdown/base-links.ts'
 import { generateReference } from './src/reference/generate.ts'
+import { renderLlms } from './src/llms.ts'
+import { renderXfdf } from './src/reference/xfdf.ts'
 import { publishSchema } from './src/schema-file.ts'
 
 // The schema's $id is https://gloss-format.org/schema/v1.json, so the package's file is served
@@ -17,6 +21,12 @@ publishSchema(new URL('./public/', import.meta.url))
 const reference = generateReference(
   schema,
   new URL('./src/content/docs/reference/', import.meta.url)
+)
+// The XFDF mapping page and /llms.txt come from the schema too, and are gitignored the same way.
+writeFileSync(new URL('./src/content/docs/xfdf.md', import.meta.url), renderXfdf(schema))
+writeFileSync(
+  new URL('./public/llms.txt', import.meta.url),
+  renderLlms(schema, reference)
 )
 
 // Pull request previews are served from /pr-preview/pr-<number>/; the site itself from the root.
@@ -60,13 +70,8 @@ export default defineConfig({
           },
         },
       },
-      head: [
-        {
-          tag: 'meta',
-          attrs: { property: 'og:image', content: 'https://gloss-format.org/og.png' },
-        },
-        { tag: 'meta', attrs: { name: 'twitter:card', content: 'summary_large_image' } },
-      ],
+      // Each page's social card, and noindex on previews.
+      routeMiddleware: './src/route-data.ts',
       components: {
         Footer: './src/components/Footer.astro',
         SiteTitle: './src/components/SiteTitle.astro',
@@ -81,6 +86,7 @@ export default defineConfig({
       sidebar: [
         { label: 'Introduction', slug: 'index' },
         { label: 'Using Gloss in your schemas', slug: 'using-gloss' },
+        { label: 'Gloss and XFDF', slug: 'xfdf' },
         {
           label: 'Reference',
           items: reference.map((g) => ({ label: g.label, items: g.items })),

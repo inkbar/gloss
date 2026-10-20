@@ -58,10 +58,19 @@ export function renderDefinition(
       throw new Error(`${name}.${field} has no description`)
   }
 
+  const title = JSON.stringify(searchTitle(name, def))
   const out: string[] = [
     '---',
     `title: ${name}`,
-    `description: ${JSON.stringify(firstSentence(description))}`,
+    `description: ${JSON.stringify(searchDescription(name, def, description))}`,
+    // Search results and link previews show more than the bare definition name.
+    'head:',
+    '  - tag: title',
+    `    content: ${title}`,
+    '  - tag: meta',
+    '    attrs:',
+    '      property: og:title',
+    `      content: ${title}`,
     // The page is generated, so there is no file on GitHub to edit.
     'editUrl: false',
     '---',
@@ -276,7 +285,7 @@ function range(node: JsonSchema): string[] {
   return out
 }
 
-function properties(def: JsonSchema): Record<string, JsonSchema> {
+export function properties(def: JsonSchema): Record<string, JsonSchema> {
   const props = def['properties']
   return props && typeof props === 'object' ? (props as Record<string, JsonSchema>) : {}
 }
@@ -300,12 +309,27 @@ function plural(count: number, noun: string): string {
   return `${count} ${noun}${count === 1 ? '' : 's'}`
 }
 
+/** `Note annotation: JSON Schema | Gloss`, or `Rect: JSON Schema | Gloss` for anything else. */
+function searchTitle(name: string, def: JsonSchema): string {
+  const kind = groupFor(name, def) === 'Annotation types' ? ' annotation' : ''
+  return `${name}${kind}: JSON Schema | Gloss`
+}
+
+/** The definition's first sentence, then what the page covers, for search results. */
+function searchDescription(name: string, def: JsonSchema, description: string): string {
+  const covers =
+    groupFor(name, def) === 'Annotation types'
+      ? `The fields, defaults and XFDF names of the ${name} annotation`
+      : `Reference for ${name}`
+  return `${firstSentence(description)} ${covers} in Gloss, a JSON format for PDF annotations.`
+}
+
 function firstSentence(text: string): string {
   return /^.*?[.!?](?=\s|$)/s.exec(text)?.[0] ?? text
 }
 
 /** A code span, with a fence longer than any run of backticks in the text. */
-function code(text: string): string {
+export function code(text: string): string {
   const longest = Math.max(0, ...(text.match(/`+/g) ?? []).map((run) => run.length))
   const fence = '`'.repeat(longest + 1)
   const pad = text.startsWith('`') || text.endsWith('`') ? ' ' : ''
@@ -313,11 +337,11 @@ function code(text: string): string {
 }
 
 /** Schema prose as Markdown text: characters Markdown would read as syntax are escaped. */
-function prose(text: string): string {
+export function prose(text: string): string {
   return text.replace(/[\\`*_<>[\]]/g, '\\$&')
 }
 
 /** A table cell: pipes escaped, line breaks folded. GFM unescapes `\|` inside code spans too. */
-function cell(text: string): string {
+export function cell(text: string): string {
   return text.replace(/\r?\n/g, ' ').replace(/\|/g, '\\|')
 }
