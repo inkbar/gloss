@@ -14,6 +14,8 @@ export default defineConfig(
   {
     name: 'gloss/rules',
     rules: {
+      // Astro's virtual modules, such as astro:content, exist only inside an Astro build.
+      'import-x/no-unresolved': ['error', { ignore: ['^astro:'] }],
       '@typescript-eslint/no-unused-vars': [
         'error',
         { argsIgnorePattern: '^_', varsIgnorePattern: '^_' },

@@ -107,11 +107,33 @@ describe('renderDefinition', () => {
   })
 
   it('renders the frontmatter, the $ref and the XFDF element', () => {
-    expect(note).toMatch(/^---\ntitle: Note\ndescription: ".+"\neditUrl: false\n---\n/)
+    expect(note).toMatch(
+      /^---\ntitle: Note\ndescription: ".+"\nhead:\n[^]*?editUrl: false\n---\n/
+    )
     expect(note).toContain(
       '"$ref": "https://gloss-format.org/schema/v1.json#/$defs/Note"'
     )
     expect(note).toContain('XFDF element: `text`')
+  })
+
+  it('gives an annotation type a search title and a longer description', () => {
+    expect(note).toContain('    content: "Note annotation: JSON Schema | Gloss"')
+    expect(note).toContain(
+      'description: "A note: an icon on the page that opens to show its contents. The fields, defaults and XFDF names of the Note annotation in Gloss, a JSON format for PDF annotations."'
+    )
+  })
+
+  it('gives any other definition a search title and a longer description', () => {
+    const rect = renderDefinition('Rect', defs['Rect'], { schemaId })
+    expect(rect).toContain('    content: "Rect: JSON Schema | Gloss"')
+    expect(rect).toMatch(
+      /description: ".+ Rect in Gloss, a JSON format for PDF annotations\."/
+    )
+  })
+
+  it('sets the same title for sharing', () => {
+    expect(note).toContain('      property: og:title')
+    expect(note).toContain('      content: "Note annotation: JSON Schema | Gloss"')
   })
 
   it('has a row per field with its default', () => {
