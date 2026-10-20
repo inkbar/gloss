@@ -1,0 +1,13 @@
+packages:
+  - packages/*
+  - site
+allowBuilds:
+  esbuild: true
+  unrs-resolver: true
+minimumReleaseAgeExclude:
+  - '@vitest/mocker@5.0.4'
+  - '@vitest/spy@5.0.4'
+  - vitest@5.0.4
+  - zod@4.6.6
+  - '@vitest/pretty-format@5.0.4'
+  - '@vitest/utils@5.0.4'
