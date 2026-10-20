@@ -1,5 +1,12 @@
 # Changelog
 
+## [1.1.0](https://github.com/inkbar/gloss/compare/v1.0.0...v1.1.0) (2026-10-20)
+
+
+### Features
+
+* leave loupe and mask to the viewers that draw them ([#18](https://github.com/inkbar/gloss/issues/18)) ([e210850](https://github.com/inkbar/gloss/commit/e210850f370a52b0bf29d6925ef5e3789d6ffa1c))
+
 ## 1.0.0 (2026-10-20)
 
 
