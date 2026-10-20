@@ -2,10 +2,10 @@ import { execFileSync } from 'node:child_process'
 import { existsSync, readFileSync } from 'node:fs'
 import { fileURLToPath } from 'node:url'
 
-import { Ajv2020 } from 'ajv/dist/2020'
+import { Ajv2020 } from 'ajv/dist/2020.js'
 import { GlossDocument } from 'gloss-format'
 import glossSchema from 'gloss-format/schema.json' with { type: 'json' }
-import { describe, expect, it } from 'vitest'
+import { afterEach, describe, expect, it, vi } from 'vitest'
 
 // The pages show these files as they are, so checking the files checks the pages.
 const site = fileURLToPath(new URL('../../', import.meta.url))
@@ -43,8 +43,8 @@ describe('minimal.gloss.json', () => {
   })
 })
 
-describe('consumer-redaction.schema.json', () => {
-  const validate = () => gloss().compile(json('consumer-redaction.schema.json') as object)
+describe('reviewed-redaction.schema.json', () => {
+  const validate = () => gloss().compile(json('reviewed-redaction.schema.json') as object)
 
   it('rejects a redaction without an origin', () => {
     expect(validate()(redaction)).toBe(false)
@@ -128,7 +128,17 @@ describe('the TypeScript samples', () => {
     ).not.toThrow()
   }, 60_000)
 
-  it.each(files)('%s runs', async (file) => {
-    await expect(import(/* @vite-ignore */ sample(file))).resolves.toBeDefined()
+  afterEach(() => {
+    vi.restoreAllMocks()
+  })
+
+  // Each sample logs what its comments say it prints.
+  it.each([
+    ['validate-zod.ts', [['highlight', 'a1', 'on page', 0], ['user']]],
+    ['validate-ajv.ts', [[true]]],
+  ])('%s runs and prints what it says', async (file, printed) => {
+    const log = vi.spyOn(console, 'log').mockImplementation(() => {})
+    await import(/* @vite-ignore */ sample(file))
+    expect(log.mock.calls).toEqual(printed)
   })
 })

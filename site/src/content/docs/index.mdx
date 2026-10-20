@@ -7,7 +7,7 @@ import { Code } from '@astrojs/starlight/components'
 
 import minimal from '../../samples/minimal.gloss.json?raw'
 
-Gloss is an open JSON format for PDF annotations. A Gloss document lists the highlights, notes, shapes and redactions on one PDF, each with its page and position. One system writes the file and another reads it back. Gloss is for systems that pass annotations between them.
+Gloss is an open JSON format for PDF annotations. A Gloss document lists the highlights, notes, shapes and redactions on one PDF, each with its page and position. Gloss is for systems that pass annotations between them, where one writes the file and another reads it back.
 
 ## Gloss and XFDF
 
@@ -45,7 +45,7 @@ The format version is the integer in the document and in the schema URL. A `vers
 - **Changes only add.** A change that would reject a document `v1.json` used to accept goes into `v2.json`, published beside `v1.json`. The package version is a separate number from the format version.
 - **Unknown fields are allowed.** No definition rejects a field it doesn't list, so a document from a newer writer still validates against an older schema. Readers may ignore unknown fields or pass them through. The schema won't flag a misspelled field name.
 - **Unknown types are allowed.** An item with a string `type`, a string `id` and a page number is an annotation, even if Gloss doesn't know its type. Readers may ignore it or pass it through. An item whose type Gloss does know must match that type's definition.
-- **Fields are optional by default.** Gloss requires only what makes an item an annotation: `type`, `id`, `page`, and the geometry its type can't be placed without. The schema records the default of every other field, and the reference shows it.
+- **Fields are optional by default.** Gloss requires only what makes an item an annotation: `type`, `id`, `page`, and the geometry its type can't be placed without. Where a field has a default, the schema records it and the reference shows it.
 
 A document with one bad item fails as a whole. To keep the good items, validate each one against [`Annotation`](reference/annotation/) or [`UnknownAnnotation`](reference/unknown-annotation/) on its own.
 
