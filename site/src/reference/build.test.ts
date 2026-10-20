@@ -43,6 +43,24 @@ describe('the built site under a preview base', () => {
     expect(broken).toEqual([])
   })
 
+  it('resolves every relative link on the hand-written pages', () => {
+    const broken: string[] = []
+    for (const page of ['', 'using-gloss']) {
+      const dir = join(dist, page)
+      const html = readFileSync(join(dir, 'index.html'), 'utf8')
+      const hrefs = [...html.matchAll(/href="([^"#]*)/g)]
+        .map(([, href]) => href)
+        .filter((href) => href !== '' && !/^(?:[a-z]+:|\/)/.test(href))
+      expect(hrefs.length, page).toBeGreaterThan(0)
+      for (const href of hrefs) {
+        const target = resolve(dir, href)
+        const file = href.endsWith('/') ? join(target, 'index.html') : target
+        if (!file.startsWith(dist) || !existsSync(file)) broken.push(`/${page}: ${href}`)
+      }
+    }
+    expect(broken).toEqual([])
+  })
+
   it('publishes the schema', () => {
     expect(existsSync(join(dist, 'schema', 'v1.json'))).toBe(true)
   })
