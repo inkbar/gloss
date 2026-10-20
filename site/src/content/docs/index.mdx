@@ -3,7 +3,7 @@ title: Gloss
 description: An open JSON format for PDF annotations.
 ---
 
-import { Code } from '@astrojs/starlight/components'
+import Glossed from '../../components/Glossed.astro'
 
 import minimal from '../../samples/minimal.gloss.json?raw'
 
@@ -23,9 +23,22 @@ The version is in the document, so the media type takes no parameter.
 
 ## A document
 
-<Code code={minimal} lang="json" title="minimal.gloss.json" />
-
-`format` and `version` mark the file as Gloss 1. `annotations` lists the marks in drawing order. This one is a highlight on the first page, since pages count from 0.
+<Glossed
+  code={minimal}
+  title="minimal.gloss.json"
+  notes={{
+    2: 'marks the file as Gloss',
+    3: 'validates against v1.json',
+    4: 'in drawing order',
+    6: 'a type Gloss defines',
+    7: 'unique in the document',
+    8: 'pages count from 0',
+    9: 'PDF points, from bottom-left',
+    10: 'the text it covers',
+    12: 'top-left, top-right',
+    14: 'bottom-left, bottom-right',
+  }}
+/>
 
 Every annotation has a `type`, an `id` and a `page`, plus the geometry its type needs. A highlight needs a `rect` and the `quads` over the text. The [Document](reference/document/) page lists the rest.
 

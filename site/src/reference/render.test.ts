@@ -19,7 +19,13 @@ const schemaId = schema.$id
 
 /** The cells of the table row for `field`, without the leading and trailing pipes. */
 function row(page: string, field: string): string[] {
-  const line = page.split('\n').find((l) => l.startsWith(`| \`${field}\` |`))
+  const line = page
+    .split('\n')
+    .find(
+      (l) =>
+        l.startsWith(`| \`${field}\` |`) ||
+        l.startsWith(`| <span class="required">\`${field}\``)
+    )
   if (!line) throw new Error(`no row for ${field}`)
   return line
     .slice(2, -2)
@@ -110,9 +116,17 @@ describe('renderDefinition', () => {
 
   it('has a row per field with its default', () => {
     expect(note).toContain('| `icon` |')
-    expect(row(note, 'icon')[3]).toContain('Note')
+    expect(row(note, 'icon')[2]).toContain('Note')
     expect(row(note, 'icon')[1]).toBe('[NoteIcon](../note-icon/)')
-    expect(row(note, 'type')[2]).toBe('Yes')
+  })
+
+  it('brackets the required fields and says so', () => {
+    expect(note).toContain('| Field | Type | Default | XFDF | Description |')
+    expect(note).toContain('Required fields are bracketed.')
+    expect(row(note, 'type')[0]).toBe(
+      '<span class="required">`type`<span class="sr-only"> (required)</span></span>'
+    )
+    expect(row(note, 'icon')[0]).toBe('`icon`')
   })
 
   it('escapes pipes in table cells', () => {

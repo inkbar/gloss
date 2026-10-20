@@ -34,9 +34,42 @@ export default defineConfig({
       title: 'Gloss',
       description: 'An open JSON format for PDF annotations.',
       favicon: '/favicon.svg',
-      customCss: ['./src/styles/gloss.css'],
+      customCss: [
+        '@fontsource/ibm-plex-sans/400.css',
+        '@fontsource/ibm-plex-sans/500.css',
+        '@fontsource/ibm-plex-sans/600.css',
+        '@fontsource/ibm-plex-mono/400.css',
+        '@fontsource/ibm-plex-mono/500.css',
+        '@fontsource/ibm-plex-serif/400-italic.css',
+        './src/styles/gloss.css',
+      ],
+      // One light theme, with code on the page grey and square corners.
+      expressiveCode: {
+        themes: ['github-light'],
+        styleOverrides: {
+          borderRadius: '0',
+          borderColor: 'var(--sl-color-gray-5)',
+          codeBackground: 'var(--sl-color-gray-7)',
+          codeFontFamily: 'var(--sl-font-mono)',
+          uiFontFamily: 'var(--sl-font)',
+          frames: {
+            editorTabBarBackground: 'var(--sl-color-black)',
+            editorActiveTabBackground: 'var(--sl-color-gray-7)',
+            editorActiveTabIndicatorTopColor: 'var(--sl-color-accent)',
+            frameBoxShadowCssValue: 'none',
+          },
+        },
+      },
+      head: [
+        {
+          tag: 'meta',
+          attrs: { property: 'og:image', content: 'https://gloss-format.org/og.png' },
+        },
+        { tag: 'meta', attrs: { name: 'twitter:card', content: 'summary_large_image' } },
+      ],
       components: {
         Footer: './src/components/Footer.astro',
+        SiteTitle: './src/components/SiteTitle.astro',
         // Light only: no theme picker, and the page is pinned to the light theme.
         ThemeSelect: './src/components/ThemeSelect.astro',
         ThemeProvider: './src/components/ThemeProvider.astro',

@@ -1,24 +1,120 @@
 /*
- * Gloss: a plain, light-only look. Neutral greys, near-black text, one teal accent and the
- * system font stacks. Contrast on white: text #1a1a1a 17.4:1, body #333 12.6:1, muted #555
- * 7.5:1, accent #0b6b66 6.4:1 (and white on accent 6.4:1), accent-high on accent-low 9.6:1.
+ * Gloss: marginalia. White paper, near-black ink and one red for the notes, as scribes rubricated
+ * theirs. Highlight yellow sits only behind ink. IBM Plex throughout: Sans for prose, Mono for
+ * every field and value, Serif italic for margin notes. Light only.
+ *
+ * Contrast on white: ink #16181d 17.8:1, body #3d424c 10.1:1, muted #5b616e 6.2:1, rubric #b8321a
+ * 6.0:1 (and white on rubric 6.0:1), rubric-high on rubric-low 7.4:1, ink on highlight 13.9:1.
+ * On the page grey #f3f4f6: muted 5.6:1, rubric 5.4:1.
  */
 :root,
 :root[data-theme='light'] {
-  --sl-color-white: #1a1a1a;
-  --sl-color-gray-1: #222222;
-  --sl-color-gray-2: #333333;
-  --sl-color-gray-3: #555555;
-  --sl-color-gray-4: #8a8a8a;
-  --sl-color-gray-5: #c4c4c4;
-  --sl-color-gray-6: #ededed;
-  --sl-color-gray-7: #f6f6f6;
+  --sl-color-white: #16181d;
+  --sl-color-gray-1: #23262d;
+  --sl-color-gray-2: #3d424c;
+  --sl-color-gray-3: #5b616e;
+  --sl-color-gray-4: #8a909c;
+  --sl-color-gray-5: #dadde3;
+  --sl-color-gray-6: #eceef1;
+  --sl-color-gray-7: #f3f4f6;
   --sl-color-black: #ffffff;
 
-  --sl-color-accent-low: #d7ecea;
-  --sl-color-accent: #0b6b66;
-  --sl-color-accent-high: #063f3c;
+  --sl-color-accent-low: #fbe9e5;
+  --sl-color-accent: #b8321a;
+  --sl-color-accent-high: #8e2512;
 
-  --sl-font: ui-sans-serif, system-ui, sans-serif;
-  --sl-font-mono: ui-monospace, monospace;
+  --gloss-highlight: #ffe36e;
+  --gloss-font-note: 'IBM Plex Serif', Georgia, serif;
+
+  --sl-font: 'IBM Plex Sans', ui-sans-serif, system-ui, sans-serif;
+  --sl-font-mono: 'IBM Plex Mono', ui-monospace, monospace;
+  --sl-color-bg-nav: #ffffff;
+  --sl-color-hairline-shade: var(--sl-color-gray-5);
+}
+
+/* Headings: tight, semibold sans. */
+.sl-markdown-content :is(h1, h2, h3, h4),
+h1#_top {
+  font-weight: 600;
+  letter-spacing: -0.02em;
+}
+h1#_top {
+  letter-spacing: -0.035em;
+}
+
+/* Links read as rubric, underlined. */
+.sl-markdown-content a:not(:where(.not-content *)) {
+  color: var(--sl-color-accent);
+  text-underline-offset: 0.18em;
+}
+.sl-markdown-content a:not(:where(.not-content *)):hover {
+  color: var(--sl-color-accent-high);
+}
+
+/* Inline code sits on the page grey, with no box. */
+.sl-markdown-content :not(pre) > code {
+  background: var(--sl-color-gray-7);
+  border: 0;
+  border-radius: 0;
+  padding: 0.1em 0.3em;
+}
+
+.sl-markdown-content mark {
+  background: var(--gloss-highlight);
+  color: var(--sl-color-white);
+  padding: 0 0.1em;
+}
+
+/* Tables: an ink rule on top, hairlines between rows, no fill. */
+.sl-markdown-content table {
+  border-top: 1px solid var(--sl-color-white);
+}
+.sl-markdown-content :is(th, td) {
+  border: 0;
+  border-bottom: 1px solid var(--sl-color-gray-5);
+  background: none;
+}
+.sl-markdown-content th {
+  color: var(--sl-color-gray-3);
+  font-weight: 500;
+}
+
+/* The current page: ink text and a rubric rule, rather than a filled block. */
+.sidebar-content a[aria-current='page'],
+.sidebar-content a[aria-current='page']:hover,
+.sidebar-content a[aria-current='page']:focus {
+  background: none;
+  color: var(--sl-color-white);
+  font-weight: 600;
+  border-radius: 0;
+  box-shadow: inset 2px 0 0 var(--sl-color-accent);
+}
+
+/* A required field in a reference table: its name between corner brackets, like the wordmark. */
+.sl-markdown-content .required {
+  position: relative;
+  display: inline-block;
+  padding: 0.15em 0.4em;
+}
+.sl-markdown-content .required::before,
+.sl-markdown-content .required::after {
+  content: '';
+  position: absolute;
+  width: 0.4em;
+  height: 0.4em;
+  border: 0 solid var(--sl-color-accent);
+}
+.sl-markdown-content .required::before {
+  top: 0;
+  left: 0;
+  border-width: 2px 0 0 2px;
+}
+.sl-markdown-content .required::after {
+  right: 0;
+  bottom: 0;
+  border-width: 0 2px 2px 0;
+}
+.sl-markdown-content .required code {
+  background: none;
+  padding: 0;
 }

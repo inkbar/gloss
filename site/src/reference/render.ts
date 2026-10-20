@@ -85,17 +85,20 @@ export function renderDefinition(
     Array.isArray(def['required']) ? (def['required'] as string[]) : []
   )
   if (Object.keys(props).length > 0) {
+    out.push('## Fields', '')
+    if (required.size > 0) out.push('Required fields are bracketed.', '')
     out.push(
-      '## Fields',
-      '',
-      '| Field | Type | Required | Default | XFDF | Description |',
-      '| --- | --- | --- | --- | --- | --- |'
+      '| Field | Type | Default | XFDF | Description |',
+      '| --- | --- | --- | --- | --- |'
     )
     for (const [field, prop] of Object.entries(props)) {
+      // The brackets are drawn by the site's CSS; the hidden text says the same to a screen reader.
+      const name = required.has(field)
+        ? `<span class="required">${code(field)}<span class="sr-only"> (required)</span></span>`
+        : code(field)
       const cells = [
-        code(field),
+        name,
         typeCell(field, prop, slug),
-        required.has(field) ? 'Yes' : 'No',
         'default' in prop ? code(JSON.stringify(prop['default'])) : '',
         typeof prop['x-xfdf'] === 'string' ? code(prop['x-xfdf']) : '—',
         prose(prop['description'] as string),

@@ -1,0 +1,44 @@
+---
+// The wordmark: "gloss" between two corner brackets, the way a viewer marks a selected annotation.
+const { siteTitleHref } = Astro.locals.starlightRoute
+---
+
+<a href={siteTitleHref} class="wordmark" aria-label="Gloss home">
+  <span class="text" translate="no">
+    gloss
+  </span>
+</a>
+
+<style>
+  .wordmark {
+    position: relative;
+    display: inline-flex;
+    padding: 0.3rem 0.85rem 0.5rem 0.75rem;
+    color: var(--sl-color-white);
+    text-decoration: none;
+  }
+  .wordmark::before,
+  .wordmark::after {
+    content: '';
+    position: absolute;
+    width: 0.75rem;
+    height: 0.75rem;
+    border: 0 solid var(--sl-color-accent);
+  }
+  .wordmark::before {
+    top: 0;
+    left: 0;
+    border-width: 3px 0 0 3px;
+  }
+  .wordmark::after {
+    right: 0;
+    bottom: 0;
+    border-width: 0 3px 3px 0;
+  }
+  .text {
+    font-size: 1.75rem;
+    font-weight: 600;
+    line-height: 1;
+    letter-spacing: -0.04em;
+  }
+</style>
