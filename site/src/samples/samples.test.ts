@@ -14,8 +14,10 @@ const json = (name: string): unknown => JSON.parse(readFileSync(sample(name), 'u
 
 const GLOSS = 'https://gloss-format.org/schema/v1.json'
 
+// Set up as the guide says: Ajv's default strict mode, formats off, x-xfdf declared.
 function gloss() {
-  const ajv = new Ajv2020({ strict: false, validateFormats: false })
+  const ajv = new Ajv2020({ validateFormats: false })
+  ajv.addKeyword('x-xfdf')
   ajv.addSchema(glossSchema)
   return ajv
 }

@@ -48,9 +48,11 @@ The `gloss-format` package exports a zod schema for every definition, with a Typ
 
 Parsing keeps fields Gloss doesn't define, and keeps items of a type it doesn't know. It also fills in defaults, so a redaction with no `origin` comes back with `origin: 'user'`.
 
+So each definition has two types. `Redact` is what a parse returns, with every default filled in. `RedactInput` is what you write, where fields with a default are optional. Use the `Input` type for data you build before you parse or send it. `isAnnotation(item)` tells you whether a document item is a type Gloss defines, and narrows its type.
+
 ## Any JSON Schema validator
 
-The schema is plain JSON Schema 2020-12, so a validator for that draft can use it. Register the schema under its `$id`, then validate a whole document or any one definition. This sample uses Ajv:
+The schema is plain JSON Schema 2020-12, so a validator for that draft can use it. Register the schema under its `$id`, then validate a whole document or any one definition. Gloss gives XFDF names in its own `x-xfdf` keyword; a strict validator needs to be told about it. This sample uses Ajv in its default strict mode:
 
 <Code code={validateAjv} lang="ts" title="validate-ajv.ts" />
 

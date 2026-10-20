@@ -30,13 +30,37 @@ if (result.success) {
 
 Every definition is exported as a zod schema with a type of the same name, such as `Redact`, `Highlight` and `Annotation`. Fields a type does not define pass through unchanged. An item whose `type` is not one Gloss knows is kept as an unknown annotation. An item with a known `type` and invalid fields fails.
 
+The type of the same name is what a parse returns, with defaults filled in: a `Redact` always has `origin` and `opacity`. Each definition also has an `Input` type for the data you write, before defaults: `RedactInput`, `HighlightInput`, `GlossDocumentInput` and so on.
+
+```ts
+import type { RedactInput } from 'gloss-format'
+
+const mark: RedactInput = {
+  type: 'redact',
+  id: 'r1',
+  page: 0,
+  rect: { x: 72, y: 700, width: 120, height: 14 },
+}
+```
+
+A document's `annotations` holds both known and unknown items. `isAnnotation` tells them apart and narrows the type:
+
+```ts
+import { isAnnotation } from 'gloss-format'
+
+for (const item of result.data.annotations) {
+  if (isAnnotation(item)) console.log(item.type) // a type Gloss defines
+}
+```
+
 ## Validate with Ajv
 
 ```ts
 import { Ajv2020 } from 'ajv/dist/2020.js'
 import schema from 'gloss-format/schema.json' with { type: 'json' }
 
-const ajv = new Ajv2020({ strict: false, validateFormats: false })
+const ajv = new Ajv2020({ validateFormats: false })
+ajv.addKeyword('x-xfdf')
 const validate = ajv.compile(schema)
 
 if (!validate(JSON.parse(text))) {
@@ -44,7 +68,9 @@ if (!validate(JSON.parse(text))) {
 }
 ```
 
-The schema is JSON Schema draft 2020-12. `validateFormats: false` skips the `date-time` check on timestamps; add `ajv-formats` if you want it.
+The schema is JSON Schema draft 2020-12. It gives XFDF names in its own `x-xfdf` keyword, so declare that keyword and keep Ajv's strict mode on.
+
+Timestamps must be RFC 3339 date-times with seconds and an offset, such as `2026-10-20T09:30:00Z`. Each carries a `pattern` that checks this, which Ajv applies even with `validateFormats: false`. To check `format: date-time` as well, add `ajv-formats` in place of `validateFormats: false`.
 
 ## Refer to a definition by URL
 
