@@ -13,7 +13,7 @@ export interface SidebarGroup {
   items: { label: string; slug: string }[]
 }
 
-const GROUPS: Group[] = ['Document', 'Annotation types', 'Shared shapes']
+const GROUPS: Group[] = ['Document', 'Annotation types', 'Shared shapes', 'Enums']
 
 /**
  * Writes a Markdown page for every `$defs` entry of `schema` into `outDir`, emptying it first so

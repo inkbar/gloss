@@ -45,6 +45,13 @@ describe('groupFor', () => {
     expect(groupFor('Redact', defs['Redact'])).toBe('Annotation types')
     expect(groupFor('Common', defs['Common'])).toBe('Shared shapes')
     expect(groupFor('Rect', defs['Rect'])).toBe('Shared shapes')
+    expect(groupFor('Color', defs['Color'])).toBe('Shared shapes')
+  })
+
+  it('puts the value sets in Enums', () => {
+    for (const name of ['Intent', 'NoteIcon', 'LineEnding'])
+      expect(groupFor(name, defs[name])).toBe('Enums')
+    expect(groupFor('Thing', { enum: ['a', 'b'], description: 'A thing.' })).toBe('Enums')
   })
 })
 
@@ -95,6 +102,13 @@ describe('renderDefinition', () => {
   it('escapes pipes in table cells', () => {
     const stamp = renderDefinition('Stamp', defs['Stamp'])
     expect(row(stamp, 'imagedata')[1]).toContain('`^data:image\\/(png\\|jpeg);base64,`')
+  })
+
+  it('describes an unknown type by pointing at Annotation', () => {
+    const page = renderDefinition('UnknownAnnotation', defs['UnknownAnnotation'])
+    expect(row(page, 'type')[1]).toBe(
+      'any string except a type Gloss defines (see [Annotation](../annotation/))'
+    )
   })
 
   it("lists the Annotation union's types", () => {

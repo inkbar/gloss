@@ -5,7 +5,7 @@
 
 export type JsonSchema = Record<string, unknown>
 
-export type Group = 'Document' | 'Annotation types' | 'Shared shapes'
+export type Group = 'Document' | 'Annotation types' | 'Shared shapes' | 'Enums'
 
 const SCHEMA_ID = 'https://gloss-format.org/schema/v1.json'
 const DOCUMENT_GROUP = new Set(['Document', 'Annotation', 'UnknownAnnotation'])
@@ -21,6 +21,8 @@ export function groupFor(defName: string, def: JsonSchema): Group {
   if (DOCUMENT_GROUP.has(defName)) return 'Document'
   const type = properties(def)['type']
   if (type && 'const' in type) return 'Annotation types'
+  // A set of values: a plain enum, or known values plus any other matching a pattern.
+  if (Array.isArray(def['enum']) || valueSet(def)) return 'Enums'
   return 'Shared shapes'
 }
 
@@ -89,7 +91,7 @@ export function renderDefinition(
     for (const [field, prop] of Object.entries(props)) {
       const cells = [
         code(field),
-        describeType(prop, slug),
+        typeCell(field, prop, slug),
         required.has(field) ? 'Yes' : 'No',
         'default' in prop ? code(JSON.stringify(prop['default'])) : '',
         typeof prop['x-xfdf'] === 'string' ? code(prop['x-xfdf']) : '—',
@@ -132,6 +134,17 @@ export function renderDefinition(
   return out.join('\n')
 }
 
+/**
+ * The Type cell. A `type` that excludes the defined types (UnknownAnnotation's) points at the
+ * Annotation union rather than listing every value.
+ */
+function typeCell(field: string, prop: JsonSchema, slug: string): string {
+  const not = prop['not'] as JsonSchema | undefined
+  if (field === 'type' && Array.isArray(not?.['enum']))
+    return `any string except a type Gloss defines (see ${link('Annotation', slug)})`
+  return describeType(prop, slug)
+}
+
 /** The definitions, other than `name` itself, whose schema refers to `name` anywhere. */
 function usedBy(name: string, defs: Record<string, JsonSchema>): string[] {
   const target = `#/$defs/${name}`
@@ -160,14 +173,9 @@ function describe(node: JsonSchema, fromSlug: string): Described {
 
   const alternatives = (node['anyOf'] ?? node['oneOf']) as JsonSchema[] | undefined
   if (Array.isArray(alternatives)) {
-    // A PDF name set: known values, plus any other value matching a pattern.
-    const [known, other] = alternatives
-    if (
-      alternatives.length === 2 &&
-      Array.isArray(known?.['enum']) &&
-      typeof other?.['pattern'] === 'string' &&
-      known['type'] === other['type']
-    ) {
+    const set = valueSet(node)
+    if (set) {
+      const [known, other] = set
       return {
         base: String(known['type']),
         constraints: [
@@ -221,6 +229,20 @@ function describe(node: JsonSchema, fromSlug: string): Described {
     constraints.push(`matches ${code(node['pattern'])}`)
 
   return { base, constraints }
+}
+
+/** Known values plus any other value matching a pattern, as the PDF name sets are written. */
+function valueSet(
+  node: JsonSchema
+): [JsonSchema, JsonSchema & { pattern: string }] | undefined {
+  const alternatives = node['anyOf']
+  if (!Array.isArray(alternatives) || alternatives.length !== 2) return undefined
+  const [known, other] = alternatives as JsonSchema[]
+  return Array.isArray(known?.['enum']) &&
+    typeof other?.['pattern'] === 'string' &&
+    known['type'] === other['type']
+    ? [known, other as JsonSchema & { pattern: string }]
+    : undefined
 }
 
 function range(node: JsonSchema): string[] {
