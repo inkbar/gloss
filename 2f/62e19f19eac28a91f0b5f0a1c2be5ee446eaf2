@@ -1,0 +1,80 @@
+site/astro.config.mjs
+  s_4b33a1ee6ce14b::t_d898bcbf51855e 27-30
+  s_4b33a1ee6ce14b::t_4b635a2520623d 1-2,12-13,25-26,73-74
+  s_4b33a1ee6ce14b::t_c6048808892896 89
+.gitignore
+  s_4b33a1ee6ce14b::t_4b635a2520623d 14-15
+site/package.json
+  s_4b33a1ee6ce14b::t_808a8a1e7a1f1e 21,24
+site/src/content/docs/index.mdx
+  s_4b33a1ee6ce14b::t_e9bba22e41948b 2-14,25
+site/src/content/docs/using-gloss.mdx
+  s_4b33a1ee6ce14b::t_e9bba22e41948b 3
+site/src/llms.test.ts
+  s_4b33a1ee6ce14b::t_68bfb1b60de464 1-6,11-30
+  s_4b33a1ee6ce14b::t_d898bcbf51855e 7-10
+site/src/reference/render.ts
+  s_4b33a1ee6ce14b::t_31c8542d611874 288,332,340,345
+  s_4b33a1ee6ce14b::t_df153f012c1643 61,65-73,312-325
+  s_4b33a1ee6ce14b::t_f7cf667ff6daf1 326
+.github/workflows/pages.yml
+  s_4b33a1ee6ce14b::t_d898bcbf51855e 61-62,64
+site/src/llms.ts
+  s_4b33a1ee6ce14b::t_d898bcbf51855e 34-36
+  s_4b33a1ee6ce14b::t_68bfb1b60de464 1-33,37-40
+site/src/reference/xfdf.test.ts
+  s_4b33a1ee6ce14b::t_143d60e9a2c8be 1-10,14-28,32-40
+  s_4b33a1ee6ce14b::t_d898bcbf51855e 11-13,29-31
+site/src/reference/xfdf.ts
+  s_4b33a1ee6ce14b::t_d898bcbf51855e 5-13,20-22,47-50,74-79,99-100,109-112,117-119
+  s_4b33a1ee6ce14b::t_31c8542d611874 1-4,14-19,23-40,42-46,51-73,80-98,101-108,113-116,120-122
+  s_4b33a1ee6ce14b::t_c736f157aec59d 41
+site/src/route-data.ts
+  s_4b33a1ee6ce14b::t_c6048808892896 4
+  s_4b33a1ee6ce14b::t_4c4ada1f52bfa3 1-3,5-9,12-17,22-25,28
+  s_4b33a1ee6ce14b::t_d898bcbf51855e 18-21,26-27
+  s_4b33a1ee6ce14b::t_5026eff1892a8c 10-11
+site/public/robots.txt
+  s_4b33a1ee6ce14b::t_4b635a2520623d 1-4
+site/src/og/card.ts
+  s_4b33a1ee6ce14b::t_40ab538a025eb9 17-18,98,140,146,148
+  s_4b33a1ee6ce14b::t_f965830cdfa8cb 136-137
+  s_4b33a1ee6ce14b::t_4c4ada1f52bfa3 1-11,13-16,19-34,50-69,95-97,99-109,118-121,129-135,138-139,141-145,147,149-152,157-158
+  s_4b33a1ee6ce14b::t_10ddb05476aa74 153
+  s_4b33a1ee6ce14b::t_c6048808892896 12
+  s_4b33a1ee6ce14b::t_d898bcbf51855e 35-49,70-94,110-117,122-128,154-156
+eslint.config.js
+  s_4b33a1ee6ce14b::t_7f0ee4c46cbc2a 17-18
+site/src/og/size.ts
+  s_4b33a1ee6ce14b::t_c6048808892896 1-2
+site/src/reference/render.test.ts
+  s_4b33a1ee6ce14b::t_b16665d72b9105 119-137
+  s_4b33a1ee6ce14b::t_d898bcbf51855e 110-112
+  s_4b33a1ee6ce14b::t_152c30b417c593 138
+site/src/reference/build.test.ts
+  s_4b33a1ee6ce14b::t_d898bcbf51855e 50,66-95
+  s_4b33a1ee6ce14b::t_1f6a2a11c68fea 15-16,19
+  s_4b33a1ee6ce14b::t_d6fa7a6718bc31 96
+site/src/pages/og/[...slug].png.ts
+  s_4b33a1ee6ce14b::t_10ddb05476aa74 6-7
+  s_4b33a1ee6ce14b::t_4c4ada1f52bfa3 1-5,8-14,21-30
+  s_4b33a1ee6ce14b::t_d898bcbf51855e 15-20
+pnpm-lock.yaml
+  s_4b33a1ee6ce14b::t_64838ee69368bb 254-256,263-265,1233-1312,1443-1447,1925-1928,1957-1959,2078-2091,2098-2100,2199-2202,2254-2256,2445-2447,2530-2532,2589-2592,2833-2835,3070-3072,3077-3079,3138-3140,3403-3406,3488-3490,3667-3669,5021-5071,5159-5163,5666-5667,5698-5699,5802-5809,5820-5825,5905-5906,5967-5968,6172-6173,6260-6261,6390-6391,6552-6556,6934-6935,6940-6944,7009-7010,7162-7176,7305-7306,7467-7471
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.7.5",
+  "base_commit_sha": "2f62e19f19eac28a91f0b5f0a1c2be5ee446eaf2",
+  "prompts": {},
+  "sessions": {
+    "s_4b33a1ee6ce14b": {
+      "agent_id": {
+        "tool": "claude",
+        "id": "6ce036f2-57fc-4d1c-a889-cdbd024c5a1e",
+        "model": "claude-opus-5-5"
+      },
+      "human_author": "Edward Coleridge Smith <edcoleridgesmith@gmail.com>"
+    }
+  }
+}
