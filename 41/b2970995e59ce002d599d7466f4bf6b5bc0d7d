@@ -1,0 +1,38 @@
+packages/gloss-format/src/schema.ts
+  s_4b33a1ee6ce14b::t_857af66617b80f 3,5-6,15,28-32
+packages/gloss-format/src/annotations.ts
+  s_4b33a1ee6ce14b::t_857af66617b80f 535-537
+packages/gloss-format/src/document.test.ts
+  s_4b33a1ee6ce14b::t_46eed30f7a2605 9-11,16-23,39-43,64-65,70-76
+  s_4b33a1ee6ce14b::t_90d3dc02cf2fcc 1-8,12-15,24-38,44-63,66-69,77-79
+packages/gloss-format/src/schema.test.ts
+  s_4b33a1ee6ce14b::t_e194f6d2bfc88f 309-310,312
+  s_4b33a1ee6ce14b::t_46eed30f7a2605 17-19,114-116,123-125,138,242-244,269-271,294-296,320-323
+  s_4b33a1ee6ce14b::t_90d3dc02cf2fcc 7-8,16,21-32,94,108-113,117-122,126-137,200,214-241,245-268,272-293,297-308,311,313-319,324-339
+  s_4b33a1ee6ce14b::t_2f0e081e225760 20,201-213
+packages/gloss-format/src/index.ts
+  s_4b33a1ee6ce14b::t_857af66617b80f 3
+packages/gloss-format/src/document.ts
+  s_4b33a1ee6ce14b::t_857af66617b80f 1-88,91-128
+  s_4b33a1ee6ce14b::t_46eed30f7a2605 89-90
+packages/gloss-format/src/shapes.ts
+  s_4b33a1ee6ce14b::t_857af66617b80f 207
+packages/gloss-format/schema.json
+  s_4b33a1ee6ce14b::t_857af66617b80f 11,13-14,16,18-19,21,23,25-33,36,38-40,42-58,60-61,63-80,82-83,117,202-267,300,417,534,651,728-730,732-740,742-745,779,857-958,960-963,965-968,971,973-977,979-996,1030,1155,1275,1411,1552,1683,1823,1938,2047-2048,2052,2166,2271-2439
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.7.5",
+  "base_commit_sha": "41b2970995e59ce002d599d7466f4bf6b5bc0d7d",
+  "prompts": {},
+  "sessions": {
+    "s_4b33a1ee6ce14b": {
+      "agent_id": {
+        "tool": "claude",
+        "id": "6ce036f2-57fc-4d1c-a889-cdbd024c5a1e",
+        "model": "claude-opus-5-5"
+      },
+      "human_author": "Edward Coleridge Smith <edcoleridgesmith@gmail.com>"
+    }
+  }
+}
