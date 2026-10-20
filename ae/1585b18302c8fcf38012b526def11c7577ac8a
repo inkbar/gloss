@@ -1,0 +1,78 @@
+site/src/llms.test.ts
+  s_4b33a1ee6ce14b::t_558c00b88985b7 22
+site/public/robots.txt
+  s_4b33a1ee6ce14b::t_558c00b88985b7 1,5-14
+  s_4b33a1ee6ce14b::t_427b456195cfab 15-16
+site/src/content/docs/using-gloss.mdx
+  s_4b33a1ee6ce14b::t_f6eb301f7e33ee 8-9,17-20
+site/src/pages/[...slug].md.ts
+  s_4b33a1ee6ce14b::t_31829fa64666c1 1-16
+site/src/components/Footer.astro
+  s_4b33a1ee6ce14b::t_0aaa342082a767 3-4,14,17,20-21,26-32
+  s_4b33a1ee6ce14b::t_74ef02ae1d3b73 15-16
+  s_4b33a1ee6ce14b::t_35fd25127b67e5 33
+.github/workflows/pages.yml
+  s_4b33a1ee6ce14b::t_558c00b88985b7 62,64
+site/src/answers.ts
+  s_4b33a1ee6ce14b::t_74ef02ae1d3b73 52-56
+  s_4b33a1ee6ce14b::t_968f2b1e293766 1-30,32-51,57-73
+  s_4b33a1ee6ce14b::t_44ea6e800cb2d4 31
+site/src/pages/llms-full.txt.ts
+  s_4b33a1ee6ce14b::t_31829fa64666c1 1-9
+site/src/components/ValidationSteps.astro
+  s_4b33a1ee6ce14b::t_74ef02ae1d3b73 18-20
+  s_4b33a1ee6ce14b::t_968f2b1e293766 1-17,21-22
+site/src/reference/build.test.ts
+  s_4b33a1ee6ce14b::t_74ef02ae1d3b73 97-137
+site/src/llms.ts
+  s_4b33a1ee6ce14b::t_558c00b88985b7 30
+site/src/answers.test.ts
+  s_4b33a1ee6ce14b::t_74ef02ae1d3b73 22-24
+  s_4b33a1ee6ce14b::t_968f2b1e293766 1-21,25-34
+site/src/markdown/export.test.ts
+  s_4b33a1ee6ce14b::t_0aaa342082a767 1-11,15-31,36-39,48-49,54-64
+  s_4b33a1ee6ce14b::t_74ef02ae1d3b73 12-14,32-35,50-53
+  s_4b33a1ee6ce14b::t_c222c93f1e6dd5 40-47
+site/src/markdown/pages.ts
+  s_4b33a1ee6ce14b::t_74ef02ae1d3b73 22-26
+  s_4b33a1ee6ce14b::t_31829fa64666c1 1-21,27-34
+site/src/markdown/export.ts
+  s_4b33a1ee6ce14b::t_c222c93f1e6dd5 53-61
+  s_4b33a1ee6ce14b::t_74ef02ae1d3b73 22-23,27-28,31-32,40-41,78-81
+  s_4b33a1ee6ce14b::t_0aaa342082a767 1-21,24-26,29-30,33-39,42-52,62-77,82-84
+site/src/components/Questions.astro
+  s_4b33a1ee6ce14b::t_74ef02ae1d3b73 23-28
+  s_4b33a1ee6ce14b::t_968f2b1e293766 1-22,29
+site/src/route-data.ts
+  s_4b33a1ee6ce14b::t_558c00b88985b7 1-2,4-5,7,26-30,33-54
+  s_4b33a1ee6ce14b::t_adf260d8ec8f1a 55
+site/src/content/docs/index.mdx
+  s_4b33a1ee6ce14b::t_f6eb301f7e33ee 14,18,22,26,30-33,41,74,122-125
+  s_4b33a1ee6ce14b::t_74ef02ae1d3b73 34-40
+site/src/reference/xfdf.test.ts
+  s_4b33a1ee6ce14b::t_44ea6e800cb2d4 21-22
+packages/gloss-format/src/schema.test.ts
+  s_4b33a1ee6ce14b::t_ad4952d1dab885 199
+packages/gloss-format/src/annotations.test.ts
+  s_4b33a1ee6ce14b::t_ad4952d1dab885 76
+site/src/reference/render.test.ts
+  s_4b33a1ee6ce14b::t_77b8367cdc6fd6 3,171-173
+packages/gloss-format/src/document.test.ts
+  s_4b33a1ee6ce14b::t_44ea6e800cb2d4 51-62
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.7.5",
+  "base_commit_sha": "ae1585b18302c8fcf38012b526def11c7577ac8a",
+  "prompts": {},
+  "sessions": {
+    "s_4b33a1ee6ce14b": {
+      "agent_id": {
+        "tool": "claude",
+        "id": "6ce036f2-57fc-4d1c-a889-cdbd024c5a1e",
+        "model": "claude-opus-5-5"
+      },
+      "human_author": "Edward Coleridge Smith <edcoleridgesmith@gmail.com>"
+    }
+  }
+}
