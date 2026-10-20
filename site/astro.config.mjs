@@ -16,6 +16,9 @@ const base = process.env.SITE_BASE ?? '/'
 export default defineConfig({
   site: 'https://gloss-format.org',
   base,
+  // Pages runs Jekyll over the gh-pages branch, which drops directories that start with an
+  // underscore, so the CSS and JS go in assets/ rather than Astro's default _astro/.
+  build: { assets: 'assets' },
   markdown: { processor: satteri({ hastPlugins: [baseLinks(base)] }) },
   integrations: [
     starlight({

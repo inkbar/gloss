@@ -48,11 +48,6 @@ jobs:
         env:
           SITE_BASE: ${{ github.event_name == 'pull_request' && format('/pr-preview/pr-{0}/', github.event.number) || '/' }}
 
-      # Only the site root needs this. The deploy actions never delete .nojekyll, so in a
-      # preview it would outlive the preview's removal. Without it, Pages drops the _astro/
-      # directory.
-      - if: github.event_name != 'pull_request'
-        run: touch site/dist/.nojekyll
       - if: github.event_name != 'pull_request'
         uses: JamesIves/github-pages-deploy-action@v4
         with:
