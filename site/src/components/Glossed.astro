@@ -1,7 +1,7 @@
 ---
 // A sample with its explanation in the margin, line for line, the way a gloss sits beside the
-// text it explains. In a narrow column the notes move below the code, each naming its line. Keep
-// notes short: in the margin they stay on one line.
+// text it explains. In a narrow column, or beside a line too long to share it, the notes move
+// below the code, each naming its line. Keep notes short: in the margin they stay on one line.
 interface Props {
   code: string
   // Keyed by line number, counting from 1.
@@ -11,6 +11,9 @@ interface Props {
 
 const { code, notes, title } = Astro.props
 const lines = code.replace(/\n$/, '').split('\n')
+// Past this many characters a line can't share the docs column with its notes, so the notes go
+// below the code. 44 characters of code beside a 15rem note fit the 44rem breakpoint below.
+const stacked = Math.max(...lines.map((line) => line.length)) > 44
 const entries = Object.entries(notes)
   .map(([line, text]) => ({ line: Number(line), text }))
   .sort((a, b) => a.line - b.line)
@@ -22,7 +25,10 @@ for (const { line } of entries) {
 }
 ---
 
-<figure class="glossed not-content" style={`--lines: ${lines.length}`}>
+<figure
+  class:list={['glossed', 'not-content', { stacked }]}
+  style={`--lines: ${lines.length}`}
+>
   {title && <figcaption>{title}</figcaption>}
   <div class="body">
     <pre><code>{lines.join('\n')}</code></pre>
@@ -52,15 +58,7 @@ for (const { line } of entries) {
     color: var(--sl-color-gray-3);
     border-bottom: 1px solid var(--sl-color-gray-5);
   }
-  .body {
-    display: grid;
-    grid-template-columns: minmax(0, 1fr) max-content;
-    /* A padding row above and below, so the code's padding keeps the notes on their lines. */
-    grid-template-rows: 1.25rem repeat(var(--lines), var(--line)) 1.25rem;
-  }
   pre {
-    grid-column: 1;
-    grid-row: 1 / -1;
     margin: 0;
     padding: 1.25rem;
     overflow-x: auto;
@@ -70,62 +68,61 @@ for (const { line } of entries) {
     line-height: var(--line);
     color: var(--sl-color-white);
   }
+
+  /* Stacked: the notes sit below the code, each naming its line. */
   .notes {
-    display: contents;
+    margin: 0;
+    padding: 0.75rem 0 1rem;
   }
   li {
-    grid-column: 2;
     list-style: none;
     margin: 0;
-    padding: 0 1.25rem;
+    padding: 0.15rem 1.25rem;
     font-family: var(--gloss-font-note);
     font-style: italic;
     font-size: 0.95rem;
-    line-height: var(--line);
+    line-height: 1.5;
     color: var(--sl-color-accent);
-    white-space: nowrap;
-  }
-  li .text::before {
-    content: '— ';
   }
   .ref {
-    position: absolute;
-    width: 1px;
-    height: 1px;
-    overflow: hidden;
-    clip-path: inset(50%);
-    white-space: nowrap;
+    margin-right: 0.5rem;
+    font-family: var(--sl-font-mono);
+    font-style: normal;
+    font-size: var(--sl-text-xs);
+    color: var(--sl-color-gray-3);
   }
 
-  @container (max-width: 36rem) {
-    .body {
-      display: block;
+  /* In the margin: each note on the row of the line it explains. */
+  @container (min-width: 44rem) {
+    .glossed:not(.stacked) .body {
+      display: grid;
+      grid-template-columns: minmax(0, 1fr) max-content;
+      /* A padding row above and below, so the code's padding keeps the notes on their lines. */
+      grid-template-rows: 1.25rem repeat(var(--lines), var(--line)) 1.25rem;
     }
-    .notes {
-      display: block;
-      margin: 0;
-      padding: 0.75rem 0 1rem;
-      list-style: none;
+    .glossed:not(.stacked) pre {
+      grid-column: 1;
+      grid-row: 1 / -1;
     }
-    li {
-      padding: 0.15rem 1.25rem;
-      line-height: 1.5;
-      white-space: normal;
+    .glossed:not(.stacked) .notes {
+      display: contents;
     }
-    .ref {
-      position: static;
-      width: auto;
-      height: auto;
-      overflow: visible;
-      clip-path: none;
-      margin-right: 0.5rem;
-      font-family: var(--sl-font-mono);
-      font-style: normal;
-      font-size: var(--sl-text-xs);
-      color: var(--sl-color-gray-3);
+    .glossed:not(.stacked) li {
+      grid-column: 2;
+      padding: 0 1.25rem;
+      line-height: var(--line);
+      white-space: nowrap;
     }
-    li .text::before {
-      content: '';
+    .glossed:not(.stacked) li .text::before {
+      content: '— ';
+    }
+    .glossed:not(.stacked) .ref {
+      position: absolute;
+      width: 1px;
+      height: 1px;
+      overflow: hidden;
+      clip-path: inset(50%);
+      white-space: nowrap;
     }
   }
 </style>
