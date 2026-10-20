@@ -1,0 +1,111 @@
+site/src/reference/render.ts
+  s_4b33a1ee6ce14b::t_2b5f39fb1eeb29 203-205
+  s_4b33a1ee6ce14b::t_4abcf31300cab8 276
+  s_4b33a1ee6ce14b::t_2d4817527c48fc 46,81-83,89,111-113,161,212-213,215-216,226-227,251-253
+  s_4b33a1ee6ce14b::t_c3c10610f1002b 1-7,9-23,26-45,47-61,64-80,84-88,90-93,95-110,114-136,148-160,162-175,179-202,206-211,214,217-225,228-233,248-250,254-275,277-312
+  s_4b33a1ee6ce14b::t_ebbde2d434d5fe 62-63
+  s_4b33a1ee6ce14b::t_1b31ba5d2c6dad 8,24-25,94,137-147,176-178,234,238-246
+  s_4b33a1ee6ce14b::t_7ebc0e2a7574df 235-237
+  s_4b33a1ee6ce14b::t_de6a0aaf3b9654 247
+site/src/reference/render.test.ts
+  s_4b33a1ee6ce14b::t_0e6c897c53ec6b 79-80
+  s_4b33a1ee6ce14b::t_ebbde2d434d5fe 88
+  s_4b33a1ee6ce14b::t_9d0234c92da825 1-4,12-40,42-44,55-63,67-69,76-78,81-84,86-87,92-102,104-106,114,116-119,121-125,131-134,138-139
+  s_4b33a1ee6ce14b::t_2d4817527c48fc 5-11,64-66,71-72,74-75,89-91,126-130,135-137
+  s_4b33a1ee6ce14b::t_4abcf31300cab8 41,45-47,70,73,85,103,115,120
+  s_4b33a1ee6ce14b::t_7dfa19749d95b3 48-54,107-111
+  s_4b33a1ee6ce14b::t_30428e88ec98e3 112-113
+site/src/reference/generate.ts
+  s_4b33a1ee6ce14b::t_2d4817527c48fc 3-9,35-36
+  s_4b33a1ee6ce14b::t_7c9ca9ad99fb0a 1-2,10-15,17-34,37-44
+  s_4b33a1ee6ce14b::t_1b31ba5d2c6dad 16
+site/src/reference/build.test.ts
+  s_4b33a1ee6ce14b::t_006cd9d358b6d5 1-31,35,40-45,64-67
+  s_4b33a1ee6ce14b::t_2d4817527c48fc 32-34,38-39
+  s_4b33a1ee6ce14b::t_4abcf31300cab8 36-37
+  s_4b33a1ee6ce14b::t_7064e034a81311 46-51,53-63
+  s_4b33a1ee6ce14b::t_446ecea2aeba23 52
+site/astro.config.mjs
+  s_4b33a1ee6ce14b::t_2d4817527c48fc 17-20,51-54
+  s_4b33a1ee6ce14b::t_a3a4c0f28fb0ab 6-7,9,16,45-49,55
+  s_4b33a1ee6ce14b::t_ac3e8f1bf7fda8 21
+  s_4b33a1ee6ce14b::t_f628707a2545a0 50
+site/src/components/Footer.astro
+  s_4b33a1ee6ce14b::t_2d4817527c48fc 8-10
+.prettierrc.mjs
+  s_4b33a1ee6ce14b::t_2d4817527c48fc 3,6-10
+  s_4b33a1ee6ce14b::t_a3a4c0f28fb0ab 1-2,4-5,11
+package.json
+  s_4b33a1ee6ce14b::t_2d4817527c48fc 38
+  s_4b33a1ee6ce14b::t_a3a4c0f28fb0ab 23
+.gitignore
+  s_4b33a1ee6ce14b::t_a3a4c0f28fb0ab 12-13
+pnpm-lock.yaml
+  s_4b33a1ee6ce14b::t_e7c3b070d6389d 180,199-201,204,260,283-288,295-300,307-312,319-325,333-339,347-353,361-367,375-379,385-390,397-402,409-412,417-420,1203-1205,2991-2996,3234-3240,3333-3335,3921,3923,3933-3935,3939-3941,3945-3947,3951-3953,3957-3959,3963-3965,3969-3971,3975-3982,3990-3992,3996-3998,4002-4017,4031-4037,4064,4085,4402,4405,4837-4838,6747,6749-6750,6752-6761,6763,6766-6767,6880-6885,7027-7030
+site/src/reference/generate.test.ts
+  s_4b33a1ee6ce14b::t_7ebc0e2a7574df 37-46
+  s_4b33a1ee6ce14b::t_7dfa19749d95b3 1-36,47-48
+site/src/content/docs/using-gloss.mdx
+  s_4b33a1ee6ce14b::t_3e88fe737b10b7 1,3-7,9-12,14-16,18,20-24,26-30,32-34,36-56
+  s_4b33a1ee6ce14b::t_b8ee234c2887a2 13,19,25,31,35,57
+  s_4b33a1ee6ce14b::t_1246eef93c2364 2,8,17
+site/src/samples/minimal.gloss.json
+  s_4b33a1ee6ce14b::t_3d224e6ce3b2d4 1-20
+site/src/samples/samples.test.ts
+  s_4b33a1ee6ce14b::t_bba701309eb32f 1-4,6-7,9-45,48-58,62-64,67-69,90-130,143-144
+  s_4b33a1ee6ce14b::t_3d224e6ce3b2d4 59-61
+  s_4b33a1ee6ce14b::t_434632a6bcd3f4 65-66
+  s_4b33a1ee6ce14b::t_7064e034a81311 70-89
+  s_4b33a1ee6ce14b::t_dc3c09b029e03c 5,8,46-47,131-142
+site/src/samples/validate-zod.ts
+  s_4b33a1ee6ce14b::t_3d224e6ce3b2d4 1-23
+site/src/samples/reviewed-redaction.schema.json
+  s_4b33a1ee6ce14b::t_3d224e6ce3b2d4 1-11
+site/src/samples/openapi.json
+  s_4b33a1ee6ce14b::t_3d224e6ce3b2d4 1-29
+site/src/content/docs/index.mdx
+  s_4b33a1ee6ce14b::t_2b630ca03adbfe 14
+  s_4b33a1ee6ce14b::t_b8ee234c2887a2 36,44,46
+  s_4b33a1ee6ce14b::t_1b69ef8dd91a34 6-9,11-13,15-35,37-43,45,47,49-79
+  s_4b33a1ee6ce14b::t_1246eef93c2364 10,48
+site/src/samples/validate-ajv.ts
+  s_4b33a1ee6ce14b::t_3d224e6ce3b2d4 1-2,4-30
+  s_4b33a1ee6ce14b::t_272df67399cc7c 3
+packages/gloss-format/README.md
+  s_4b33a1ee6ce14b::t_dc3c09b029e03c 36
+.github/workflows/test.yml
+  s_4b33a1ee6ce14b::t_7e53fe8195f02d 27-28
+packages/gloss-format/src/schema.test.ts
+  s_4b33a1ee6ce14b::t_2be4064c407cb5 280-305
+packages/gloss-format/src/annotations.ts
+  s_4b33a1ee6ce14b::t_b5f5a0203b621d 153,167,207,248,262,278,292,305,319,335,350,366,384,398,529,563
+  s_4b33a1ee6ce14b::t_b316338d7579c9 118
+  s_4b33a1ee6ce14b::t_0dfbc00de6a0f8 528,562
+  s_4b33a1ee6ce14b::t_5a5157a6895ac8 127,131,135,139,416,456,476,499,513,541,576,606,638,653
+packages/gloss-format/src/document.ts
+  s_4b33a1ee6ce14b::t_a8d2a5c1b67d7b 24,54,68-69,80-84
+  s_4b33a1ee6ce14b::t_d431bc23615ad8 74
+  s_4b33a1ee6ce14b::t_9554d1be3a020a 79,133
+packages/gloss-format/schema.json
+  s_4b33a1ee6ce14b::t_b5f5a0203b621d 180,363,480,597,713,879,1108,1228,1363,1501,1632,1770,1891,2007,2120,2249,2337-2338,2344-2345,2351
+packages/gloss-format/src/document.test.ts
+  s_4b33a1ee6ce14b::t_2be4064c407cb5 1,3-7,63-88,110-148
+packages/gloss-format/src/shapes.ts
+  s_4b33a1ee6ce14b::t_b5a1c2e96cafa4 83,100,117,128,153,161,171,181,191,272
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.7.5",
+  "base_commit_sha": "5379bf443a2d2698fedecea3d036cd9e0694d306",
+  "prompts": {},
+  "sessions": {
+    "s_4b33a1ee6ce14b": {
+      "agent_id": {
+        "tool": "claude",
+        "id": "6ce036f2-57fc-4d1c-a889-cdbd024c5a1e",
+        "model": "claude-opus-5-5"
+      },
+      "human_author": "Edward Coleridge Smith <edcoleridgesmith@gmail.com>"
+    }
+  }
+}
