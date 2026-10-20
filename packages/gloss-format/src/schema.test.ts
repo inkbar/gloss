@@ -1,7 +1,9 @@
 import { readFileSync } from 'node:fs'
 
+import { Ajv2020 } from 'ajv/dist/2020'
 import { describe, expect, it } from 'vitest'
 
+import { ANNOTATION_TYPES } from './annotations'
 import { buildSchema } from './schema'
 
 const schema = JSON.parse(
@@ -25,7 +27,7 @@ describe('schema.json', () => {
     expect(schema).toEqual(buildSchema())
   })
 
-  it('names every shared shape', () => {
+  it('names every shared shape and annotation type', () => {
     expect(Object.keys(defs)).toEqual(
       expect.arrayContaining([
         'Point',
@@ -38,8 +40,65 @@ describe('schema.json', () => {
         'NoteIcon',
         'Intent',
         'Common',
+        'Highlight',
+        'Underline',
+        'Strikeout',
+        'Squiggly',
+        'Note',
+        'FreeTextStyle',
+        'FreeText',
+        'Square',
+        'Circle',
+        'Line',
+        'Polyline',
+        'Polygon',
+        'Ink',
+        'Stamp',
+        'Loupe',
+        'Mask',
+        'Suggestion',
+        'Redact',
       ])
     )
+  })
+
+  it('marks defaults optional', () => {
+    const note = defs.Note as {
+      required: string[]
+      properties: Record<string, Record<string, unknown>>
+    }
+    expect(note.required).not.toContain('icon')
+    expect(note.properties.icon?.default).toBe('Note')
+    expect(note.properties.icon?.$ref).toBe('#/$defs/NoteIcon')
+  })
+
+  it('every type has an example that validates', () => {
+    const ajv = new Ajv2020({ strict: true, validateFormats: false })
+    ajv.addKeyword('x-xfdf')
+    ajv.addSchema(schema)
+    const types = Object.entries(defs).filter(([, def]) => {
+      const type = (def.properties as Record<string, Record<string, unknown>> | undefined)
+        ?.type
+      return typeof type?.const === 'string'
+    })
+    expect(
+      types.map(
+        ([, def]) =>
+          (def.properties as Record<string, Record<string, unknown>>).type?.const
+      )
+    ).toEqual(expect.arrayContaining([...ANNOTATION_TYPES]))
+    expect(types).toHaveLength(ANNOTATION_TYPES.length)
+    for (const [name, def] of types) {
+      const validate = ajv.getSchema(`${String(schema.$id)}#/$defs/${name}`)
+      expect(validate, name).toBeDefined()
+      const examples = def.examples as unknown[] | undefined
+      expect(examples?.length, name).toBeGreaterThan(0)
+      for (const example of examples ?? []) {
+        expect(validate?.(example), `${name}: ${JSON.stringify(validate?.errors)}`).toBe(
+          true
+        )
+      }
+    }
   })
 
   it('never closes an object', () => {

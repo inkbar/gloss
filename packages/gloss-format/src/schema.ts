@@ -1,5 +1,6 @@
 import { z } from 'zod'
 
+import './annotations'
 import { GLOSS_SCHEMA_ID } from './constants'
 import { define, field, gloss, registeredDefinitions } from './registry'
 import { Common, Dashes, Fringe, LineEnding, NoteIcon, Quad } from './shapes'

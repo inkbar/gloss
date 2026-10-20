@@ -150,7 +150,7 @@ export type Fringe = z.infer<typeof Fringe>
 export const Dashes = define('Dashes', z.array(z.number().nonnegative()).min(1), {
   title: 'Dashes',
   description:
-    'A dash pattern in points: lengths on, then off, repeating. Absent means a solid line (XFDF dashes, PDF /D).',
+    'A dash pattern in points: lengths on, then off, repeating (XFDF dashes, PDF /D).',
 })
 export type Dashes = z.infer<typeof Dashes>
 
@@ -198,46 +198,49 @@ export const commonFields = {
     'x-xfdf': 'rect',
   }),
   color: field(Color, {
-    description: "The annotation's colour.",
+    description: "The annotation's colour. Absent: the reader chooses the colour.",
     'x-xfdf': 'color',
   }).optional(),
   opacity: field(z.number().min(0).max(1), {
-    description: 'Opacity, from 0 (invisible) to 1 (opaque).',
+    description: 'Opacity, from 0 (invisible) to 1 (opaque). Absent means opaque.',
     'x-xfdf': 'opacity',
   }).optional(),
   author: field(z.string(), {
-    description: 'Who made the annotation.',
+    description: 'Who made the annotation. Absent means unknown.',
     'x-xfdf': 'title',
   }).optional(),
   contents: field(z.string(), {
-    description: "The annotation's text, such as a comment or a note.",
+    description:
+      "The annotation's text, such as a comment or a note. Absent means no text.",
     'x-xfdf': 'contents',
   }).optional(),
   inReplyTo: field(z.string(), {
-    description: 'The id of the annotation this one replies to. Replies form threads.',
+    description:
+      'The id of the annotation this one replies to. Replies form threads. Absent means the annotation is not a reply.',
     'x-xfdf': 'inreplyto',
   }).optional(),
   createdAt: field(dateTime, {
     description:
-      'When the annotation was made, as an ISO 8601 date-time with an offset. XFDF writes a PDF date string (D:20261019120000Z).',
+      'When the annotation was made, as an ISO 8601 date-time with an offset. XFDF writes a PDF date string (D:20261019120000Z). Absent means unknown.',
     'x-xfdf': 'creationdate',
   }).optional(),
   modifiedAt: field(dateTime, {
     description:
-      'When the annotation last changed, as an ISO 8601 date-time with an offset. XFDF writes a PDF date string.',
+      'When the annotation last changed, as an ISO 8601 date-time with an offset. XFDF writes a PDF date string. Absent means unknown.',
     'x-xfdf': 'date',
   }).optional(),
   subject: field(z.string(), {
-    description: 'A short label for what the mark is.',
+    description: 'A short label for what the mark is. Absent means no label.',
     'x-xfdf': 'subject',
   }).optional(),
   intent: field(Intent, {
-    description: 'What the mark is for, such as a callout or an arrow.',
+    description:
+      "What the mark is for, such as a callout or an arrow. Absent means the type's plain form.",
     'x-xfdf': 'intent',
   }).optional(),
   custom: field(z.record(z.string(), z.unknown()), {
     description:
-      'Data of your own. Gloss readers keep it as it is and never interpret it.',
+      'Data of your own. Gloss readers keep it as it is and never interpret it. Absent means none.',
   }).optional(),
 }
 
