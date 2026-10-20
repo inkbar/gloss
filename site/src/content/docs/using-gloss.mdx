@@ -5,12 +5,18 @@ description: Build your API schemas on Gloss. Refer to Gloss definitions by URL,
 
 import { Code } from '@astrojs/starlight/components'
 
+import ValidationSteps from '../../components/ValidationSteps.astro'
+
 import consumer from '../../samples/reviewed-redaction.schema.json?raw'
 import openapi from '../../samples/openapi.json?raw'
 import validateAjv from '../../samples/validate-ajv.ts?raw'
 import validateZod from '../../samples/validate-zod.ts?raw'
 
 Gloss defines what annotation data means and leaves each system to decide what it accepts. You set that in your own schemas, which can point at Gloss definitions instead of copying them.
+
+## Validate a document
+
+<ValidationSteps />
 
 ## Refer to a definition by URL
 
