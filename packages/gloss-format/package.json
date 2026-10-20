@@ -5,7 +5,11 @@
   "keywords": [
     "pdf",
     "annotations",
+    "pdf-annotations",
+    "xfdf",
+    "redaction",
     "json-schema",
+    "typescript",
     "zod",
     "gloss"
   ],
