@@ -3,3 +3,4 @@ pnpm-lock.yaml
 CHANGELOG.md
 site/src/content/docs/reference/
 site/public/schema/
+.release-please-manifest.json
