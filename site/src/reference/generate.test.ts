@@ -45,4 +45,10 @@ describe('generateReference', () => {
       slug: 'reference/highlight',
     })
   })
+
+  it('needs the schema to have an $id', () => {
+    dir = mkdtempSync(join(tmpdir(), 'gloss-reference-'))
+    const { $id: _id, ...noId } = schema
+    expect(() => generateReference(noId, pathToFileURL(`${dir}/`))).toThrow('$id')
+  })
 })

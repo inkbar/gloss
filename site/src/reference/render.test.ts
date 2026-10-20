@@ -11,9 +11,11 @@ import {
 } from './render.ts'
 
 const schema = createRequire(import.meta.url)('gloss-format/schema.json') as {
+  $id: string
   $defs: Record<string, JsonSchema>
 }
 const defs = schema.$defs
+const schemaId = schema.$id
 
 /** The cells of the table row for `field`, without the leading and trailing pipes. */
 function row(page: string, field: string): string[] {
@@ -75,6 +77,13 @@ describe('describeType', () => {
     )
   })
 
+  it('spells out what a date-time must look like', () => {
+    const props = defs['Common']['properties'] as Record<string, JsonSchema>
+    expect(describeType(props['createdAt'], 'common')).toBe(
+      'string; format `date-time` (RFC 3339 with seconds and an offset, e.g. `2026-10-20T09:30:00Z`)'
+    )
+  })
+
   it('leaves out the safe-integer bound zod adds', () => {
     const props = defs['Highlight']['properties'] as Record<string, JsonSchema>
     expect(describeType(props['page'], 'highlight')).toBe('integer; ≥ 0')
@@ -82,7 +91,14 @@ describe('describeType', () => {
 })
 
 describe('renderDefinition', () => {
-  const note = renderDefinition('Note', defs['Note'])
+  const note = renderDefinition('Note', defs['Note'], { schemaId })
+
+  it('takes the $ref URL from the schema it is given', () => {
+    const page = renderDefinition('Note', defs['Note'], {
+      schemaId: 'https://example.test/v9.json',
+    })
+    expect(page).toContain('"$ref": "https://example.test/v9.json#/$defs/Note"')
+  })
 
   it('renders the frontmatter, the $ref and the XFDF element', () => {
     expect(note).toMatch(/^---\ntitle: Note\ndescription: ".+"\neditUrl: false\n---\n/)
@@ -100,24 +116,26 @@ describe('renderDefinition', () => {
   })
 
   it('escapes pipes in table cells', () => {
-    const stamp = renderDefinition('Stamp', defs['Stamp'])
+    const stamp = renderDefinition('Stamp', defs['Stamp'], { schemaId })
     expect(row(stamp, 'imagedata')[1]).toContain('`^data:image\\/(png\\|jpeg);base64,`')
   })
 
   it('describes an unknown type by pointing at Annotation', () => {
-    const page = renderDefinition('UnknownAnnotation', defs['UnknownAnnotation'])
+    const page = renderDefinition('UnknownAnnotation', defs['UnknownAnnotation'], {
+      schemaId,
+    })
     expect(row(page, 'type')[1]).toBe(
       'any string except a type Gloss defines (see [Annotation](../annotation/))'
     )
   })
 
   it("lists the Annotation union's types", () => {
-    const page = renderDefinition('Annotation', defs['Annotation'])
+    const page = renderDefinition('Annotation', defs['Annotation'], { schemaId })
     expect(page.match(/^- \[\w+\]\(\.\.\/[\w-]+\/\)/gm)).toHaveLength(16)
   })
 
   it('lists the definitions that use it', () => {
-    const page = renderDefinition('Rect', defs['Rect'], defs)
+    const page = renderDefinition('Rect', defs['Rect'], { schemaId, defs })
     expect(page).toContain('## Used by')
     expect(page).toContain('- [Redact](../redact/)')
   })
@@ -128,11 +146,13 @@ describe('renderDefinition', () => {
       type: 'object',
       properties: { x: { type: 'number' } },
     }
-    expect(() => renderDefinition('Thing', def)).toThrow('Thing.x has no description')
+    expect(() => renderDefinition('Thing', def, { schemaId })).toThrow(
+      'Thing.x has no description'
+    )
   })
 
   it('throws when a definition has no description', () => {
-    expect(() => renderDefinition('Thing', { type: 'object' })).toThrow(
+    expect(() => renderDefinition('Thing', { type: 'object' }, { schemaId })).toThrow(
       'Thing has no description'
     )
   })

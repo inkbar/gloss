@@ -7,7 +7,6 @@ export type JsonSchema = Record<string, unknown>
 
 export type Group = 'Document' | 'Annotation types' | 'Shared shapes' | 'Enums'
 
-const SCHEMA_ID = 'https://gloss-format.org/schema/v1.json'
 const DOCUMENT_GROUP = new Set(['Document', 'Annotation', 'UnknownAnnotation'])
 /** zod's `int()` bounds every integer by the safe-integer range. It isn't a real constraint. */
 const SAFE_INTEGER_BOUNDS = new Set([Number.MAX_SAFE_INTEGER, Number.MIN_SAFE_INTEGER])
@@ -36,14 +35,18 @@ export function describeType(node: JsonSchema, fromSlug: string): string {
   return [base, ...constraints].join('; ')
 }
 
-/**
- * The page for one definition, frontmatter included. `defs` is every definition in the schema;
- * with it the page lists which definitions use this one.
- */
+export interface RenderContext {
+  /** The schema's `$id`, which the page's `$ref` example starts with. */
+  schemaId: string
+  /** Every definition in the schema. With it, the page lists which definitions use this one. */
+  defs?: Record<string, JsonSchema>
+}
+
+/** The page for one definition, frontmatter included. */
 export function renderDefinition(
   name: string,
   def: JsonSchema,
-  defs: Record<string, JsonSchema> = {}
+  { schemaId, defs = {} }: RenderContext
 ): string {
   const description = def['description']
   if (typeof description !== 'string' || !description.trim())
@@ -68,7 +71,7 @@ export function renderDefinition(
     '## Use it',
     '',
     '```json',
-    JSON.stringify({ $ref: `${SCHEMA_ID}#/$defs/${name}` }, null, 2),
+    JSON.stringify({ $ref: `${schemaId}#/$defs/${name}` }, null, 2),
     '```',
     '',
   ]
@@ -222,8 +225,13 @@ function describe(node: JsonSchema, fromSlug: string): Described {
   if (typeof node['maxLength'] === 'number')
     constraints.push(`at most ${plural(node['maxLength'], 'character')}`)
 
-  // zod writes a format's own check as a pattern too. The format says it more readably.
-  if (typeof node['format'] === 'string')
+  // zod writes a format's own check as a pattern too. The format says it more readably, and a
+  // validator that skips formats still checks the pattern.
+  if (node['format'] === 'date-time')
+    constraints.push(
+      `format ${code('date-time')} (RFC 3339 with seconds and an offset, e.g. ${code('2026-10-20T09:30:00Z')})`
+    )
+  else if (typeof node['format'] === 'string')
     constraints.push(`format ${code(node['format'])}`)
   else if (typeof node['pattern'] === 'string')
     constraints.push(`matches ${code(node['pattern'])}`)
