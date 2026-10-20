@@ -7,8 +7,6 @@ import {
   Highlight,
   Ink,
   Line,
-  Loupe,
-  Mask,
   Note,
   Polygon,
   Polyline,
@@ -55,8 +53,6 @@ const minStamp = {
   ...base('stamp', 'st1'),
   imagedata: 'data:image/png;base64,iVBORw0KGgo=',
 }
-const minLoupe = base('loupe', 'lo1')
-const minMask = { ...base('mask', 'm1'), shape: 'ellipse' }
 const minRedact = base('redact', 'r1')
 
 const table: [z.ZodType, Record<string, unknown>][] = [
@@ -73,13 +69,11 @@ const table: [z.ZodType, Record<string, unknown>][] = [
   [Polygon, minPolygon],
   [Ink, minInk],
   [Stamp, minStamp],
-  [Loupe, minLoupe],
-  [Mask, minMask],
   [Redact, minRedact],
 ]
 
 describe('annotation types', () => {
-  it('lists the sixteen types in order', () => {
+  it('lists the fourteen types in order', () => {
     expect(ANNOTATION_TYPES).toEqual([
       'highlight',
       'underline',
@@ -94,8 +88,6 @@ describe('annotation types', () => {
       'polygon',
       'ink',
       'stamp',
-      'loupe',
-      'mask',
       'redact',
     ])
     expect(table.map(([, min]) => min.type)).toEqual(ANNOTATION_TYPES)
@@ -136,12 +128,10 @@ describe('annotation types', () => {
     expect(
       Stamp.safeParse({ ...minStamp, imagedata: 'data:image/gif;base64,R0' }).success
     ).toBe(false)
-    expect(Mask.safeParse({ ...minMask, shape: 'star' }).success).toBe(false)
     expect(
       Redact.safeParse({ ...minRedact, suggestion: { confidence: 1.5 } }).success
     ).toBe(false)
     expect(Redact.safeParse({ ...minRedact, suggestion: {} }).success).toBe(false)
-    expect(Loupe.safeParse({ ...minLoupe, magnification: 1 }).success).toBe(false)
   })
 
   it('fills documented defaults', () => {
@@ -155,8 +145,6 @@ describe('annotation types', () => {
       fontSize: 12,
       textAlign: 'left',
     })
-    expect(Loupe.parse(minLoupe)).toMatchObject({ magnification: 2, width: 2 })
-    expect(Mask.parse(minMask).dim).toBe(0.5)
   })
 
   it('passes unknown fields through', () => {

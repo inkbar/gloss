@@ -48,6 +48,18 @@ describe('GlossDocument', () => {
     expect(parsed.annotations[0]).toEqual(item)
   })
 
+  it('still accepts a loupe or a mask, which v1.0.0 defined, as unknown types', () => {
+    const loupe = { type: 'loupe', id: 'l1', page: 0, magnification: 3 }
+    const mask = { type: 'mask', id: 'm1', page: 0, shape: 'ellipse' }
+    expect(isAnnotation(loupe)).toBe(false)
+    const parsed = GlossDocument.parse({
+      format: 'gloss',
+      version: 1,
+      annotations: [loupe, mask],
+    })
+    expect(parsed.annotations).toEqual([loupe, mask])
+  })
+
   it('rejects an unknown type without id or page', () => {
     expect(UnknownAnnotation.safeParse({ type: 'sticker', page: 0 }).success).toBe(false)
     expect(UnknownAnnotation.safeParse({ type: 'sticker', id: 'a' }).success).toBe(false)
