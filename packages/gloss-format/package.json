@@ -2,6 +2,13 @@
   "name": "gloss-format",
   "version": "0.0.0",
   "description": "Gloss: a JSON format for PDF annotations. JSON Schema, types and constants.",
+  "keywords": [
+    "pdf",
+    "annotations",
+    "json-schema",
+    "zod",
+    "gloss"
+  ],
   "license": "MIT",
   "homepage": "https://gloss-format.org",
   "repository": {
