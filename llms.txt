@@ -1,0 +1,52 @@
+# Gloss
+
+> An open JSON format for PDF annotations. A Gloss document lists the highlights, notes, shapes and redactions on one PDF, each with its page and position. Send it as `application/vnd.gloss.annotations+json` and validate it against the JSON Schema at https://gloss-format.org/schema/v1.json. The `gloss-format` npm package ships the schema, zod schemas and TypeScript types.
+
+## Docs
+
+- [Introduction](https://gloss-format.org/): the format, its coordinates, versioning and where to get the schema.
+- [Using Gloss in your schemas](https://gloss-format.org/using-gloss/): refer to Gloss definitions by URL and require the fields your system needs.
+- [Gloss and XFDF](https://gloss-format.org/xfdf/): the Gloss type for each XFDF element and the Gloss field for each XFDF attribute.
+- [JSON Schema](https://gloss-format.org/schema/v1.json): every definition, as JSON Schema 2020-12.
+- [Full text](https://gloss-format.org/llms-full.txt): every page as Markdown in one file. Each page also has its own copy: add `.md` to its path, as in https://gloss-format.org/using-gloss.md.
+
+## Reference: Document
+
+- [Document](https://gloss-format.org/reference/document/): A Gloss document: the annotations on one PDF.
+- [Annotation](https://gloss-format.org/reference/annotation/): Any annotation type Gloss defines, chosen by its type field.
+- [UnknownAnnotation](https://gloss-format.org/reference/unknown-annotation/): An annotation of a type this version of Gloss does not define, such as one from a newer writer or a host's own.
+
+## Reference: Annotation types
+
+- [Highlight](https://gloss-format.org/reference/highlight/): A highlight over a run of text.
+- [Underline](https://gloss-format.org/reference/underline/): A line under a run of text.
+- [Strikeout](https://gloss-format.org/reference/strikeout/): A line through a run of text.
+- [Squiggly](https://gloss-format.org/reference/squiggly/): A wavy line under a run of text.
+- [Note](https://gloss-format.org/reference/note/): A note: an icon on the page that opens to show its contents.
+- [FreeText](https://gloss-format.org/reference/free-text/): Text drawn directly on the page in a box.
+- [Square](https://gloss-format.org/reference/square/): A rectangle drawn to fill rect.
+- [Circle](https://gloss-format.org/reference/circle/): An ellipse inscribed in rect.
+- [Line](https://gloss-format.org/reference/line/): A straight line from start to end.
+- [Polyline](https://gloss-format.org/reference/polyline/): Straight lines joining vertices in order, left open.
+- [Polygon](https://gloss-format.org/reference/polygon/): Straight lines joining vertices in order, closed back to the first.
+- [Ink](https://gloss-format.org/reference/ink/): Freehand strokes.
+- [Stamp](https://gloss-format.org/reference/stamp/): An image drawn to fill rect.
+- [Redact](https://gloss-format.org/reference/redact/): A mark over content to be removed.
+
+## Reference: Shared shapes
+
+- [Rect](https://gloss-format.org/reference/rect/): A rectangle in PDF user space, given by its bottom-left corner and its size.
+- [Color](https://gloss-format.org/reference/color/): An sRGB colour as #RRGGBB.
+- [Quad](https://gloss-format.org/reference/quad/): A quadrilateral over a run of text, its corners in the order PDF uses for /QuadPoints.
+- [Point](https://gloss-format.org/reference/point/): A point in PDF user space: points, origin bottom-left, before /Rotate.
+- [Dashes](https://gloss-format.org/reference/dashes/): A dash pattern in points: lengths on, then off, repeating (XFDF dashes, PDF /D).
+- [FreeTextStyle](https://gloss-format.org/reference/free-text-style/): A free-text box's text style.
+- [Fringe](https://gloss-format.org/reference/fringe/): Insets from an annotation's rect to the area it draws in, in points (PDF /RD, XFDF fringe, both in this order).
+- [Suggestion](https://gloss-format.org/reference/suggestion/): Why a redaction was suggested: what a detector found and how sure it is.
+- [Common](https://gloss-format.org/reference/common/): The fields every annotation accepts.
+
+## Reference: Enums
+
+- [Intent](https://gloss-format.org/reference/intent/): What a mark is for, such as a callout or an arrow (XFDF intent, PDF /IT).
+- [NoteIcon](https://gloss-format.org/reference/note-icon/): The icon a note shows on the page (XFDF icon, PDF /Name).
+- [LineEnding](https://gloss-format.org/reference/line-ending/): The shape drawn at the end of a line (XFDF head and tail, PDF /LE).
