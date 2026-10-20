@@ -3,12 +3,21 @@ import starlight from '@astrojs/starlight'
 import { defineConfig } from 'astro/config'
 import starlightLinksValidator from 'starlight-links-validator'
 
+import schema from 'gloss-format/schema.json' with { type: 'json' }
+
 import { baseLinks } from './src/markdown/base-links.ts'
+import { generateReference } from './src/reference/generate.ts'
 import { publishSchema } from './src/schema-file.ts'
 
 // The schema's $id is https://gloss-format.org/schema/v1.json, so the package's file is served
 // from there unchanged.
 publishSchema(new URL('./public/', import.meta.url))
+
+// One page per schema definition, written into a gitignored folder on every build and dev start.
+const reference = generateReference(
+  schema,
+  new URL('./src/content/docs/reference/', import.meta.url)
+)
 
 // Pull request previews are served from /pr-preview/pr-<number>/; the site itself from the root.
 const base = process.env.SITE_BASE ?? '/'
@@ -33,8 +42,16 @@ export default defineConfig({
         ThemeProvider: './src/components/ThemeProvider.astro',
       },
       editLink: { baseUrl: 'https://github.com/inkbar/gloss/edit/main/site/' },
-      plugins: [starlightLinksValidator()],
-      sidebar: [{ label: 'Introduction', slug: 'index' }],
+      // The reference pages link to each other relatively, so they work under any base. The
+      // validator can't follow relative links; the build test checks them instead.
+      plugins: [starlightLinksValidator({ errorOnRelativeLinks: false })],
+      sidebar: [
+        { label: 'Introduction', slug: 'index' },
+        {
+          label: 'Reference',
+          items: reference.map((g) => ({ label: g.label, items: g.items })),
+        },
+      ],
     }),
   ],
 })

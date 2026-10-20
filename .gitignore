@@ -9,3 +9,5 @@ site/public/schema/
 site/.astro
 # A global ignore of docs/ would drop the site content.
 !docs
+# Generated from the schema on every build.
+site/src/content/docs/reference/
