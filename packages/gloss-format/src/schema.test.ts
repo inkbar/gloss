@@ -277,6 +277,32 @@ describe('validating with the schema', () => {
     expect(validator(ajv, 'UnknownAnnotation')({ type: 'sticker', id: 'a' })).toBe(false)
   })
 
+  it('rejects an unknown type with a bad id or page', () => {
+    const ajv = glossAjv()
+    for (const item of [
+      { type: 'sticker', id: 'a', page: -1 },
+      { type: 'sticker', id: 'a', page: 1.5 },
+      { type: 'sticker', id: '', page: 0 },
+    ]) {
+      expect(validator(ajv, 'UnknownAnnotation')(item), JSON.stringify(item)).toBe(false)
+      expect(
+        validator(ajv, 'Document')({ format: 'gloss', version: 1, annotations: [item] }),
+        JSON.stringify(item)
+      ).toBe(false)
+    }
+  })
+
+  it('rejects a known type whose id is not a string', () => {
+    const ajv = glossAjv()
+    const item = { type: 'redact', id: 5, page: 0, rect }
+    expect(validator(ajv, 'Annotation')({ ...item, id: 'r1' })).toBe(true)
+    expect(validator(ajv, 'Annotation')(item)).toBe(false)
+    expect(validator(ajv, 'UnknownAnnotation')(item)).toBe(false)
+    expect(
+      validator(ajv, 'Document')({ format: 'gloss', version: 1, annotations: [item] })
+    ).toBe(false)
+  })
+
   it('does not let a broken known type pass as unknown', () => {
     const ajv = glossAjv()
     const broken = { type: 'highlight', id: 'a', page: 0, rect }

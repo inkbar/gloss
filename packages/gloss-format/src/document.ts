@@ -21,6 +21,7 @@ import {
 } from './annotations'
 import { GLOSS_FORMAT, GLOSS_VERSION } from './constants'
 import { define, field } from './registry'
+import { commonFields } from './shapes'
 
 const KNOWN_TYPES: readonly string[] = ANNOTATION_TYPES
 
@@ -50,6 +51,7 @@ export const Annotation = define(
   }
 )
 export type Annotation = z.infer<typeof Annotation>
+export type AnnotationInput = z.input<typeof Annotation>
 
 export const UnknownAnnotation = define(
   'UnknownAnnotation',
@@ -63,21 +65,23 @@ export const UnknownAnnotation = define(
           "An annotation type this version of Gloss doesn't define. A type Gloss defines must match its own definition instead.",
       }
     ),
-    id: field(z.string().min(1), {
-      description: 'Unique within the document. Never reused for a different annotation.',
-    }),
-    page: field(z.number().int().nonnegative(), {
-      description: 'The page the annotation is on, counted from 0.',
-    }),
+    id: commonFields.id,
+    page: commonFields.page,
   }),
   {
     title: 'UnknownAnnotation',
     description:
-      'An annotation of a type this version of Gloss does not define, such as one from a newer writer. It needs a type, an id and a page. Readers may ignore it or pass it through.',
+      "An annotation of a type this version of Gloss does not define, such as one from a newer writer or a host's own. It needs a type, an id and a page. Readers may ignore it or pass it through. Types match case-sensitively, so Highlight is an unknown type. Gloss never defines a type that starts with x-, so a host's own types should use that prefix: no later version can then reject them.",
     examples: [{ type: 'sticker', id: 'a1', page: 0, sticker: 'star' }],
   }
 )
 export type UnknownAnnotation = z.infer<typeof UnknownAnnotation>
+export type UnknownAnnotationInput = z.input<typeof UnknownAnnotation>
+
+/** True when `item` is an annotation type Gloss defines, rather than an unknown one. */
+export function isAnnotation(item: Annotation | UnknownAnnotation): item is Annotation {
+  return KNOWN_TYPES.includes(item.type)
+}
 
 export const GlossDocument = define(
   'Document',
@@ -126,3 +130,4 @@ export const GlossDocument = define(
   }
 )
 export type GlossDocument = z.infer<typeof GlossDocument>
+export type GlossDocumentInput = z.input<typeof GlossDocument>

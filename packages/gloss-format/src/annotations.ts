@@ -115,7 +115,7 @@ function textMarkup<const T extends keyof typeof MARKUP>(type: T) {
     }),
     {
       title: name,
-      description: `${description} XFDF element ${type}.`,
+      description,
       'x-xfdf': type,
       examples: [{ type, ...sample, rect: sampleTextRect, color, quads: sampleQuads }],
     }
@@ -124,15 +124,19 @@ function textMarkup<const T extends keyof typeof MARKUP>(type: T) {
 
 export const Highlight = textMarkup('highlight')
 export type Highlight = z.infer<typeof Highlight>
+export type HighlightInput = z.input<typeof Highlight>
 
 export const Underline = textMarkup('underline')
 export type Underline = z.infer<typeof Underline>
+export type UnderlineInput = z.input<typeof Underline>
 
 export const Strikeout = textMarkup('strikeout')
 export type Strikeout = z.infer<typeof Strikeout>
+export type StrikeoutInput = z.input<typeof Strikeout>
 
 export const Squiggly = textMarkup('squiggly')
 export type Squiggly = z.infer<typeof Squiggly>
+export type SquigglyInput = z.input<typeof Squiggly>
 
 export const Note = define(
   'Note',
@@ -146,8 +150,7 @@ export const Note = define(
   }),
   {
     title: 'Note',
-    description:
-      'A note: an icon on the page that opens to show its contents. XFDF element text.',
+    description: 'A note: an icon on the page that opens to show its contents.',
     'x-xfdf': 'text',
     examples: [
       {
@@ -161,6 +164,7 @@ export const Note = define(
   }
 )
 export type Note = z.infer<typeof Note>
+export type NoteInput = z.input<typeof Note>
 
 export const FreeTextStyle = define(
   'FreeTextStyle',
@@ -200,6 +204,7 @@ export const FreeTextStyle = define(
   }
 )
 export type FreeTextStyle = z.infer<typeof FreeTextStyle>
+export type FreeTextStyleInput = z.input<typeof FreeTextStyle>
 
 export const FreeText = define(
   'FreeText',
@@ -240,7 +245,7 @@ export const FreeText = define(
   {
     title: 'FreeText',
     description:
-      'Text drawn directly on the page in a box. color is the fill of the box and defaultStyle holds the text style. XFDF element freetext.',
+      'Text drawn directly on the page in a box. color is the fill of the box and defaultStyle holds the text style.',
     'x-xfdf': 'freetext',
     examples: [
       {
@@ -254,6 +259,7 @@ export const FreeText = define(
   }
 )
 export type FreeText = z.infer<typeof FreeText>
+export type FreeTextInput = z.input<typeof FreeText>
 
 export const Square = define(
   'Square',
@@ -269,7 +275,7 @@ export const Square = define(
   }),
   {
     title: 'Square',
-    description: 'A rectangle drawn to fill rect. XFDF element square.',
+    description: 'A rectangle drawn to fill rect.',
     'x-xfdf': 'square',
     examples: [
       {
@@ -283,6 +289,7 @@ export const Square = define(
   }
 )
 export type Square = z.infer<typeof Square>
+export type SquareInput = z.input<typeof Square>
 
 export const Circle = define(
   'Circle',
@@ -295,7 +302,7 @@ export const Circle = define(
   }),
   {
     title: 'Circle',
-    description: 'An ellipse inscribed in rect. XFDF element circle.',
+    description: 'An ellipse inscribed in rect.',
     'x-xfdf': 'circle',
     examples: [
       {
@@ -309,6 +316,7 @@ export const Circle = define(
   }
 )
 export type Circle = z.infer<typeof Circle>
+export type CircleInput = z.input<typeof Circle>
 
 export const Line = define(
   'Line',
@@ -324,7 +332,7 @@ export const Line = define(
   }),
   {
     title: 'Line',
-    description: 'A straight line from start to end. XFDF element line.',
+    description: 'A straight line from start to end.',
     'x-xfdf': 'line',
     examples: [
       {
@@ -339,6 +347,7 @@ export const Line = define(
   }
 )
 export type Line = z.infer<typeof Line>
+export type LineInput = z.input<typeof Line>
 
 export const Polyline = define(
   'Polyline',
@@ -354,8 +363,7 @@ export const Polyline = define(
   }),
   {
     title: 'Polyline',
-    description:
-      'Straight lines joining vertices in order, left open. XFDF element polyline.',
+    description: 'Straight lines joining vertices in order, left open.',
     'x-xfdf': 'polyline',
     examples: [
       {
@@ -373,6 +381,7 @@ export const Polyline = define(
   }
 )
 export type Polyline = z.infer<typeof Polyline>
+export type PolylineInput = z.input<typeof Polyline>
 
 export const Polygon = define(
   'Polygon',
@@ -386,8 +395,7 @@ export const Polygon = define(
   }),
   {
     title: 'Polygon',
-    description:
-      'Straight lines joining vertices in order, closed back to the first. XFDF element polygon.',
+    description: 'Straight lines joining vertices in order, closed back to the first.',
     'x-xfdf': 'polygon',
     examples: [
       {
@@ -405,6 +413,7 @@ export const Polygon = define(
   }
 )
 export type Polygon = z.infer<typeof Polygon>
+export type PolygonInput = z.input<typeof Polygon>
 
 /** Pressure must have one value per point of each stroke. */
 function checkPressure(
@@ -444,7 +453,7 @@ export const Ink = define(
     .superRefine(checkPressure),
   {
     title: 'Ink',
-    description: 'Freehand strokes. XFDF element ink.',
+    description: 'Freehand strokes.',
     'x-xfdf': 'ink',
     examples: [
       {
@@ -464,6 +473,7 @@ export const Ink = define(
   }
 )
 export type Ink = z.infer<typeof Ink>
+export type InkInput = z.input<typeof Ink>
 
 export const Stamp = define(
   'Stamp',
@@ -486,7 +496,7 @@ export const Stamp = define(
   {
     title: 'Stamp',
     description:
-      'An image drawn to fill rect. A signature is a stamp with subject Signature. XFDF element stamp.',
+      'An image drawn to fill rect. A signature is a stamp with subject Signature.',
     'x-xfdf': 'stamp',
     examples: [
       {
@@ -500,6 +510,7 @@ export const Stamp = define(
   }
 )
 export type Stamp = z.infer<typeof Stamp>
+export type StampInput = z.input<typeof Stamp>
 
 export const Loupe = define(
   'Loupe',
@@ -514,7 +525,8 @@ export const Loupe = define(
   }),
   {
     title: 'Loupe',
-    description: `A magnifier: a circle inscribed in rect that shows the page content under its own centre, magnified. color and width draw its rim. ${EXTENSION}`,
+    description:
+      'A magnifier: a circle inscribed in rect that shows the page content under its own centre, magnified. color and width draw its rim.',
     examples: [
       {
         type: 'loupe',
@@ -526,6 +538,7 @@ export const Loupe = define(
   }
 )
 export type Loupe = z.infer<typeof Loupe>
+export type LoupeInput = z.input<typeof Loupe>
 
 export const Mask = define(
   'Mask',
@@ -546,7 +559,8 @@ export const Mask = define(
   }),
   {
     title: 'Mask',
-    description: `Dims everything on the page outside shape drawn in rect. color is the dimming colour. One per page: a second one replaces the first. ${EXTENSION}`,
+    description:
+      'Dims everything on the page outside shape drawn in rect. color is the dimming colour. One per page: a second one replaces the first.',
     examples: [
       {
         type: 'mask',
@@ -559,6 +573,7 @@ export const Mask = define(
   }
 )
 export type Mask = z.infer<typeof Mask>
+export type MaskInput = z.input<typeof Mask>
 
 export const Suggestion = define(
   'Suggestion',
@@ -588,6 +603,7 @@ export const Suggestion = define(
   }
 )
 export type Suggestion = z.infer<typeof Suggestion>
+export type SuggestionInput = z.input<typeof Suggestion>
 
 export const Redact = define(
   'Redact',
@@ -619,7 +635,7 @@ export const Redact = define(
   {
     title: 'Redact',
     description:
-      'A mark over content to be removed. Applying it removes the content and fills the area. XFDF element redact.',
+      'A mark over content to be removed. Applying it removes the content and fills the area.',
     'x-xfdf': 'redact',
     examples: [
       {
@@ -634,3 +650,4 @@ export const Redact = define(
   }
 )
 export type Redact = z.infer<typeof Redact>
+export type RedactInput = z.input<typeof Redact>
