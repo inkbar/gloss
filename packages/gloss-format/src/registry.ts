@@ -31,8 +31,15 @@ export function define<T extends z.ZodType>(id: string, schema: T, meta: GlossMe
  * It describes a clone, so the shared definition keeps its own metadata. zod links the clone to
  * the original, so a field whose schema is a named definition comes out as `$ref` plus the
  * field's own keywords.
+ *
+ * A field can't be made from another field: the clone would hide the definition and inline it.
+ * Describe the definition directly instead.
  */
 export function field<T extends z.ZodType>(schema: T, meta: GlossMeta): T {
+  if (gloss.has(schema) && gloss.get(schema)?.id === undefined)
+    throw new Error(
+      `field() got a schema that is already a field (${gloss.get(schema)?.description ?? ''}); describe the original schema instead`
+    )
   const clone = schema.clone()
   gloss.add(clone, meta)
   return clone
