@@ -28,7 +28,7 @@
   "scripts": {
     "build": "tsdown",
     "typecheck": "tsc --noEmit",
-    "lint": "eslint --no-error-on-unmatched-pattern src scripts",
+    "lint": "eslint src scripts",
     "test": "vitest run",
     "generate": "tsx scripts/generate-schema.ts"
   },
