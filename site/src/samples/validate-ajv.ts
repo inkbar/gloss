@@ -3,9 +3,13 @@ import { readFileSync } from 'node:fs'
 import { Ajv2020 } from 'ajv/dist/2020.js'
 import glossSchema from 'gloss-format/schema.json' with { type: 'json' }
 
-// Gloss uses its own x-xfdf keyword, so turn off strict mode. Timestamps carry
-// format: date-time; add ajv-formats to check them as well.
-const ajv = new Ajv2020({ strict: false, validateFormats: false })
+// Timestamps carry format: date-time and a pattern. Ajv checks the pattern either
+// way; leave formats off, or add ajv-formats to check them too.
+const ajv = new Ajv2020({ validateFormats: false })
+
+// Gloss gives XFDF names in its own x-xfdf keyword. Declare it so strict mode
+// accepts it.
+ajv.addKeyword('x-xfdf')
 
 // Register the schema under its $id, so references to the URL resolve without
 // a network request.

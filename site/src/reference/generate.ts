@@ -21,13 +21,15 @@ const GROUPS: Group[] = ['Document', 'Annotation types', 'Shared shapes', 'Enums
  * Within a group, pages follow the order of `$defs`.
  */
 export function generateReference(schema: JsonSchema, outDir: URL): SidebarGroup[] {
+  const schemaId = schema['$id']
+  if (typeof schemaId !== 'string') throw new Error('the schema has no $id')
   const defs = (schema['$defs'] ?? {}) as Record<string, JsonSchema>
   // Render everything before touching the folder, so a missing description fails cleanly.
   const pages = Object.entries(defs).map(([name, def]) => ({
     name,
     slug: slugFor(name),
     group: groupFor(name, def),
-    markdown: renderDefinition(name, def, defs),
+    markdown: renderDefinition(name, def, { schemaId, defs }),
   }))
 
   rmSync(outDir, { recursive: true, force: true })

@@ -80,6 +80,7 @@ export const Point = define(
   }
 )
 export type Point = z.infer<typeof Point>
+export type PointInput = z.input<typeof Point>
 
 export const Rect = define(
   'Rect',
@@ -96,6 +97,7 @@ export const Rect = define(
   }
 )
 export type Rect = z.infer<typeof Rect>
+export type RectInput = z.input<typeof Rect>
 
 export const Quad = define(
   'Quad',
@@ -112,6 +114,7 @@ export const Quad = define(
   }
 )
 export type Quad = z.infer<typeof Quad>
+export type QuadInput = z.input<typeof Quad>
 
 export const Color = define(
   'Color',
@@ -122,6 +125,7 @@ export const Color = define(
   }
 )
 export type Color = z.infer<typeof Color>
+export type ColorInput = z.input<typeof Color>
 
 export const Fringe = define(
   'Fringe',
@@ -146,6 +150,7 @@ export const Fringe = define(
   }
 )
 export type Fringe = z.infer<typeof Fringe>
+export type FringeInput = z.input<typeof Fringe>
 
 export const Dashes = define('Dashes', z.array(z.number().nonnegative()).min(1), {
   title: 'Dashes',
@@ -153,6 +158,7 @@ export const Dashes = define('Dashes', z.array(z.number().nonnegative()).min(1),
     'A dash pattern in points: lengths on, then off, repeating (XFDF dashes, PDF /D).',
 })
 export type Dashes = z.infer<typeof Dashes>
+export type DashesInput = z.input<typeof Dashes>
 
 export const LineEnding = define('LineEnding', pdfNameSet(LINE_ENDINGS), {
   title: 'LineEnding',
@@ -162,6 +168,7 @@ export const LineEnding = define('LineEnding', pdfNameSet(LINE_ENDINGS), {
   ),
 })
 export type LineEnding = z.infer<typeof LineEnding>
+export type LineEndingInput = z.input<typeof LineEnding>
 
 export const NoteIcon = define('NoteIcon', pdfNameSet(NOTE_ICONS), {
   title: 'NoteIcon',
@@ -171,6 +178,7 @@ export const NoteIcon = define('NoteIcon', pdfNameSet(NOTE_ICONS), {
   ),
 })
 export type NoteIcon = z.infer<typeof NoteIcon>
+export type NoteIconInput = z.input<typeof NoteIcon>
 
 export const Intent = define('Intent', pdfNameSet(INTENTS), {
   title: 'Intent',
@@ -180,6 +188,7 @@ export const Intent = define('Intent', pdfNameSet(INTENTS), {
   ),
 })
 export type Intent = z.infer<typeof Intent>
+export type IntentInput = z.input<typeof Intent>
 
 const dateTime = z.iso.datetime({ offset: true })
 
@@ -260,3 +269,4 @@ export const Common = define(
   }
 )
 export type Common = z.infer<typeof Common>
+export type CommonInput = z.input<typeof Common>

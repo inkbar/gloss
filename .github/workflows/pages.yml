@@ -11,6 +11,8 @@ on:
     paths-ignore:
       - README.md
       - LICENSE
+  # Run it by hand on the latest release tag, to ship a site-only change. Run on main, it would
+  # publish schema changes that are not yet released.
   workflow_dispatch:
 
 permissions:

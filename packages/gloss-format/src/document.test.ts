@@ -1,6 +1,10 @@
-import { describe, expect, it } from 'vitest'
+import { describe, expect, expectTypeOf, it } from 'vitest'
 
-import { Annotation, GlossDocument, UnknownAnnotation } from './document'
+import { ANNOTATION_TYPES } from './annotations'
+import { Annotation, GlossDocument, isAnnotation, UnknownAnnotation } from './document'
+
+import type { Redact, RedactInput } from './annotations'
+import type { GlossDocumentInput } from './document'
 
 const rect = { x: 72, y: 700, width: 120, height: 14 }
 
@@ -56,6 +60,32 @@ describe('GlossDocument', () => {
     ).toBe(false)
   })
 
+  it('rejects an unknown type with a bad id or page', () => {
+    for (const item of [
+      { type: 'sticker', id: 'a', page: -1 },
+      { type: 'sticker', id: 'a', page: 1.5 },
+      { type: 'sticker', id: '', page: 0 },
+    ]) {
+      expect(UnknownAnnotation.safeParse(item).success, JSON.stringify(item)).toBe(false)
+      expect(
+        GlossDocument.safeParse({ format: 'gloss', version: 1, annotations: [item] })
+          .success,
+        JSON.stringify(item)
+      ).toBe(false)
+    }
+  })
+
+  it('rejects a known type whose id is not a string', () => {
+    const item = { type: 'redact', id: 5, page: 0, rect }
+    expect(Annotation.safeParse({ ...item, id: 'r1' }).success).toBe(true)
+    expect(Annotation.safeParse(item).success).toBe(false)
+    expect(UnknownAnnotation.safeParse(item).success).toBe(false)
+    expect(
+      GlossDocument.safeParse({ format: 'gloss', version: 1, annotations: [item] })
+        .success
+    ).toBe(false)
+  })
+
   it('does not let a broken known type pass as unknown', () => {
     const broken = { type: 'highlight', id: 'a', page: 0, rect }
     expect(UnknownAnnotation.safeParse(broken).success).toBe(false)
@@ -75,5 +105,44 @@ describe('GlossDocument', () => {
       extra: true,
     }
     expect(GlossDocument.parse(doc)).toEqual(doc)
+  })
+})
+
+describe('annotation types', () => {
+  it('never start with x-, which is left for host types', () => {
+    expect(ANNOTATION_TYPES.filter((t) => t.startsWith('x-'))).toEqual([])
+  })
+
+  it('match case-sensitively', () => {
+    const item = { type: 'Highlight', id: 'a', page: 0 }
+    expect(UnknownAnnotation.safeParse(item).success).toBe(true)
+    expect(Annotation.safeParse(item).success).toBe(false)
+  })
+})
+
+describe('isAnnotation', () => {
+  it('tells a defined type from an unknown one', () => {
+    const { annotations } = GlossDocument.parse({
+      format: 'gloss',
+      version: 1,
+      annotations: [
+        { type: 'redact', id: 'r1', page: 0, rect },
+        { type: 'x-sticker', id: 's1', page: 0 },
+      ],
+    })
+    expect(annotations.map(isAnnotation)).toEqual([true, false])
+  })
+})
+
+describe('input types', () => {
+  it('take what a writer writes, before defaults are filled', () => {
+    const written = { type: 'redact' as const, id: 'r1', page: 0, rect }
+    expectTypeOf(written).toExtend<RedactInput>()
+    expectTypeOf(written).not.toExtend<Redact>()
+    expectTypeOf({
+      format: 'gloss' as const,
+      version: 1 as const,
+      annotations: [written],
+    }).toExtend<GlossDocumentInput>()
   })
 })

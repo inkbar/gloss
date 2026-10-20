@@ -177,7 +177,7 @@
       "required": ["type", "id", "page", "rect", "quads"],
       "additionalProperties": {},
       "title": "Highlight",
-      "description": "A highlight over a run of text. XFDF element highlight.",
+      "description": "A highlight over a run of text.",
       "x-xfdf": "highlight",
       "examples": [
         {
@@ -360,7 +360,7 @@
       "required": ["type", "id", "page", "rect", "quads"],
       "additionalProperties": {},
       "title": "Underline",
-      "description": "A line under a run of text. XFDF element underline.",
+      "description": "A line under a run of text.",
       "x-xfdf": "underline",
       "examples": [
         {
@@ -477,7 +477,7 @@
       "required": ["type", "id", "page", "rect", "quads"],
       "additionalProperties": {},
       "title": "Strikeout",
-      "description": "A line through a run of text. XFDF element strikeout.",
+      "description": "A line through a run of text.",
       "x-xfdf": "strikeout",
       "examples": [
         {
@@ -594,7 +594,7 @@
       "required": ["type", "id", "page", "rect", "quads"],
       "additionalProperties": {},
       "title": "Squiggly",
-      "description": "A wavy line under a run of text. XFDF element squiggly.",
+      "description": "A wavy line under a run of text.",
       "x-xfdf": "squiggly",
       "examples": [
         {
@@ -710,7 +710,7 @@
       "required": ["type", "id", "page", "rect"],
       "additionalProperties": {},
       "title": "Note",
-      "description": "A note: an icon on the page that opens to show its contents. XFDF element text.",
+      "description": "A note: an icon on the page that opens to show its contents.",
       "x-xfdf": "text",
       "examples": [
         {
@@ -876,7 +876,7 @@
       "required": ["type", "id", "page", "rect", "contents"],
       "additionalProperties": {},
       "title": "FreeText",
-      "description": "Text drawn directly on the page in a box. color is the fill of the box and defaultStyle holds the text style. XFDF element freetext.",
+      "description": "Text drawn directly on the page in a box. color is the fill of the box and defaultStyle holds the text style.",
       "x-xfdf": "freetext",
       "examples": [
         {
@@ -1105,7 +1105,7 @@
       "required": ["type", "id", "page", "rect"],
       "additionalProperties": {},
       "title": "Square",
-      "description": "A rectangle drawn to fill rect. XFDF element square.",
+      "description": "A rectangle drawn to fill rect.",
       "x-xfdf": "square",
       "examples": [
         {
@@ -1225,7 +1225,7 @@
       "required": ["type", "id", "page", "rect"],
       "additionalProperties": {},
       "title": "Circle",
-      "description": "An ellipse inscribed in rect. XFDF element circle.",
+      "description": "An ellipse inscribed in rect.",
       "x-xfdf": "circle",
       "examples": [
         {
@@ -1360,7 +1360,7 @@
       "required": ["type", "id", "page", "rect", "start", "end"],
       "additionalProperties": {},
       "title": "Line",
-      "description": "A straight line from start to end. XFDF element line.",
+      "description": "A straight line from start to end.",
       "x-xfdf": "line",
       "examples": [
         {
@@ -1498,7 +1498,7 @@
       "required": ["type", "id", "page", "rect", "vertices"],
       "additionalProperties": {},
       "title": "Polyline",
-      "description": "Straight lines joining vertices in order, left open. XFDF element polyline.",
+      "description": "Straight lines joining vertices in order, left open.",
       "x-xfdf": "polyline",
       "examples": [
         {
@@ -1629,7 +1629,7 @@
       "required": ["type", "id", "page", "rect", "vertices"],
       "additionalProperties": {},
       "title": "Polygon",
-      "description": "Straight lines joining vertices in order, closed back to the first. XFDF element polygon.",
+      "description": "Straight lines joining vertices in order, closed back to the first.",
       "x-xfdf": "polygon",
       "examples": [
         {
@@ -1767,7 +1767,7 @@
       "required": ["type", "id", "page", "rect", "inklist"],
       "additionalProperties": {},
       "title": "Ink",
-      "description": "Freehand strokes. XFDF element ink.",
+      "description": "Freehand strokes.",
       "x-xfdf": "ink",
       "examples": [
         {
@@ -1888,7 +1888,7 @@
       "required": ["type", "id", "page", "rect", "imagedata"],
       "additionalProperties": {},
       "title": "Stamp",
-      "description": "An image drawn to fill rect. A signature is a stamp with subject Signature. XFDF element stamp.",
+      "description": "An image drawn to fill rect. A signature is a stamp with subject Signature.",
       "x-xfdf": "stamp",
       "examples": [
         {
@@ -2004,7 +2004,7 @@
       "required": ["type", "id", "page", "rect"],
       "additionalProperties": {},
       "title": "Loupe",
-      "description": "A magnifier: a circle inscribed in rect that shows the page content under its own centre, magnified. color and width draw its rim. An extension; XFDF has no equivalent.",
+      "description": "A magnifier: a circle inscribed in rect that shows the page content under its own centre, magnified. color and width draw its rim.",
       "examples": [
         {
           "type": "loupe",
@@ -2117,7 +2117,7 @@
       "required": ["type", "id", "page", "rect", "shape"],
       "additionalProperties": {},
       "title": "Mask",
-      "description": "Dims everything on the page outside shape drawn in rect. color is the dimming colour. One per page: a second one replaces the first. An extension; XFDF has no equivalent.",
+      "description": "Dims everything on the page outside shape drawn in rect. color is the dimming colour. One per page: a second one replaces the first.",
       "examples": [
         {
           "type": "mask",
@@ -2246,7 +2246,7 @@
       "required": ["type", "id", "page", "rect"],
       "additionalProperties": {},
       "title": "Redact",
-      "description": "A mark over content to be removed. Applying it removes the content and fills the area. XFDF element redact.",
+      "description": "A mark over content to be removed. Applying it removes the content and fills the area.",
       "x-xfdf": "redact",
       "examples": [
         {
@@ -2334,19 +2334,21 @@
         "id": {
           "type": "string",
           "minLength": 1,
-          "description": "Unique within the document. Never reused for a different annotation."
+          "description": "Unique within the document. Never reused for a different annotation.",
+          "x-xfdf": "name"
         },
         "page": {
           "type": "integer",
           "minimum": 0,
           "maximum": 9007199254740991,
-          "description": "The page the annotation is on, counted from 0."
+          "description": "The page the annotation is on, counted from 0.",
+          "x-xfdf": "page"
         }
       },
       "required": ["type", "id", "page"],
       "additionalProperties": {},
       "title": "UnknownAnnotation",
-      "description": "An annotation of a type this version of Gloss does not define, such as one from a newer writer. It needs a type, an id and a page. Readers may ignore it or pass it through.",
+      "description": "An annotation of a type this version of Gloss does not define, such as one from a newer writer or a host's own. It needs a type, an id and a page. Readers may ignore it or pass it through. Types match case-sensitively, so Highlight is an unknown type. Gloss never defines a type that starts with x-, so a host's own types should use that prefix: no later version can then reject them.",
       "examples": [{ "type": "sticker", "id": "a1", "page": 0, "sticker": "star" }]
     },
     "Common": {
