@@ -1,0 +1,2442 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://gloss-format.org/schema/v1.json",
+  "title": "Gloss",
+  "description": "Gloss: a JSON format for PDF annotations. Coordinates are PDF user space in points, origin bottom-left, before /Rotate.",
+  "$ref": "#/$defs/Document",
+  "$defs": {
+    "Document": {
+      "type": "object",
+      "properties": {
+        "format": {
+          "type": "string",
+          "const": "gloss",
+          "description": "Marks the file as Gloss. Always gloss."
+        },
+        "version": {
+          "type": "number",
+          "const": 1,
+          "description": "The Gloss format version the document follows. Always 1 for this schema."
+        },
+        "documentKey": {
+          "type": "string",
+          "description": "Optional. Identifies the PDF the annotations belong to, in whatever form the writer and reader agree on."
+        },
+        "annotations": {
+          "type": "array",
+          "items": {
+            "anyOf": [
+              { "$ref": "#/$defs/Annotation" },
+              { "$ref": "#/$defs/UnknownAnnotation" }
+            ]
+          },
+          "description": "The annotations, in drawing order. Each is a type Gloss defines or one it doesn't."
+        }
+      },
+      "required": ["format", "version", "annotations"],
+      "additionalProperties": {},
+      "title": "Document",
+      "description": "A Gloss document: the annotations on one PDF.",
+      "examples": [
+        {
+          "format": "gloss",
+          "version": 1,
+          "annotations": [
+            {
+              "type": "highlight",
+              "id": "a1",
+              "page": 0,
+              "rect": { "x": 72, "y": 700, "width": 120, "height": 14 },
+              "quads": [
+                {
+                  "p1": { "x": 72, "y": 714 },
+                  "p2": { "x": 192, "y": 714 },
+                  "p3": { "x": 72, "y": 700 },
+                  "p4": { "x": 192, "y": 700 }
+                }
+              ]
+            }
+          ]
+        }
+      ]
+    },
+    "Annotation": {
+      "oneOf": [
+        { "$ref": "#/$defs/Highlight" },
+        { "$ref": "#/$defs/Underline" },
+        { "$ref": "#/$defs/Strikeout" },
+        { "$ref": "#/$defs/Squiggly" },
+        { "$ref": "#/$defs/Note" },
+        { "$ref": "#/$defs/FreeText" },
+        { "$ref": "#/$defs/Square" },
+        { "$ref": "#/$defs/Circle" },
+        { "$ref": "#/$defs/Line" },
+        { "$ref": "#/$defs/Polyline" },
+        { "$ref": "#/$defs/Polygon" },
+        { "$ref": "#/$defs/Ink" },
+        { "$ref": "#/$defs/Stamp" },
+        { "$ref": "#/$defs/Loupe" },
+        { "$ref": "#/$defs/Mask" },
+        { "$ref": "#/$defs/Redact" }
+      ],
+      "title": "Annotation",
+      "description": "Any annotation type Gloss defines, chosen by its type field."
+    },
+    "Highlight": {
+      "type": "object",
+      "properties": {
+        "type": {
+          "type": "string",
+          "const": "highlight",
+          "description": "The annotation type. Always highlight."
+        },
+        "id": {
+          "type": "string",
+          "minLength": 1,
+          "description": "Unique within the document. Never reused for a different annotation.",
+          "x-xfdf": "name"
+        },
+        "page": {
+          "type": "integer",
+          "minimum": 0,
+          "maximum": 9007199254740991,
+          "description": "The page the annotation is on, counted from 0.",
+          "x-xfdf": "page"
+        },
+        "rect": {
+          "description": "The bounding box, in PDF user space.",
+          "x-xfdf": "rect",
+          "$ref": "#/$defs/Rect"
+        },
+        "color": {
+          "description": "The annotation's colour. Absent: the reader chooses the colour.",
+          "x-xfdf": "color",
+          "$ref": "#/$defs/Color"
+        },
+        "opacity": {
+          "default": 1,
+          "type": "number",
+          "minimum": 0,
+          "maximum": 1,
+          "description": "Opacity, from 0 (invisible) to 1 (opaque). Absent means opaque.",
+          "x-xfdf": "opacity"
+        },
+        "author": {
+          "type": "string",
+          "description": "Who made the annotation. Absent means unknown.",
+          "x-xfdf": "title"
+        },
+        "contents": {
+          "type": "string",
+          "description": "The annotation's text, such as a comment or a note. Absent means no text.",
+          "x-xfdf": "contents"
+        },
+        "inReplyTo": {
+          "type": "string",
+          "description": "The id of the annotation this one replies to. Replies form threads. Absent means the annotation is not a reply.",
+          "x-xfdf": "inreplyto"
+        },
+        "createdAt": {
+          "type": "string",
+          "format": "date-time",
+          "pattern": "^(?:(?:\\d\\d[2468][048]|\\d\\d[13579][26]|\\d\\d0[48]|[02468][048]00|[13579][26]00)-02-29|\\d{4}-(?:(?:0[13578]|1[02])-(?:0[1-9]|[12]\\d|3[01])|(?:0[469]|11)-(?:0[1-9]|[12]\\d|30)|(?:02)-(?:0[1-9]|1\\d|2[0-8])))T(?:(?:[01]\\d|2[0-3]):[0-5]\\d:[0-5]\\d(?:\\.\\d+)?(?:Z|([+-](?:[01]\\d|2[0-3]):[0-5]\\d)))$",
+          "description": "When the annotation was made, as an ISO 8601 date-time with an offset. XFDF writes a PDF date string (D:20261019120000Z). Absent means unknown.",
+          "x-xfdf": "creationdate"
+        },
+        "modifiedAt": {
+          "type": "string",
+          "format": "date-time",
+          "pattern": "^(?:(?:\\d\\d[2468][048]|\\d\\d[13579][26]|\\d\\d0[48]|[02468][048]00|[13579][26]00)-02-29|\\d{4}-(?:(?:0[13578]|1[02])-(?:0[1-9]|[12]\\d|3[01])|(?:0[469]|11)-(?:0[1-9]|[12]\\d|30)|(?:02)-(?:0[1-9]|1\\d|2[0-8])))T(?:(?:[01]\\d|2[0-3]):[0-5]\\d:[0-5]\\d(?:\\.\\d+)?(?:Z|([+-](?:[01]\\d|2[0-3]):[0-5]\\d)))$",
+          "description": "When the annotation last changed, as an ISO 8601 date-time with an offset. XFDF writes a PDF date string. Absent means unknown.",
+          "x-xfdf": "date"
+        },
+        "subject": {
+          "type": "string",
+          "description": "A short label for what the mark is. Absent means no label.",
+          "x-xfdf": "subject"
+        },
+        "intent": {
+          "description": "What the mark is for, such as a callout or an arrow. Absent means the type's plain form.",
+          "x-xfdf": "intent",
+          "$ref": "#/$defs/Intent"
+        },
+        "custom": {
+          "type": "object",
+          "propertyNames": { "type": "string" },
+          "additionalProperties": {},
+          "description": "Data of your own. Gloss readers keep it as it is and never interpret it. Absent means none."
+        },
+        "quads": {
+          "minItems": 1,
+          "type": "array",
+          "items": { "$ref": "#/$defs/Quad" },
+          "description": "The runs of text the mark covers, one quad per line. At least one.",
+          "x-xfdf": "coords"
+        }
+      },
+      "required": ["type", "id", "page", "rect", "quads"],
+      "additionalProperties": {},
+      "title": "Highlight",
+      "description": "A highlight over a run of text. XFDF element highlight.",
+      "x-xfdf": "highlight",
+      "examples": [
+        {
+          "type": "highlight",
+          "id": "a1",
+          "page": 0,
+          "author": "Ana",
+          "createdAt": "2026-10-19T12:00:00Z",
+          "rect": { "x": 72, "y": 700, "width": 120, "height": 14 },
+          "color": "#FFE066",
+          "quads": [
+            {
+              "p1": { "x": 72, "y": 714 },
+              "p2": { "x": 192, "y": 714 },
+              "p3": { "x": 72, "y": 700 },
+              "p4": { "x": 192, "y": 700 }
+            }
+          ]
+        }
+      ]
+    },
+    "Rect": {
+      "type": "object",
+      "properties": {
+        "x": { "type": "number", "description": "Left edge in points." },
+        "y": { "type": "number", "description": "Bottom edge in points." },
+        "width": { "type": "number", "minimum": 0, "description": "Width in points." },
+        "height": { "type": "number", "minimum": 0, "description": "Height in points." }
+      },
+      "required": ["x", "y", "width", "height"],
+      "additionalProperties": {},
+      "title": "Rect",
+      "description": "A rectangle in PDF user space, given by its bottom-left corner and its size. XFDF writes it as x1,y1,x2,y2."
+    },
+    "Color": {
+      "type": "string",
+      "pattern": "^#[0-9a-fA-F]{6}$",
+      "title": "Color",
+      "description": "An sRGB colour as #RRGGBB."
+    },
+    "Intent": {
+      "anyOf": [
+        {
+          "type": "string",
+          "enum": [
+            "FreeText",
+            "FreeTextCallout",
+            "FreeTextTypeWriter",
+            "LineArrow",
+            "LineDimension",
+            "PolygonCloud",
+            "PolygonDimension",
+            "PolyLineDimension"
+          ]
+        },
+        { "type": "string", "pattern": "^[^\\s()<>[\\]{}/%]+$" }
+      ],
+      "title": "Intent",
+      "description": "What a mark is for, such as a callout or an arrow (XFDF intent, PDF /IT). One of FreeText, FreeTextCallout, FreeTextTypeWriter, LineArrow, LineDimension, PolygonCloud, PolygonDimension, PolyLineDimension. Any other PDF name is allowed and is kept unchanged."
+    },
+    "Quad": {
+      "type": "object",
+      "properties": {
+        "p1": { "description": "Top-left corner.", "$ref": "#/$defs/Point" },
+        "p2": { "description": "Top-right corner.", "$ref": "#/$defs/Point" },
+        "p3": { "description": "Bottom-left corner.", "$ref": "#/$defs/Point" },
+        "p4": { "description": "Bottom-right corner.", "$ref": "#/$defs/Point" }
+      },
+      "required": ["p1", "p2", "p3", "p4"],
+      "additionalProperties": {},
+      "title": "Quad",
+      "description": "A quadrilateral over a run of text, its corners in the order PDF uses for /QuadPoints. It need not be axis-aligned."
+    },
+    "Point": {
+      "type": "object",
+      "properties": {
+        "x": { "type": "number", "description": "Horizontal position in points." },
+        "y": {
+          "type": "number",
+          "description": "Vertical position in points, measured up from the bottom."
+        }
+      },
+      "required": ["x", "y"],
+      "additionalProperties": {},
+      "title": "Point",
+      "description": "A point in PDF user space: points, origin bottom-left, before /Rotate."
+    },
+    "Underline": {
+      "type": "object",
+      "properties": {
+        "type": {
+          "type": "string",
+          "const": "underline",
+          "description": "The annotation type. Always underline."
+        },
+        "id": {
+          "type": "string",
+          "minLength": 1,
+          "description": "Unique within the document. Never reused for a different annotation.",
+          "x-xfdf": "name"
+        },
+        "page": {
+          "type": "integer",
+          "minimum": 0,
+          "maximum": 9007199254740991,
+          "description": "The page the annotation is on, counted from 0.",
+          "x-xfdf": "page"
+        },
+        "rect": {
+          "description": "The bounding box, in PDF user space.",
+          "x-xfdf": "rect",
+          "$ref": "#/$defs/Rect"
+        },
+        "color": {
+          "description": "The annotation's colour. Absent: the reader chooses the colour.",
+          "x-xfdf": "color",
+          "$ref": "#/$defs/Color"
+        },
+        "opacity": {
+          "default": 1,
+          "type": "number",
+          "minimum": 0,
+          "maximum": 1,
+          "description": "Opacity, from 0 (invisible) to 1 (opaque). Absent means opaque.",
+          "x-xfdf": "opacity"
+        },
+        "author": {
+          "type": "string",
+          "description": "Who made the annotation. Absent means unknown.",
+          "x-xfdf": "title"
+        },
+        "contents": {
+          "type": "string",
+          "description": "The annotation's text, such as a comment or a note. Absent means no text.",
+          "x-xfdf": "contents"
+        },
+        "inReplyTo": {
+          "type": "string",
+          "description": "The id of the annotation this one replies to. Replies form threads. Absent means the annotation is not a reply.",
+          "x-xfdf": "inreplyto"
+        },
+        "createdAt": {
+          "type": "string",
+          "format": "date-time",
+          "pattern": "^(?:(?:\\d\\d[2468][048]|\\d\\d[13579][26]|\\d\\d0[48]|[02468][048]00|[13579][26]00)-02-29|\\d{4}-(?:(?:0[13578]|1[02])-(?:0[1-9]|[12]\\d|3[01])|(?:0[469]|11)-(?:0[1-9]|[12]\\d|30)|(?:02)-(?:0[1-9]|1\\d|2[0-8])))T(?:(?:[01]\\d|2[0-3]):[0-5]\\d:[0-5]\\d(?:\\.\\d+)?(?:Z|([+-](?:[01]\\d|2[0-3]):[0-5]\\d)))$",
+          "description": "When the annotation was made, as an ISO 8601 date-time with an offset. XFDF writes a PDF date string (D:20261019120000Z). Absent means unknown.",
+          "x-xfdf": "creationdate"
+        },
+        "modifiedAt": {
+          "type": "string",
+          "format": "date-time",
+          "pattern": "^(?:(?:\\d\\d[2468][048]|\\d\\d[13579][26]|\\d\\d0[48]|[02468][048]00|[13579][26]00)-02-29|\\d{4}-(?:(?:0[13578]|1[02])-(?:0[1-9]|[12]\\d|3[01])|(?:0[469]|11)-(?:0[1-9]|[12]\\d|30)|(?:02)-(?:0[1-9]|1\\d|2[0-8])))T(?:(?:[01]\\d|2[0-3]):[0-5]\\d:[0-5]\\d(?:\\.\\d+)?(?:Z|([+-](?:[01]\\d|2[0-3]):[0-5]\\d)))$",
+          "description": "When the annotation last changed, as an ISO 8601 date-time with an offset. XFDF writes a PDF date string. Absent means unknown.",
+          "x-xfdf": "date"
+        },
+        "subject": {
+          "type": "string",
+          "description": "A short label for what the mark is. Absent means no label.",
+          "x-xfdf": "subject"
+        },
+        "intent": {
+          "description": "What the mark is for, such as a callout or an arrow. Absent means the type's plain form.",
+          "x-xfdf": "intent",
+          "$ref": "#/$defs/Intent"
+        },
+        "custom": {
+          "type": "object",
+          "propertyNames": { "type": "string" },
+          "additionalProperties": {},
+          "description": "Data of your own. Gloss readers keep it as it is and never interpret it. Absent means none."
+        },
+        "quads": {
+          "minItems": 1,
+          "type": "array",
+          "items": { "$ref": "#/$defs/Quad" },
+          "description": "The runs of text the mark covers, one quad per line. At least one.",
+          "x-xfdf": "coords"
+        }
+      },
+      "required": ["type", "id", "page", "rect", "quads"],
+      "additionalProperties": {},
+      "title": "Underline",
+      "description": "A line under a run of text. XFDF element underline.",
+      "x-xfdf": "underline",
+      "examples": [
+        {
+          "type": "underline",
+          "id": "a1",
+          "page": 0,
+          "author": "Ana",
+          "createdAt": "2026-10-19T12:00:00Z",
+          "rect": { "x": 72, "y": 700, "width": 120, "height": 14 },
+          "color": "#2F6FDE",
+          "quads": [
+            {
+              "p1": { "x": 72, "y": 714 },
+              "p2": { "x": 192, "y": 714 },
+              "p3": { "x": 72, "y": 700 },
+              "p4": { "x": 192, "y": 700 }
+            }
+          ]
+        }
+      ]
+    },
+    "Strikeout": {
+      "type": "object",
+      "properties": {
+        "type": {
+          "type": "string",
+          "const": "strikeout",
+          "description": "The annotation type. Always strikeout."
+        },
+        "id": {
+          "type": "string",
+          "minLength": 1,
+          "description": "Unique within the document. Never reused for a different annotation.",
+          "x-xfdf": "name"
+        },
+        "page": {
+          "type": "integer",
+          "minimum": 0,
+          "maximum": 9007199254740991,
+          "description": "The page the annotation is on, counted from 0.",
+          "x-xfdf": "page"
+        },
+        "rect": {
+          "description": "The bounding box, in PDF user space.",
+          "x-xfdf": "rect",
+          "$ref": "#/$defs/Rect"
+        },
+        "color": {
+          "description": "The annotation's colour. Absent: the reader chooses the colour.",
+          "x-xfdf": "color",
+          "$ref": "#/$defs/Color"
+        },
+        "opacity": {
+          "default": 1,
+          "type": "number",
+          "minimum": 0,
+          "maximum": 1,
+          "description": "Opacity, from 0 (invisible) to 1 (opaque). Absent means opaque.",
+          "x-xfdf": "opacity"
+        },
+        "author": {
+          "type": "string",
+          "description": "Who made the annotation. Absent means unknown.",
+          "x-xfdf": "title"
+        },
+        "contents": {
+          "type": "string",
+          "description": "The annotation's text, such as a comment or a note. Absent means no text.",
+          "x-xfdf": "contents"
+        },
+        "inReplyTo": {
+          "type": "string",
+          "description": "The id of the annotation this one replies to. Replies form threads. Absent means the annotation is not a reply.",
+          "x-xfdf": "inreplyto"
+        },
+        "createdAt": {
+          "type": "string",
+          "format": "date-time",
+          "pattern": "^(?:(?:\\d\\d[2468][048]|\\d\\d[13579][26]|\\d\\d0[48]|[02468][048]00|[13579][26]00)-02-29|\\d{4}-(?:(?:0[13578]|1[02])-(?:0[1-9]|[12]\\d|3[01])|(?:0[469]|11)-(?:0[1-9]|[12]\\d|30)|(?:02)-(?:0[1-9]|1\\d|2[0-8])))T(?:(?:[01]\\d|2[0-3]):[0-5]\\d:[0-5]\\d(?:\\.\\d+)?(?:Z|([+-](?:[01]\\d|2[0-3]):[0-5]\\d)))$",
+          "description": "When the annotation was made, as an ISO 8601 date-time with an offset. XFDF writes a PDF date string (D:20261019120000Z). Absent means unknown.",
+          "x-xfdf": "creationdate"
+        },
+        "modifiedAt": {
+          "type": "string",
+          "format": "date-time",
+          "pattern": "^(?:(?:\\d\\d[2468][048]|\\d\\d[13579][26]|\\d\\d0[48]|[02468][048]00|[13579][26]00)-02-29|\\d{4}-(?:(?:0[13578]|1[02])-(?:0[1-9]|[12]\\d|3[01])|(?:0[469]|11)-(?:0[1-9]|[12]\\d|30)|(?:02)-(?:0[1-9]|1\\d|2[0-8])))T(?:(?:[01]\\d|2[0-3]):[0-5]\\d:[0-5]\\d(?:\\.\\d+)?(?:Z|([+-](?:[01]\\d|2[0-3]):[0-5]\\d)))$",
+          "description": "When the annotation last changed, as an ISO 8601 date-time with an offset. XFDF writes a PDF date string. Absent means unknown.",
+          "x-xfdf": "date"
+        },
+        "subject": {
+          "type": "string",
+          "description": "A short label for what the mark is. Absent means no label.",
+          "x-xfdf": "subject"
+        },
+        "intent": {
+          "description": "What the mark is for, such as a callout or an arrow. Absent means the type's plain form.",
+          "x-xfdf": "intent",
+          "$ref": "#/$defs/Intent"
+        },
+        "custom": {
+          "type": "object",
+          "propertyNames": { "type": "string" },
+          "additionalProperties": {},
+          "description": "Data of your own. Gloss readers keep it as it is and never interpret it. Absent means none."
+        },
+        "quads": {
+          "minItems": 1,
+          "type": "array",
+          "items": { "$ref": "#/$defs/Quad" },
+          "description": "The runs of text the mark covers, one quad per line. At least one.",
+          "x-xfdf": "coords"
+        }
+      },
+      "required": ["type", "id", "page", "rect", "quads"],
+      "additionalProperties": {},
+      "title": "Strikeout",
+      "description": "A line through a run of text. XFDF element strikeout.",
+      "x-xfdf": "strikeout",
+      "examples": [
+        {
+          "type": "strikeout",
+          "id": "a1",
+          "page": 0,
+          "author": "Ana",
+          "createdAt": "2026-10-19T12:00:00Z",
+          "rect": { "x": 72, "y": 700, "width": 120, "height": 14 },
+          "color": "#D93025",
+          "quads": [
+            {
+              "p1": { "x": 72, "y": 714 },
+              "p2": { "x": 192, "y": 714 },
+              "p3": { "x": 72, "y": 700 },
+              "p4": { "x": 192, "y": 700 }
+            }
+          ]
+        }
+      ]
+    },
+    "Squiggly": {
+      "type": "object",
+      "properties": {
+        "type": {
+          "type": "string",
+          "const": "squiggly",
+          "description": "The annotation type. Always squiggly."
+        },
+        "id": {
+          "type": "string",
+          "minLength": 1,
+          "description": "Unique within the document. Never reused for a different annotation.",
+          "x-xfdf": "name"
+        },
+        "page": {
+          "type": "integer",
+          "minimum": 0,
+          "maximum": 9007199254740991,
+          "description": "The page the annotation is on, counted from 0.",
+          "x-xfdf": "page"
+        },
+        "rect": {
+          "description": "The bounding box, in PDF user space.",
+          "x-xfdf": "rect",
+          "$ref": "#/$defs/Rect"
+        },
+        "color": {
+          "description": "The annotation's colour. Absent: the reader chooses the colour.",
+          "x-xfdf": "color",
+          "$ref": "#/$defs/Color"
+        },
+        "opacity": {
+          "default": 1,
+          "type": "number",
+          "minimum": 0,
+          "maximum": 1,
+          "description": "Opacity, from 0 (invisible) to 1 (opaque). Absent means opaque.",
+          "x-xfdf": "opacity"
+        },
+        "author": {
+          "type": "string",
+          "description": "Who made the annotation. Absent means unknown.",
+          "x-xfdf": "title"
+        },
+        "contents": {
+          "type": "string",
+          "description": "The annotation's text, such as a comment or a note. Absent means no text.",
+          "x-xfdf": "contents"
+        },
+        "inReplyTo": {
+          "type": "string",
+          "description": "The id of the annotation this one replies to. Replies form threads. Absent means the annotation is not a reply.",
+          "x-xfdf": "inreplyto"
+        },
+        "createdAt": {
+          "type": "string",
+          "format": "date-time",
+          "pattern": "^(?:(?:\\d\\d[2468][048]|\\d\\d[13579][26]|\\d\\d0[48]|[02468][048]00|[13579][26]00)-02-29|\\d{4}-(?:(?:0[13578]|1[02])-(?:0[1-9]|[12]\\d|3[01])|(?:0[469]|11)-(?:0[1-9]|[12]\\d|30)|(?:02)-(?:0[1-9]|1\\d|2[0-8])))T(?:(?:[01]\\d|2[0-3]):[0-5]\\d:[0-5]\\d(?:\\.\\d+)?(?:Z|([+-](?:[01]\\d|2[0-3]):[0-5]\\d)))$",
+          "description": "When the annotation was made, as an ISO 8601 date-time with an offset. XFDF writes a PDF date string (D:20261019120000Z). Absent means unknown.",
+          "x-xfdf": "creationdate"
+        },
+        "modifiedAt": {
+          "type": "string",
+          "format": "date-time",
+          "pattern": "^(?:(?:\\d\\d[2468][048]|\\d\\d[13579][26]|\\d\\d0[48]|[02468][048]00|[13579][26]00)-02-29|\\d{4}-(?:(?:0[13578]|1[02])-(?:0[1-9]|[12]\\d|3[01])|(?:0[469]|11)-(?:0[1-9]|[12]\\d|30)|(?:02)-(?:0[1-9]|1\\d|2[0-8])))T(?:(?:[01]\\d|2[0-3]):[0-5]\\d:[0-5]\\d(?:\\.\\d+)?(?:Z|([+-](?:[01]\\d|2[0-3]):[0-5]\\d)))$",
+          "description": "When the annotation last changed, as an ISO 8601 date-time with an offset. XFDF writes a PDF date string. Absent means unknown.",
+          "x-xfdf": "date"
+        },
+        "subject": {
+          "type": "string",
+          "description": "A short label for what the mark is. Absent means no label.",
+          "x-xfdf": "subject"
+        },
+        "intent": {
+          "description": "What the mark is for, such as a callout or an arrow. Absent means the type's plain form.",
+          "x-xfdf": "intent",
+          "$ref": "#/$defs/Intent"
+        },
+        "custom": {
+          "type": "object",
+          "propertyNames": { "type": "string" },
+          "additionalProperties": {},
+          "description": "Data of your own. Gloss readers keep it as it is and never interpret it. Absent means none."
+        },
+        "quads": {
+          "minItems": 1,
+          "type": "array",
+          "items": { "$ref": "#/$defs/Quad" },
+          "description": "The runs of text the mark covers, one quad per line. At least one.",
+          "x-xfdf": "coords"
+        }
+      },
+      "required": ["type", "id", "page", "rect", "quads"],
+      "additionalProperties": {},
+      "title": "Squiggly",
+      "description": "A wavy line under a run of text. XFDF element squiggly.",
+      "x-xfdf": "squiggly",
+      "examples": [
+        {
+          "type": "squiggly",
+          "id": "a1",
+          "page": 0,
+          "author": "Ana",
+          "createdAt": "2026-10-19T12:00:00Z",
+          "rect": { "x": 72, "y": 700, "width": 120, "height": 14 },
+          "color": "#D93025",
+          "quads": [
+            {
+              "p1": { "x": 72, "y": 714 },
+              "p2": { "x": 192, "y": 714 },
+              "p3": { "x": 72, "y": 700 },
+              "p4": { "x": 192, "y": 700 }
+            }
+          ]
+        }
+      ]
+    },
+    "Note": {
+      "type": "object",
+      "properties": {
+        "type": {
+          "type": "string",
+          "const": "text",
+          "description": "The annotation type. Always text."
+        },
+        "id": {
+          "type": "string",
+          "minLength": 1,
+          "description": "Unique within the document. Never reused for a different annotation.",
+          "x-xfdf": "name"
+        },
+        "page": {
+          "type": "integer",
+          "minimum": 0,
+          "maximum": 9007199254740991,
+          "description": "The page the annotation is on, counted from 0.",
+          "x-xfdf": "page"
+        },
+        "rect": {
+          "description": "The bounding box, in PDF user space.",
+          "x-xfdf": "rect",
+          "$ref": "#/$defs/Rect"
+        },
+        "color": {
+          "description": "The annotation's colour. Absent: the reader chooses the colour.",
+          "x-xfdf": "color",
+          "$ref": "#/$defs/Color"
+        },
+        "opacity": {
+          "default": 1,
+          "type": "number",
+          "minimum": 0,
+          "maximum": 1,
+          "description": "Opacity, from 0 (invisible) to 1 (opaque). Absent means opaque.",
+          "x-xfdf": "opacity"
+        },
+        "author": {
+          "type": "string",
+          "description": "Who made the annotation. Absent means unknown.",
+          "x-xfdf": "title"
+        },
+        "contents": {
+          "type": "string",
+          "description": "The annotation's text, such as a comment or a note. Absent means no text.",
+          "x-xfdf": "contents"
+        },
+        "inReplyTo": {
+          "type": "string",
+          "description": "The id of the annotation this one replies to. Replies form threads. Absent means the annotation is not a reply.",
+          "x-xfdf": "inreplyto"
+        },
+        "createdAt": {
+          "type": "string",
+          "format": "date-time",
+          "pattern": "^(?:(?:\\d\\d[2468][048]|\\d\\d[13579][26]|\\d\\d0[48]|[02468][048]00|[13579][26]00)-02-29|\\d{4}-(?:(?:0[13578]|1[02])-(?:0[1-9]|[12]\\d|3[01])|(?:0[469]|11)-(?:0[1-9]|[12]\\d|30)|(?:02)-(?:0[1-9]|1\\d|2[0-8])))T(?:(?:[01]\\d|2[0-3]):[0-5]\\d:[0-5]\\d(?:\\.\\d+)?(?:Z|([+-](?:[01]\\d|2[0-3]):[0-5]\\d)))$",
+          "description": "When the annotation was made, as an ISO 8601 date-time with an offset. XFDF writes a PDF date string (D:20261019120000Z). Absent means unknown.",
+          "x-xfdf": "creationdate"
+        },
+        "modifiedAt": {
+          "type": "string",
+          "format": "date-time",
+          "pattern": "^(?:(?:\\d\\d[2468][048]|\\d\\d[13579][26]|\\d\\d0[48]|[02468][048]00|[13579][26]00)-02-29|\\d{4}-(?:(?:0[13578]|1[02])-(?:0[1-9]|[12]\\d|3[01])|(?:0[469]|11)-(?:0[1-9]|[12]\\d|30)|(?:02)-(?:0[1-9]|1\\d|2[0-8])))T(?:(?:[01]\\d|2[0-3]):[0-5]\\d:[0-5]\\d(?:\\.\\d+)?(?:Z|([+-](?:[01]\\d|2[0-3]):[0-5]\\d)))$",
+          "description": "When the annotation last changed, as an ISO 8601 date-time with an offset. XFDF writes a PDF date string. Absent means unknown.",
+          "x-xfdf": "date"
+        },
+        "subject": {
+          "type": "string",
+          "description": "A short label for what the mark is. Absent means no label.",
+          "x-xfdf": "subject"
+        },
+        "intent": {
+          "description": "What the mark is for, such as a callout or an arrow. Absent means the type's plain form.",
+          "x-xfdf": "intent",
+          "$ref": "#/$defs/Intent"
+        },
+        "custom": {
+          "type": "object",
+          "propertyNames": { "type": "string" },
+          "additionalProperties": {},
+          "description": "Data of your own. Gloss readers keep it as it is and never interpret it. Absent means none."
+        },
+        "icon": {
+          "default": "Note",
+          "description": "The icon the note shows on the page. Absent means Note.",
+          "x-xfdf": "icon",
+          "$ref": "#/$defs/NoteIcon"
+        }
+      },
+      "required": ["type", "id", "page", "rect"],
+      "additionalProperties": {},
+      "title": "Note",
+      "description": "A note: an icon on the page that opens to show its contents. XFDF element text.",
+      "x-xfdf": "text",
+      "examples": [
+        {
+          "type": "text",
+          "id": "a1",
+          "page": 0,
+          "author": "Ana",
+          "createdAt": "2026-10-19T12:00:00Z",
+          "rect": { "x": 400, "y": 700, "width": 20, "height": 20 },
+          "contents": "Is this date right?",
+          "icon": "Comment"
+        }
+      ]
+    },
+    "NoteIcon": {
+      "anyOf": [
+        {
+          "type": "string",
+          "enum": [
+            "Comment",
+            "Note",
+            "Help",
+            "Insert",
+            "Key",
+            "NewParagraph",
+            "Paragraph"
+          ]
+        },
+        { "type": "string", "pattern": "^[^\\s()<>[\\]{}/%]+$" }
+      ],
+      "title": "NoteIcon",
+      "description": "The icon a note shows on the page (XFDF icon, PDF /Name). One of Comment, Note, Help, Insert, Key, NewParagraph, Paragraph. Any other PDF name is allowed and is kept unchanged."
+    },
+    "FreeText": {
+      "type": "object",
+      "properties": {
+        "type": {
+          "type": "string",
+          "const": "freetext",
+          "description": "The annotation type. Always freetext."
+        },
+        "id": {
+          "type": "string",
+          "minLength": 1,
+          "description": "Unique within the document. Never reused for a different annotation.",
+          "x-xfdf": "name"
+        },
+        "page": {
+          "type": "integer",
+          "minimum": 0,
+          "maximum": 9007199254740991,
+          "description": "The page the annotation is on, counted from 0.",
+          "x-xfdf": "page"
+        },
+        "rect": {
+          "description": "The bounding box, in PDF user space.",
+          "x-xfdf": "rect",
+          "$ref": "#/$defs/Rect"
+        },
+        "color": {
+          "description": "The box's fill. Absent means no fill.",
+          "x-xfdf": "color",
+          "$ref": "#/$defs/Color"
+        },
+        "opacity": {
+          "default": 1,
+          "type": "number",
+          "minimum": 0,
+          "maximum": 1,
+          "description": "Opacity, from 0 (invisible) to 1 (opaque). Absent means opaque.",
+          "x-xfdf": "opacity"
+        },
+        "author": {
+          "type": "string",
+          "description": "Who made the annotation. Absent means unknown.",
+          "x-xfdf": "title"
+        },
+        "contents": {
+          "type": "string",
+          "description": "The text shown on the page.",
+          "x-xfdf": "contents"
+        },
+        "inReplyTo": {
+          "type": "string",
+          "description": "The id of the annotation this one replies to. Replies form threads. Absent means the annotation is not a reply.",
+          "x-xfdf": "inreplyto"
+        },
+        "createdAt": {
+          "type": "string",
+          "format": "date-time",
+          "pattern": "^(?:(?:\\d\\d[2468][048]|\\d\\d[13579][26]|\\d\\d0[48]|[02468][048]00|[13579][26]00)-02-29|\\d{4}-(?:(?:0[13578]|1[02])-(?:0[1-9]|[12]\\d|3[01])|(?:0[469]|11)-(?:0[1-9]|[12]\\d|30)|(?:02)-(?:0[1-9]|1\\d|2[0-8])))T(?:(?:[01]\\d|2[0-3]):[0-5]\\d:[0-5]\\d(?:\\.\\d+)?(?:Z|([+-](?:[01]\\d|2[0-3]):[0-5]\\d)))$",
+          "description": "When the annotation was made, as an ISO 8601 date-time with an offset. XFDF writes a PDF date string (D:20261019120000Z). Absent means unknown.",
+          "x-xfdf": "creationdate"
+        },
+        "modifiedAt": {
+          "type": "string",
+          "format": "date-time",
+          "pattern": "^(?:(?:\\d\\d[2468][048]|\\d\\d[13579][26]|\\d\\d0[48]|[02468][048]00|[13579][26]00)-02-29|\\d{4}-(?:(?:0[13578]|1[02])-(?:0[1-9]|[12]\\d|3[01])|(?:0[469]|11)-(?:0[1-9]|[12]\\d|30)|(?:02)-(?:0[1-9]|1\\d|2[0-8])))T(?:(?:[01]\\d|2[0-3]):[0-5]\\d:[0-5]\\d(?:\\.\\d+)?(?:Z|([+-](?:[01]\\d|2[0-3]):[0-5]\\d)))$",
+          "description": "When the annotation last changed, as an ISO 8601 date-time with an offset. XFDF writes a PDF date string. Absent means unknown.",
+          "x-xfdf": "date"
+        },
+        "subject": {
+          "type": "string",
+          "description": "A short label for what the mark is. Absent means no label.",
+          "x-xfdf": "subject"
+        },
+        "intent": {
+          "description": "What the mark is for, such as a callout or an arrow. Absent means the type's plain form.",
+          "x-xfdf": "intent",
+          "$ref": "#/$defs/Intent"
+        },
+        "custom": {
+          "type": "object",
+          "propertyNames": { "type": "string" },
+          "additionalProperties": {},
+          "description": "Data of your own. Gloss readers keep it as it is and never interpret it. Absent means none."
+        },
+        "borderColor": {
+          "description": "The border's colour. Absent: the reader chooses the colour. An extension; XFDF has no equivalent.",
+          "$ref": "#/$defs/Color"
+        },
+        "width": {
+          "default": 0,
+          "type": "number",
+          "minimum": 0,
+          "description": "The border's width in points; 0 draws no border. Absent means 0.",
+          "x-xfdf": "width"
+        },
+        "dashes": {
+          "description": "The dash pattern of the stroke. Absent means a solid line.",
+          "x-xfdf": "dashes",
+          "$ref": "#/$defs/Dashes"
+        },
+        "cornerRadius": {
+          "type": "number",
+          "minimum": 0,
+          "description": "The radius of the box's corners in points. Absent means square corners. An extension; XFDF has no equivalent."
+        },
+        "defaultStyle": {
+          "description": "The text style. Absent: each style field's own default applies.",
+          "x-xfdf": "defaultstyle",
+          "$ref": "#/$defs/FreeTextStyle"
+        },
+        "fringe": {
+          "description": "The insets from rect to the text box. Absent means the box is rect.",
+          "x-xfdf": "fringe",
+          "$ref": "#/$defs/Fringe"
+        },
+        "callout": {
+          "minItems": 2,
+          "maxItems": 3,
+          "type": "array",
+          "items": { "$ref": "#/$defs/Point" },
+          "description": "A callout's leader line: the tip, an optional bend, and the point where it meets the box (PDF /CL). Absent means no leader line.",
+          "x-xfdf": "callout"
+        },
+        "head": {
+          "description": "The line ending at a callout's tip. Absent means None.",
+          "x-xfdf": "head",
+          "$ref": "#/$defs/LineEnding"
+        }
+      },
+      "required": ["type", "id", "page", "rect", "contents"],
+      "additionalProperties": {},
+      "title": "FreeText",
+      "description": "Text drawn directly on the page in a box. color is the fill of the box and defaultStyle holds the text style. XFDF element freetext.",
+      "x-xfdf": "freetext",
+      "examples": [
+        {
+          "type": "freetext",
+          "id": "a1",
+          "page": 0,
+          "author": "Ana",
+          "createdAt": "2026-10-19T12:00:00Z",
+          "rect": { "x": 72, "y": 600, "width": 220, "height": 40 },
+          "contents": "Check this clause",
+          "defaultStyle": { "fontSize": 14, "color": "#1A1A1A" }
+        }
+      ]
+    },
+    "Dashes": {
+      "minItems": 1,
+      "type": "array",
+      "items": { "type": "number", "minimum": 0 },
+      "title": "Dashes",
+      "description": "A dash pattern in points: lengths on, then off, repeating (XFDF dashes, PDF /D)."
+    },
+    "FreeTextStyle": {
+      "type": "object",
+      "properties": {
+        "fontFamily": {
+          "default": "Helvetica",
+          "type": "string",
+          "minLength": 1,
+          "description": "The font family. Absent means Helvetica. XFDF writes it as font-family."
+        },
+        "fontSize": {
+          "default": 12,
+          "type": "number",
+          "exclusiveMinimum": 0,
+          "description": "The font size in points. Absent means 12. XFDF writes it as font-size."
+        },
+        "color": {
+          "description": "The text colour. Absent: the reader chooses the text colour.",
+          "$ref": "#/$defs/Color"
+        },
+        "textAlign": {
+          "default": "left",
+          "type": "string",
+          "enum": ["left", "center", "right", "justify"],
+          "description": "How lines of text line up in the box. Absent means left. XFDF writes it as text-align."
+        },
+        "fontWeight": {
+          "type": "string",
+          "const": "bold",
+          "description": "Bold text. Absent means normal weight. XFDF writes it as font-weight."
+        },
+        "fontStyle": {
+          "type": "string",
+          "const": "italic",
+          "description": "Italic text. Absent means upright. XFDF writes it as font-style."
+        },
+        "textDecoration": {
+          "type": "string",
+          "const": "underline",
+          "description": "Underlined text. Absent means no underline. XFDF writes it as text-decoration."
+        }
+      },
+      "additionalProperties": {},
+      "title": "FreeTextStyle",
+      "description": "A free-text box's text style. The keys are the CSS property names XFDF writes in its defaultstyle string, in camel case.",
+      "examples": [{ "fontFamily": "Helvetica", "fontSize": 12, "color": "#1A1A1A" }]
+    },
+    "Fringe": {
+      "type": "object",
+      "properties": {
+        "left": {
+          "type": "number",
+          "minimum": 0,
+          "description": "Inset from the left edge in points."
+        },
+        "top": {
+          "type": "number",
+          "minimum": 0,
+          "description": "Inset from the top edge in points."
+        },
+        "right": {
+          "type": "number",
+          "minimum": 0,
+          "description": "Inset from the right edge in points."
+        },
+        "bottom": {
+          "type": "number",
+          "minimum": 0,
+          "description": "Inset from the bottom edge in points."
+        }
+      },
+      "required": ["left", "top", "right", "bottom"],
+      "additionalProperties": {},
+      "title": "Fringe",
+      "description": "Insets from an annotation's rect to the area it draws in, in points (PDF /RD, XFDF fringe, both in this order)."
+    },
+    "LineEnding": {
+      "anyOf": [
+        {
+          "type": "string",
+          "enum": [
+            "None",
+            "Square",
+            "Circle",
+            "Diamond",
+            "OpenArrow",
+            "ClosedArrow",
+            "Butt",
+            "ROpenArrow",
+            "RClosedArrow",
+            "Slash"
+          ]
+        },
+        { "type": "string", "pattern": "^[^\\s()<>[\\]{}/%]+$" }
+      ],
+      "title": "LineEnding",
+      "description": "The shape drawn at the end of a line (XFDF head and tail, PDF /LE). One of None, Square, Circle, Diamond, OpenArrow, ClosedArrow, Butt, ROpenArrow, RClosedArrow, Slash. Any other PDF name is allowed and is kept unchanged."
+    },
+    "Square": {
+      "type": "object",
+      "properties": {
+        "type": {
+          "type": "string",
+          "const": "square",
+          "description": "The annotation type. Always square."
+        },
+        "id": {
+          "type": "string",
+          "minLength": 1,
+          "description": "Unique within the document. Never reused for a different annotation.",
+          "x-xfdf": "name"
+        },
+        "page": {
+          "type": "integer",
+          "minimum": 0,
+          "maximum": 9007199254740991,
+          "description": "The page the annotation is on, counted from 0.",
+          "x-xfdf": "page"
+        },
+        "rect": {
+          "description": "The bounding box, in PDF user space.",
+          "x-xfdf": "rect",
+          "$ref": "#/$defs/Rect"
+        },
+        "color": {
+          "description": "The annotation's colour. Absent: the reader chooses the colour.",
+          "x-xfdf": "color",
+          "$ref": "#/$defs/Color"
+        },
+        "opacity": {
+          "default": 1,
+          "type": "number",
+          "minimum": 0,
+          "maximum": 1,
+          "description": "Opacity, from 0 (invisible) to 1 (opaque). Absent means opaque.",
+          "x-xfdf": "opacity"
+        },
+        "author": {
+          "type": "string",
+          "description": "Who made the annotation. Absent means unknown.",
+          "x-xfdf": "title"
+        },
+        "contents": {
+          "type": "string",
+          "description": "The annotation's text, such as a comment or a note. Absent means no text.",
+          "x-xfdf": "contents"
+        },
+        "inReplyTo": {
+          "type": "string",
+          "description": "The id of the annotation this one replies to. Replies form threads. Absent means the annotation is not a reply.",
+          "x-xfdf": "inreplyto"
+        },
+        "createdAt": {
+          "type": "string",
+          "format": "date-time",
+          "pattern": "^(?:(?:\\d\\d[2468][048]|\\d\\d[13579][26]|\\d\\d0[48]|[02468][048]00|[13579][26]00)-02-29|\\d{4}-(?:(?:0[13578]|1[02])-(?:0[1-9]|[12]\\d|3[01])|(?:0[469]|11)-(?:0[1-9]|[12]\\d|30)|(?:02)-(?:0[1-9]|1\\d|2[0-8])))T(?:(?:[01]\\d|2[0-3]):[0-5]\\d:[0-5]\\d(?:\\.\\d+)?(?:Z|([+-](?:[01]\\d|2[0-3]):[0-5]\\d)))$",
+          "description": "When the annotation was made, as an ISO 8601 date-time with an offset. XFDF writes a PDF date string (D:20261019120000Z). Absent means unknown.",
+          "x-xfdf": "creationdate"
+        },
+        "modifiedAt": {
+          "type": "string",
+          "format": "date-time",
+          "pattern": "^(?:(?:\\d\\d[2468][048]|\\d\\d[13579][26]|\\d\\d0[48]|[02468][048]00|[13579][26]00)-02-29|\\d{4}-(?:(?:0[13578]|1[02])-(?:0[1-9]|[12]\\d|3[01])|(?:0[469]|11)-(?:0[1-9]|[12]\\d|30)|(?:02)-(?:0[1-9]|1\\d|2[0-8])))T(?:(?:[01]\\d|2[0-3]):[0-5]\\d:[0-5]\\d(?:\\.\\d+)?(?:Z|([+-](?:[01]\\d|2[0-3]):[0-5]\\d)))$",
+          "description": "When the annotation last changed, as an ISO 8601 date-time with an offset. XFDF writes a PDF date string. Absent means unknown.",
+          "x-xfdf": "date"
+        },
+        "subject": {
+          "type": "string",
+          "description": "A short label for what the mark is. Absent means no label.",
+          "x-xfdf": "subject"
+        },
+        "intent": {
+          "description": "What the mark is for, such as a callout or an arrow. Absent means the type's plain form.",
+          "x-xfdf": "intent",
+          "$ref": "#/$defs/Intent"
+        },
+        "custom": {
+          "type": "object",
+          "propertyNames": { "type": "string" },
+          "additionalProperties": {},
+          "description": "Data of your own. Gloss readers keep it as it is and never interpret it. Absent means none."
+        },
+        "width": {
+          "default": 1,
+          "type": "number",
+          "minimum": 0,
+          "description": "The stroke width in points. Absent means 1.",
+          "x-xfdf": "width"
+        },
+        "dashes": {
+          "description": "The dash pattern of the stroke. Absent means a solid line.",
+          "x-xfdf": "dashes",
+          "$ref": "#/$defs/Dashes"
+        },
+        "interiorColor": {
+          "description": "The fill inside the shape. Absent means no fill.",
+          "x-xfdf": "interior-color",
+          "$ref": "#/$defs/Color"
+        },
+        "cornerRadius": {
+          "type": "number",
+          "minimum": 0,
+          "description": "The radius of the corners in points. Absent means square corners. An extension; XFDF has no equivalent."
+        }
+      },
+      "required": ["type", "id", "page", "rect"],
+      "additionalProperties": {},
+      "title": "Square",
+      "description": "A rectangle drawn to fill rect. XFDF element square.",
+      "x-xfdf": "square",
+      "examples": [
+        {
+          "type": "square",
+          "id": "a1",
+          "page": 0,
+          "author": "Ana",
+          "createdAt": "2026-10-19T12:00:00Z",
+          "rect": { "x": 72, "y": 500, "width": 200, "height": 80 },
+          "color": "#D93025",
+          "width": 2
+        }
+      ]
+    },
+    "Circle": {
+      "type": "object",
+      "properties": {
+        "type": {
+          "type": "string",
+          "const": "circle",
+          "description": "The annotation type. Always circle."
+        },
+        "id": {
+          "type": "string",
+          "minLength": 1,
+          "description": "Unique within the document. Never reused for a different annotation.",
+          "x-xfdf": "name"
+        },
+        "page": {
+          "type": "integer",
+          "minimum": 0,
+          "maximum": 9007199254740991,
+          "description": "The page the annotation is on, counted from 0.",
+          "x-xfdf": "page"
+        },
+        "rect": {
+          "description": "The bounding box, in PDF user space.",
+          "x-xfdf": "rect",
+          "$ref": "#/$defs/Rect"
+        },
+        "color": {
+          "description": "The annotation's colour. Absent: the reader chooses the colour.",
+          "x-xfdf": "color",
+          "$ref": "#/$defs/Color"
+        },
+        "opacity": {
+          "default": 1,
+          "type": "number",
+          "minimum": 0,
+          "maximum": 1,
+          "description": "Opacity, from 0 (invisible) to 1 (opaque). Absent means opaque.",
+          "x-xfdf": "opacity"
+        },
+        "author": {
+          "type": "string",
+          "description": "Who made the annotation. Absent means unknown.",
+          "x-xfdf": "title"
+        },
+        "contents": {
+          "type": "string",
+          "description": "The annotation's text, such as a comment or a note. Absent means no text.",
+          "x-xfdf": "contents"
+        },
+        "inReplyTo": {
+          "type": "string",
+          "description": "The id of the annotation this one replies to. Replies form threads. Absent means the annotation is not a reply.",
+          "x-xfdf": "inreplyto"
+        },
+        "createdAt": {
+          "type": "string",
+          "format": "date-time",
+          "pattern": "^(?:(?:\\d\\d[2468][048]|\\d\\d[13579][26]|\\d\\d0[48]|[02468][048]00|[13579][26]00)-02-29|\\d{4}-(?:(?:0[13578]|1[02])-(?:0[1-9]|[12]\\d|3[01])|(?:0[469]|11)-(?:0[1-9]|[12]\\d|30)|(?:02)-(?:0[1-9]|1\\d|2[0-8])))T(?:(?:[01]\\d|2[0-3]):[0-5]\\d:[0-5]\\d(?:\\.\\d+)?(?:Z|([+-](?:[01]\\d|2[0-3]):[0-5]\\d)))$",
+          "description": "When the annotation was made, as an ISO 8601 date-time with an offset. XFDF writes a PDF date string (D:20261019120000Z). Absent means unknown.",
+          "x-xfdf": "creationdate"
+        },
+        "modifiedAt": {
+          "type": "string",
+          "format": "date-time",
+          "pattern": "^(?:(?:\\d\\d[2468][048]|\\d\\d[13579][26]|\\d\\d0[48]|[02468][048]00|[13579][26]00)-02-29|\\d{4}-(?:(?:0[13578]|1[02])-(?:0[1-9]|[12]\\d|3[01])|(?:0[469]|11)-(?:0[1-9]|[12]\\d|30)|(?:02)-(?:0[1-9]|1\\d|2[0-8])))T(?:(?:[01]\\d|2[0-3]):[0-5]\\d:[0-5]\\d(?:\\.\\d+)?(?:Z|([+-](?:[01]\\d|2[0-3]):[0-5]\\d)))$",
+          "description": "When the annotation last changed, as an ISO 8601 date-time with an offset. XFDF writes a PDF date string. Absent means unknown.",
+          "x-xfdf": "date"
+        },
+        "subject": {
+          "type": "string",
+          "description": "A short label for what the mark is. Absent means no label.",
+          "x-xfdf": "subject"
+        },
+        "intent": {
+          "description": "What the mark is for, such as a callout or an arrow. Absent means the type's plain form.",
+          "x-xfdf": "intent",
+          "$ref": "#/$defs/Intent"
+        },
+        "custom": {
+          "type": "object",
+          "propertyNames": { "type": "string" },
+          "additionalProperties": {},
+          "description": "Data of your own. Gloss readers keep it as it is and never interpret it. Absent means none."
+        },
+        "width": {
+          "default": 1,
+          "type": "number",
+          "minimum": 0,
+          "description": "The stroke width in points. Absent means 1.",
+          "x-xfdf": "width"
+        },
+        "dashes": {
+          "description": "The dash pattern of the stroke. Absent means a solid line.",
+          "x-xfdf": "dashes",
+          "$ref": "#/$defs/Dashes"
+        },
+        "interiorColor": {
+          "description": "The fill inside the shape. Absent means no fill.",
+          "x-xfdf": "interior-color",
+          "$ref": "#/$defs/Color"
+        }
+      },
+      "required": ["type", "id", "page", "rect"],
+      "additionalProperties": {},
+      "title": "Circle",
+      "description": "An ellipse inscribed in rect. XFDF element circle.",
+      "x-xfdf": "circle",
+      "examples": [
+        {
+          "type": "circle",
+          "id": "a1",
+          "page": 0,
+          "author": "Ana",
+          "createdAt": "2026-10-19T12:00:00Z",
+          "rect": { "x": 300, "y": 500, "width": 80, "height": 80 },
+          "color": "#2F6FDE",
+          "interiorColor": "#DCE8FB"
+        }
+      ]
+    },
+    "Line": {
+      "type": "object",
+      "properties": {
+        "type": {
+          "type": "string",
+          "const": "line",
+          "description": "The annotation type. Always line."
+        },
+        "id": {
+          "type": "string",
+          "minLength": 1,
+          "description": "Unique within the document. Never reused for a different annotation.",
+          "x-xfdf": "name"
+        },
+        "page": {
+          "type": "integer",
+          "minimum": 0,
+          "maximum": 9007199254740991,
+          "description": "The page the annotation is on, counted from 0.",
+          "x-xfdf": "page"
+        },
+        "rect": {
+          "description": "The bounding box, in PDF user space.",
+          "x-xfdf": "rect",
+          "$ref": "#/$defs/Rect"
+        },
+        "color": {
+          "description": "The annotation's colour. Absent: the reader chooses the colour.",
+          "x-xfdf": "color",
+          "$ref": "#/$defs/Color"
+        },
+        "opacity": {
+          "default": 1,
+          "type": "number",
+          "minimum": 0,
+          "maximum": 1,
+          "description": "Opacity, from 0 (invisible) to 1 (opaque). Absent means opaque.",
+          "x-xfdf": "opacity"
+        },
+        "author": {
+          "type": "string",
+          "description": "Who made the annotation. Absent means unknown.",
+          "x-xfdf": "title"
+        },
+        "contents": {
+          "type": "string",
+          "description": "The annotation's text, such as a comment or a note. Absent means no text.",
+          "x-xfdf": "contents"
+        },
+        "inReplyTo": {
+          "type": "string",
+          "description": "The id of the annotation this one replies to. Replies form threads. Absent means the annotation is not a reply.",
+          "x-xfdf": "inreplyto"
+        },
+        "createdAt": {
+          "type": "string",
+          "format": "date-time",
+          "pattern": "^(?:(?:\\d\\d[2468][048]|\\d\\d[13579][26]|\\d\\d0[48]|[02468][048]00|[13579][26]00)-02-29|\\d{4}-(?:(?:0[13578]|1[02])-(?:0[1-9]|[12]\\d|3[01])|(?:0[469]|11)-(?:0[1-9]|[12]\\d|30)|(?:02)-(?:0[1-9]|1\\d|2[0-8])))T(?:(?:[01]\\d|2[0-3]):[0-5]\\d:[0-5]\\d(?:\\.\\d+)?(?:Z|([+-](?:[01]\\d|2[0-3]):[0-5]\\d)))$",
+          "description": "When the annotation was made, as an ISO 8601 date-time with an offset. XFDF writes a PDF date string (D:20261019120000Z). Absent means unknown.",
+          "x-xfdf": "creationdate"
+        },
+        "modifiedAt": {
+          "type": "string",
+          "format": "date-time",
+          "pattern": "^(?:(?:\\d\\d[2468][048]|\\d\\d[13579][26]|\\d\\d0[48]|[02468][048]00|[13579][26]00)-02-29|\\d{4}-(?:(?:0[13578]|1[02])-(?:0[1-9]|[12]\\d|3[01])|(?:0[469]|11)-(?:0[1-9]|[12]\\d|30)|(?:02)-(?:0[1-9]|1\\d|2[0-8])))T(?:(?:[01]\\d|2[0-3]):[0-5]\\d:[0-5]\\d(?:\\.\\d+)?(?:Z|([+-](?:[01]\\d|2[0-3]):[0-5]\\d)))$",
+          "description": "When the annotation last changed, as an ISO 8601 date-time with an offset. XFDF writes a PDF date string. Absent means unknown.",
+          "x-xfdf": "date"
+        },
+        "subject": {
+          "type": "string",
+          "description": "A short label for what the mark is. Absent means no label.",
+          "x-xfdf": "subject"
+        },
+        "intent": {
+          "description": "What the mark is for, such as a callout or an arrow. Absent means the type's plain form.",
+          "x-xfdf": "intent",
+          "$ref": "#/$defs/Intent"
+        },
+        "custom": {
+          "type": "object",
+          "propertyNames": { "type": "string" },
+          "additionalProperties": {},
+          "description": "Data of your own. Gloss readers keep it as it is and never interpret it. Absent means none."
+        },
+        "start": {
+          "description": "Where the line starts.",
+          "x-xfdf": "start",
+          "$ref": "#/$defs/Point"
+        },
+        "end": {
+          "description": "Where the line ends.",
+          "x-xfdf": "end",
+          "$ref": "#/$defs/Point"
+        },
+        "width": {
+          "default": 1,
+          "type": "number",
+          "minimum": 0,
+          "description": "The stroke width in points. Absent means 1.",
+          "x-xfdf": "width"
+        },
+        "dashes": {
+          "description": "The dash pattern of the stroke. Absent means a solid line.",
+          "x-xfdf": "dashes",
+          "$ref": "#/$defs/Dashes"
+        },
+        "head": {
+          "description": "The line ending at the start. Absent means None.",
+          "x-xfdf": "head",
+          "$ref": "#/$defs/LineEnding"
+        },
+        "tail": {
+          "description": "The line ending at the end. Absent means None.",
+          "x-xfdf": "tail",
+          "$ref": "#/$defs/LineEnding"
+        }
+      },
+      "required": ["type", "id", "page", "rect", "start", "end"],
+      "additionalProperties": {},
+      "title": "Line",
+      "description": "A straight line from start to end. XFDF element line.",
+      "x-xfdf": "line",
+      "examples": [
+        {
+          "type": "line",
+          "id": "a1",
+          "page": 0,
+          "author": "Ana",
+          "createdAt": "2026-10-19T12:00:00Z",
+          "rect": { "x": 72, "y": 400, "width": 200, "height": 50 },
+          "start": { "x": 72, "y": 400 },
+          "end": { "x": 272, "y": 450 },
+          "tail": "OpenArrow"
+        }
+      ]
+    },
+    "Polyline": {
+      "type": "object",
+      "properties": {
+        "type": {
+          "type": "string",
+          "const": "polyline",
+          "description": "The annotation type. Always polyline."
+        },
+        "id": {
+          "type": "string",
+          "minLength": 1,
+          "description": "Unique within the document. Never reused for a different annotation.",
+          "x-xfdf": "name"
+        },
+        "page": {
+          "type": "integer",
+          "minimum": 0,
+          "maximum": 9007199254740991,
+          "description": "The page the annotation is on, counted from 0.",
+          "x-xfdf": "page"
+        },
+        "rect": {
+          "description": "The bounding box, in PDF user space.",
+          "x-xfdf": "rect",
+          "$ref": "#/$defs/Rect"
+        },
+        "color": {
+          "description": "The annotation's colour. Absent: the reader chooses the colour.",
+          "x-xfdf": "color",
+          "$ref": "#/$defs/Color"
+        },
+        "opacity": {
+          "default": 1,
+          "type": "number",
+          "minimum": 0,
+          "maximum": 1,
+          "description": "Opacity, from 0 (invisible) to 1 (opaque). Absent means opaque.",
+          "x-xfdf": "opacity"
+        },
+        "author": {
+          "type": "string",
+          "description": "Who made the annotation. Absent means unknown.",
+          "x-xfdf": "title"
+        },
+        "contents": {
+          "type": "string",
+          "description": "The annotation's text, such as a comment or a note. Absent means no text.",
+          "x-xfdf": "contents"
+        },
+        "inReplyTo": {
+          "type": "string",
+          "description": "The id of the annotation this one replies to. Replies form threads. Absent means the annotation is not a reply.",
+          "x-xfdf": "inreplyto"
+        },
+        "createdAt": {
+          "type": "string",
+          "format": "date-time",
+          "pattern": "^(?:(?:\\d\\d[2468][048]|\\d\\d[13579][26]|\\d\\d0[48]|[02468][048]00|[13579][26]00)-02-29|\\d{4}-(?:(?:0[13578]|1[02])-(?:0[1-9]|[12]\\d|3[01])|(?:0[469]|11)-(?:0[1-9]|[12]\\d|30)|(?:02)-(?:0[1-9]|1\\d|2[0-8])))T(?:(?:[01]\\d|2[0-3]):[0-5]\\d:[0-5]\\d(?:\\.\\d+)?(?:Z|([+-](?:[01]\\d|2[0-3]):[0-5]\\d)))$",
+          "description": "When the annotation was made, as an ISO 8601 date-time with an offset. XFDF writes a PDF date string (D:20261019120000Z). Absent means unknown.",
+          "x-xfdf": "creationdate"
+        },
+        "modifiedAt": {
+          "type": "string",
+          "format": "date-time",
+          "pattern": "^(?:(?:\\d\\d[2468][048]|\\d\\d[13579][26]|\\d\\d0[48]|[02468][048]00|[13579][26]00)-02-29|\\d{4}-(?:(?:0[13578]|1[02])-(?:0[1-9]|[12]\\d|3[01])|(?:0[469]|11)-(?:0[1-9]|[12]\\d|30)|(?:02)-(?:0[1-9]|1\\d|2[0-8])))T(?:(?:[01]\\d|2[0-3]):[0-5]\\d:[0-5]\\d(?:\\.\\d+)?(?:Z|([+-](?:[01]\\d|2[0-3]):[0-5]\\d)))$",
+          "description": "When the annotation last changed, as an ISO 8601 date-time with an offset. XFDF writes a PDF date string. Absent means unknown.",
+          "x-xfdf": "date"
+        },
+        "subject": {
+          "type": "string",
+          "description": "A short label for what the mark is. Absent means no label.",
+          "x-xfdf": "subject"
+        },
+        "intent": {
+          "description": "What the mark is for, such as a callout or an arrow. Absent means the type's plain form.",
+          "x-xfdf": "intent",
+          "$ref": "#/$defs/Intent"
+        },
+        "custom": {
+          "type": "object",
+          "propertyNames": { "type": "string" },
+          "additionalProperties": {},
+          "description": "Data of your own. Gloss readers keep it as it is and never interpret it. Absent means none."
+        },
+        "vertices": {
+          "minItems": 2,
+          "type": "array",
+          "items": { "$ref": "#/$defs/Point" },
+          "description": "The points the lines join, in order. At least two.",
+          "x-xfdf": "vertices"
+        },
+        "width": {
+          "default": 1,
+          "type": "number",
+          "minimum": 0,
+          "description": "The stroke width in points. Absent means 1.",
+          "x-xfdf": "width"
+        },
+        "dashes": {
+          "description": "The dash pattern of the stroke. Absent means a solid line.",
+          "x-xfdf": "dashes",
+          "$ref": "#/$defs/Dashes"
+        },
+        "interiorColor": {
+          "description": "The fill inside the shape. Absent means no fill.",
+          "x-xfdf": "interior-color",
+          "$ref": "#/$defs/Color"
+        },
+        "head": {
+          "description": "The line ending at the first vertex. Absent means None.",
+          "x-xfdf": "head",
+          "$ref": "#/$defs/LineEnding"
+        },
+        "tail": {
+          "description": "The line ending at the last vertex. Absent means None.",
+          "x-xfdf": "tail",
+          "$ref": "#/$defs/LineEnding"
+        }
+      },
+      "required": ["type", "id", "page", "rect", "vertices"],
+      "additionalProperties": {},
+      "title": "Polyline",
+      "description": "Straight lines joining vertices in order, left open. XFDF element polyline.",
+      "x-xfdf": "polyline",
+      "examples": [
+        {
+          "type": "polyline",
+          "id": "a1",
+          "page": 0,
+          "author": "Ana",
+          "createdAt": "2026-10-19T12:00:00Z",
+          "rect": { "x": 72, "y": 300, "width": 200, "height": 60 },
+          "vertices": [
+            { "x": 72, "y": 300 },
+            { "x": 172, "y": 360 },
+            { "x": 272, "y": 300 }
+          ],
+          "width": 2
+        }
+      ]
+    },
+    "Polygon": {
+      "type": "object",
+      "properties": {
+        "type": {
+          "type": "string",
+          "const": "polygon",
+          "description": "The annotation type. Always polygon."
+        },
+        "id": {
+          "type": "string",
+          "minLength": 1,
+          "description": "Unique within the document. Never reused for a different annotation.",
+          "x-xfdf": "name"
+        },
+        "page": {
+          "type": "integer",
+          "minimum": 0,
+          "maximum": 9007199254740991,
+          "description": "The page the annotation is on, counted from 0.",
+          "x-xfdf": "page"
+        },
+        "rect": {
+          "description": "The bounding box, in PDF user space.",
+          "x-xfdf": "rect",
+          "$ref": "#/$defs/Rect"
+        },
+        "color": {
+          "description": "The annotation's colour. Absent: the reader chooses the colour.",
+          "x-xfdf": "color",
+          "$ref": "#/$defs/Color"
+        },
+        "opacity": {
+          "default": 1,
+          "type": "number",
+          "minimum": 0,
+          "maximum": 1,
+          "description": "Opacity, from 0 (invisible) to 1 (opaque). Absent means opaque.",
+          "x-xfdf": "opacity"
+        },
+        "author": {
+          "type": "string",
+          "description": "Who made the annotation. Absent means unknown.",
+          "x-xfdf": "title"
+        },
+        "contents": {
+          "type": "string",
+          "description": "The annotation's text, such as a comment or a note. Absent means no text.",
+          "x-xfdf": "contents"
+        },
+        "inReplyTo": {
+          "type": "string",
+          "description": "The id of the annotation this one replies to. Replies form threads. Absent means the annotation is not a reply.",
+          "x-xfdf": "inreplyto"
+        },
+        "createdAt": {
+          "type": "string",
+          "format": "date-time",
+          "pattern": "^(?:(?:\\d\\d[2468][048]|\\d\\d[13579][26]|\\d\\d0[48]|[02468][048]00|[13579][26]00)-02-29|\\d{4}-(?:(?:0[13578]|1[02])-(?:0[1-9]|[12]\\d|3[01])|(?:0[469]|11)-(?:0[1-9]|[12]\\d|30)|(?:02)-(?:0[1-9]|1\\d|2[0-8])))T(?:(?:[01]\\d|2[0-3]):[0-5]\\d:[0-5]\\d(?:\\.\\d+)?(?:Z|([+-](?:[01]\\d|2[0-3]):[0-5]\\d)))$",
+          "description": "When the annotation was made, as an ISO 8601 date-time with an offset. XFDF writes a PDF date string (D:20261019120000Z). Absent means unknown.",
+          "x-xfdf": "creationdate"
+        },
+        "modifiedAt": {
+          "type": "string",
+          "format": "date-time",
+          "pattern": "^(?:(?:\\d\\d[2468][048]|\\d\\d[13579][26]|\\d\\d0[48]|[02468][048]00|[13579][26]00)-02-29|\\d{4}-(?:(?:0[13578]|1[02])-(?:0[1-9]|[12]\\d|3[01])|(?:0[469]|11)-(?:0[1-9]|[12]\\d|30)|(?:02)-(?:0[1-9]|1\\d|2[0-8])))T(?:(?:[01]\\d|2[0-3]):[0-5]\\d:[0-5]\\d(?:\\.\\d+)?(?:Z|([+-](?:[01]\\d|2[0-3]):[0-5]\\d)))$",
+          "description": "When the annotation last changed, as an ISO 8601 date-time with an offset. XFDF writes a PDF date string. Absent means unknown.",
+          "x-xfdf": "date"
+        },
+        "subject": {
+          "type": "string",
+          "description": "A short label for what the mark is. Absent means no label.",
+          "x-xfdf": "subject"
+        },
+        "intent": {
+          "description": "What the mark is for, such as a callout or an arrow. Absent means the type's plain form.",
+          "x-xfdf": "intent",
+          "$ref": "#/$defs/Intent"
+        },
+        "custom": {
+          "type": "object",
+          "propertyNames": { "type": "string" },
+          "additionalProperties": {},
+          "description": "Data of your own. Gloss readers keep it as it is and never interpret it. Absent means none."
+        },
+        "vertices": {
+          "minItems": 2,
+          "type": "array",
+          "items": { "$ref": "#/$defs/Point" },
+          "description": "The points the lines join, in order. At least two.",
+          "x-xfdf": "vertices"
+        },
+        "width": {
+          "default": 1,
+          "type": "number",
+          "minimum": 0,
+          "description": "The stroke width in points. Absent means 1.",
+          "x-xfdf": "width"
+        },
+        "dashes": {
+          "description": "The dash pattern of the stroke. Absent means a solid line.",
+          "x-xfdf": "dashes",
+          "$ref": "#/$defs/Dashes"
+        },
+        "interiorColor": {
+          "description": "The fill inside the shape. Absent means no fill.",
+          "x-xfdf": "interior-color",
+          "$ref": "#/$defs/Color"
+        }
+      },
+      "required": ["type", "id", "page", "rect", "vertices"],
+      "additionalProperties": {},
+      "title": "Polygon",
+      "description": "Straight lines joining vertices in order, closed back to the first. XFDF element polygon.",
+      "x-xfdf": "polygon",
+      "examples": [
+        {
+          "type": "polygon",
+          "id": "a1",
+          "page": 0,
+          "author": "Ana",
+          "createdAt": "2026-10-19T12:00:00Z",
+          "rect": { "x": 72, "y": 200, "width": 200, "height": 60 },
+          "vertices": [
+            { "x": 72, "y": 200 },
+            { "x": 172, "y": 260 },
+            { "x": 272, "y": 200 }
+          ],
+          "interiorColor": "#FFE066"
+        }
+      ]
+    },
+    "Ink": {
+      "type": "object",
+      "properties": {
+        "type": {
+          "type": "string",
+          "const": "ink",
+          "description": "The annotation type. Always ink."
+        },
+        "id": {
+          "type": "string",
+          "minLength": 1,
+          "description": "Unique within the document. Never reused for a different annotation.",
+          "x-xfdf": "name"
+        },
+        "page": {
+          "type": "integer",
+          "minimum": 0,
+          "maximum": 9007199254740991,
+          "description": "The page the annotation is on, counted from 0.",
+          "x-xfdf": "page"
+        },
+        "rect": {
+          "description": "The bounding box, in PDF user space.",
+          "x-xfdf": "rect",
+          "$ref": "#/$defs/Rect"
+        },
+        "color": {
+          "description": "The annotation's colour. Absent: the reader chooses the colour.",
+          "x-xfdf": "color",
+          "$ref": "#/$defs/Color"
+        },
+        "opacity": {
+          "default": 1,
+          "type": "number",
+          "minimum": 0,
+          "maximum": 1,
+          "description": "Opacity, from 0 (invisible) to 1 (opaque). Absent means opaque.",
+          "x-xfdf": "opacity"
+        },
+        "author": {
+          "type": "string",
+          "description": "Who made the annotation. Absent means unknown.",
+          "x-xfdf": "title"
+        },
+        "contents": {
+          "type": "string",
+          "description": "The annotation's text, such as a comment or a note. Absent means no text.",
+          "x-xfdf": "contents"
+        },
+        "inReplyTo": {
+          "type": "string",
+          "description": "The id of the annotation this one replies to. Replies form threads. Absent means the annotation is not a reply.",
+          "x-xfdf": "inreplyto"
+        },
+        "createdAt": {
+          "type": "string",
+          "format": "date-time",
+          "pattern": "^(?:(?:\\d\\d[2468][048]|\\d\\d[13579][26]|\\d\\d0[48]|[02468][048]00|[13579][26]00)-02-29|\\d{4}-(?:(?:0[13578]|1[02])-(?:0[1-9]|[12]\\d|3[01])|(?:0[469]|11)-(?:0[1-9]|[12]\\d|30)|(?:02)-(?:0[1-9]|1\\d|2[0-8])))T(?:(?:[01]\\d|2[0-3]):[0-5]\\d:[0-5]\\d(?:\\.\\d+)?(?:Z|([+-](?:[01]\\d|2[0-3]):[0-5]\\d)))$",
+          "description": "When the annotation was made, as an ISO 8601 date-time with an offset. XFDF writes a PDF date string (D:20261019120000Z). Absent means unknown.",
+          "x-xfdf": "creationdate"
+        },
+        "modifiedAt": {
+          "type": "string",
+          "format": "date-time",
+          "pattern": "^(?:(?:\\d\\d[2468][048]|\\d\\d[13579][26]|\\d\\d0[48]|[02468][048]00|[13579][26]00)-02-29|\\d{4}-(?:(?:0[13578]|1[02])-(?:0[1-9]|[12]\\d|3[01])|(?:0[469]|11)-(?:0[1-9]|[12]\\d|30)|(?:02)-(?:0[1-9]|1\\d|2[0-8])))T(?:(?:[01]\\d|2[0-3]):[0-5]\\d:[0-5]\\d(?:\\.\\d+)?(?:Z|([+-](?:[01]\\d|2[0-3]):[0-5]\\d)))$",
+          "description": "When the annotation last changed, as an ISO 8601 date-time with an offset. XFDF writes a PDF date string. Absent means unknown.",
+          "x-xfdf": "date"
+        },
+        "subject": {
+          "type": "string",
+          "description": "A short label for what the mark is. Absent means no label.",
+          "x-xfdf": "subject"
+        },
+        "intent": {
+          "description": "What the mark is for, such as a callout or an arrow. Absent means the type's plain form.",
+          "x-xfdf": "intent",
+          "$ref": "#/$defs/Intent"
+        },
+        "custom": {
+          "type": "object",
+          "propertyNames": { "type": "string" },
+          "additionalProperties": {},
+          "description": "Data of your own. Gloss readers keep it as it is and never interpret it. Absent means none."
+        },
+        "inklist": {
+          "minItems": 1,
+          "type": "array",
+          "items": {
+            "minItems": 1,
+            "type": "array",
+            "items": { "$ref": "#/$defs/Point" }
+          },
+          "description": "The strokes, each a list of points in the order they were drawn. At least one stroke of at least one point.",
+          "x-xfdf": "inklist"
+        },
+        "pressure": {
+          "type": "array",
+          "items": {
+            "type": "array",
+            "items": { "type": "number", "minimum": 0, "maximum": 1 }
+          },
+          "description": "Pen pressure per point, from 0 to 1. It has the same shape as inklist: one list per stroke, one value per point. JSON Schema cannot check that rule, so a validator must. Absent means no pressure data, as with mouse input."
+        },
+        "width": {
+          "default": 2,
+          "type": "number",
+          "minimum": 0,
+          "description": "The stroke width in points. Absent means 2.",
+          "x-xfdf": "width"
+        },
+        "dashes": {
+          "description": "The dash pattern of the stroke. Absent means a solid line.",
+          "x-xfdf": "dashes",
+          "$ref": "#/$defs/Dashes"
+        }
+      },
+      "required": ["type", "id", "page", "rect", "inklist"],
+      "additionalProperties": {},
+      "title": "Ink",
+      "description": "Freehand strokes. XFDF element ink.",
+      "x-xfdf": "ink",
+      "examples": [
+        {
+          "type": "ink",
+          "id": "a1",
+          "page": 0,
+          "author": "Ana",
+          "createdAt": "2026-10-19T12:00:00Z",
+          "rect": { "x": 100, "y": 100, "width": 60, "height": 30 },
+          "inklist": [
+            [
+              { "x": 100, "y": 100 },
+              { "x": 130, "y": 130 },
+              { "x": 160, "y": 110 }
+            ]
+          ],
+          "color": "#1A1A1A"
+        }
+      ]
+    },
+    "Stamp": {
+      "type": "object",
+      "properties": {
+        "type": {
+          "type": "string",
+          "const": "stamp",
+          "description": "The annotation type. Always stamp."
+        },
+        "id": {
+          "type": "string",
+          "minLength": 1,
+          "description": "Unique within the document. Never reused for a different annotation.",
+          "x-xfdf": "name"
+        },
+        "page": {
+          "type": "integer",
+          "minimum": 0,
+          "maximum": 9007199254740991,
+          "description": "The page the annotation is on, counted from 0.",
+          "x-xfdf": "page"
+        },
+        "rect": {
+          "description": "The bounding box, in PDF user space.",
+          "x-xfdf": "rect",
+          "$ref": "#/$defs/Rect"
+        },
+        "color": {
+          "description": "The annotation's colour. Absent: the reader chooses the colour.",
+          "x-xfdf": "color",
+          "$ref": "#/$defs/Color"
+        },
+        "opacity": {
+          "default": 1,
+          "type": "number",
+          "minimum": 0,
+          "maximum": 1,
+          "description": "Opacity, from 0 (invisible) to 1 (opaque). Absent means opaque.",
+          "x-xfdf": "opacity"
+        },
+        "author": {
+          "type": "string",
+          "description": "Who made the annotation. Absent means unknown.",
+          "x-xfdf": "title"
+        },
+        "contents": {
+          "type": "string",
+          "description": "The annotation's text, such as a comment or a note. Absent means no text.",
+          "x-xfdf": "contents"
+        },
+        "inReplyTo": {
+          "type": "string",
+          "description": "The id of the annotation this one replies to. Replies form threads. Absent means the annotation is not a reply.",
+          "x-xfdf": "inreplyto"
+        },
+        "createdAt": {
+          "type": "string",
+          "format": "date-time",
+          "pattern": "^(?:(?:\\d\\d[2468][048]|\\d\\d[13579][26]|\\d\\d0[48]|[02468][048]00|[13579][26]00)-02-29|\\d{4}-(?:(?:0[13578]|1[02])-(?:0[1-9]|[12]\\d|3[01])|(?:0[469]|11)-(?:0[1-9]|[12]\\d|30)|(?:02)-(?:0[1-9]|1\\d|2[0-8])))T(?:(?:[01]\\d|2[0-3]):[0-5]\\d:[0-5]\\d(?:\\.\\d+)?(?:Z|([+-](?:[01]\\d|2[0-3]):[0-5]\\d)))$",
+          "description": "When the annotation was made, as an ISO 8601 date-time with an offset. XFDF writes a PDF date string (D:20261019120000Z). Absent means unknown.",
+          "x-xfdf": "creationdate"
+        },
+        "modifiedAt": {
+          "type": "string",
+          "format": "date-time",
+          "pattern": "^(?:(?:\\d\\d[2468][048]|\\d\\d[13579][26]|\\d\\d0[48]|[02468][048]00|[13579][26]00)-02-29|\\d{4}-(?:(?:0[13578]|1[02])-(?:0[1-9]|[12]\\d|3[01])|(?:0[469]|11)-(?:0[1-9]|[12]\\d|30)|(?:02)-(?:0[1-9]|1\\d|2[0-8])))T(?:(?:[01]\\d|2[0-3]):[0-5]\\d:[0-5]\\d(?:\\.\\d+)?(?:Z|([+-](?:[01]\\d|2[0-3]):[0-5]\\d)))$",
+          "description": "When the annotation last changed, as an ISO 8601 date-time with an offset. XFDF writes a PDF date string. Absent means unknown.",
+          "x-xfdf": "date"
+        },
+        "subject": {
+          "type": "string",
+          "description": "A short label for what the mark is. Absent means no label.",
+          "x-xfdf": "subject"
+        },
+        "intent": {
+          "description": "What the mark is for, such as a callout or an arrow. Absent means the type's plain form.",
+          "x-xfdf": "intent",
+          "$ref": "#/$defs/Intent"
+        },
+        "custom": {
+          "type": "object",
+          "propertyNames": { "type": "string" },
+          "additionalProperties": {},
+          "description": "Data of your own. Gloss readers keep it as it is and never interpret it. Absent means none."
+        },
+        "imagedata": {
+          "type": "string",
+          "pattern": "^data:image\\/(png|jpeg);base64,",
+          "description": "The image, as a base64 PNG or JPEG data URL.",
+          "x-xfdf": "imagedata"
+        },
+        "rotation": {
+          "type": "number",
+          "enum": [0, 90, 180, 270],
+          "description": "Quarter turns, in degrees anticlockwise, the image is turned within rect. Absent means upright in user space.",
+          "x-xfdf": "rotation"
+        }
+      },
+      "required": ["type", "id", "page", "rect", "imagedata"],
+      "additionalProperties": {},
+      "title": "Stamp",
+      "description": "An image drawn to fill rect. A signature is a stamp with subject Signature. XFDF element stamp.",
+      "x-xfdf": "stamp",
+      "examples": [
+        {
+          "type": "stamp",
+          "id": "a1",
+          "page": 0,
+          "author": "Ana",
+          "createdAt": "2026-10-19T12:00:00Z",
+          "rect": { "x": 350, "y": 80, "width": 160, "height": 50 },
+          "imagedata": "data:image/png;base64,iVBORw0KGgo=",
+          "subject": "Signature"
+        }
+      ]
+    },
+    "Loupe": {
+      "type": "object",
+      "properties": {
+        "type": {
+          "type": "string",
+          "const": "loupe",
+          "description": "The annotation type. Always loupe."
+        },
+        "id": {
+          "type": "string",
+          "minLength": 1,
+          "description": "Unique within the document. Never reused for a different annotation.",
+          "x-xfdf": "name"
+        },
+        "page": {
+          "type": "integer",
+          "minimum": 0,
+          "maximum": 9007199254740991,
+          "description": "The page the annotation is on, counted from 0.",
+          "x-xfdf": "page"
+        },
+        "rect": {
+          "description": "The bounding box, in PDF user space.",
+          "x-xfdf": "rect",
+          "$ref": "#/$defs/Rect"
+        },
+        "color": {
+          "description": "The annotation's colour. Absent: the reader chooses the colour.",
+          "x-xfdf": "color",
+          "$ref": "#/$defs/Color"
+        },
+        "opacity": {
+          "default": 1,
+          "type": "number",
+          "minimum": 0,
+          "maximum": 1,
+          "description": "Opacity, from 0 (invisible) to 1 (opaque). Absent means opaque.",
+          "x-xfdf": "opacity"
+        },
+        "author": {
+          "type": "string",
+          "description": "Who made the annotation. Absent means unknown.",
+          "x-xfdf": "title"
+        },
+        "contents": {
+          "type": "string",
+          "description": "The annotation's text, such as a comment or a note. Absent means no text.",
+          "x-xfdf": "contents"
+        },
+        "inReplyTo": {
+          "type": "string",
+          "description": "The id of the annotation this one replies to. Replies form threads. Absent means the annotation is not a reply.",
+          "x-xfdf": "inreplyto"
+        },
+        "createdAt": {
+          "type": "string",
+          "format": "date-time",
+          "pattern": "^(?:(?:\\d\\d[2468][048]|\\d\\d[13579][26]|\\d\\d0[48]|[02468][048]00|[13579][26]00)-02-29|\\d{4}-(?:(?:0[13578]|1[02])-(?:0[1-9]|[12]\\d|3[01])|(?:0[469]|11)-(?:0[1-9]|[12]\\d|30)|(?:02)-(?:0[1-9]|1\\d|2[0-8])))T(?:(?:[01]\\d|2[0-3]):[0-5]\\d:[0-5]\\d(?:\\.\\d+)?(?:Z|([+-](?:[01]\\d|2[0-3]):[0-5]\\d)))$",
+          "description": "When the annotation was made, as an ISO 8601 date-time with an offset. XFDF writes a PDF date string (D:20261019120000Z). Absent means unknown.",
+          "x-xfdf": "creationdate"
+        },
+        "modifiedAt": {
+          "type": "string",
+          "format": "date-time",
+          "pattern": "^(?:(?:\\d\\d[2468][048]|\\d\\d[13579][26]|\\d\\d0[48]|[02468][048]00|[13579][26]00)-02-29|\\d{4}-(?:(?:0[13578]|1[02])-(?:0[1-9]|[12]\\d|3[01])|(?:0[469]|11)-(?:0[1-9]|[12]\\d|30)|(?:02)-(?:0[1-9]|1\\d|2[0-8])))T(?:(?:[01]\\d|2[0-3]):[0-5]\\d:[0-5]\\d(?:\\.\\d+)?(?:Z|([+-](?:[01]\\d|2[0-3]):[0-5]\\d)))$",
+          "description": "When the annotation last changed, as an ISO 8601 date-time with an offset. XFDF writes a PDF date string. Absent means unknown.",
+          "x-xfdf": "date"
+        },
+        "subject": {
+          "type": "string",
+          "description": "A short label for what the mark is. Absent means no label.",
+          "x-xfdf": "subject"
+        },
+        "intent": {
+          "description": "What the mark is for, such as a callout or an arrow. Absent means the type's plain form.",
+          "x-xfdf": "intent",
+          "$ref": "#/$defs/Intent"
+        },
+        "custom": {
+          "type": "object",
+          "propertyNames": { "type": "string" },
+          "additionalProperties": {},
+          "description": "Data of your own. Gloss readers keep it as it is and never interpret it. Absent means none."
+        },
+        "magnification": {
+          "default": 2,
+          "type": "number",
+          "exclusiveMinimum": 1,
+          "description": "How many times larger the content under the centre is drawn. Above 1. Absent means 2."
+        },
+        "width": {
+          "default": 2,
+          "type": "number",
+          "minimum": 0,
+          "description": "The rim's width in points. Absent means 2.",
+          "x-xfdf": "width"
+        }
+      },
+      "required": ["type", "id", "page", "rect"],
+      "additionalProperties": {},
+      "title": "Loupe",
+      "description": "A magnifier: a circle inscribed in rect that shows the page content under its own centre, magnified. color and width draw its rim. An extension; XFDF has no equivalent.",
+      "examples": [
+        {
+          "type": "loupe",
+          "id": "a1",
+          "page": 0,
+          "author": "Ana",
+          "createdAt": "2026-10-19T12:00:00Z",
+          "rect": { "x": 200, "y": 300, "width": 120, "height": 120 },
+          "magnification": 3
+        }
+      ]
+    },
+    "Mask": {
+      "type": "object",
+      "properties": {
+        "type": {
+          "type": "string",
+          "const": "mask",
+          "description": "The annotation type. Always mask."
+        },
+        "id": {
+          "type": "string",
+          "minLength": 1,
+          "description": "Unique within the document. Never reused for a different annotation.",
+          "x-xfdf": "name"
+        },
+        "page": {
+          "type": "integer",
+          "minimum": 0,
+          "maximum": 9007199254740991,
+          "description": "The page the annotation is on, counted from 0.",
+          "x-xfdf": "page"
+        },
+        "rect": {
+          "description": "The bounding box, in PDF user space.",
+          "x-xfdf": "rect",
+          "$ref": "#/$defs/Rect"
+        },
+        "color": {
+          "default": "#000000",
+          "description": "The dimming colour. Absent means black.",
+          "$ref": "#/$defs/Color"
+        },
+        "opacity": {
+          "default": 1,
+          "type": "number",
+          "minimum": 0,
+          "maximum": 1,
+          "description": "Opacity, from 0 (invisible) to 1 (opaque). Absent means opaque.",
+          "x-xfdf": "opacity"
+        },
+        "author": {
+          "type": "string",
+          "description": "Who made the annotation. Absent means unknown.",
+          "x-xfdf": "title"
+        },
+        "contents": {
+          "type": "string",
+          "description": "The annotation's text, such as a comment or a note. Absent means no text.",
+          "x-xfdf": "contents"
+        },
+        "inReplyTo": {
+          "type": "string",
+          "description": "The id of the annotation this one replies to. Replies form threads. Absent means the annotation is not a reply.",
+          "x-xfdf": "inreplyto"
+        },
+        "createdAt": {
+          "type": "string",
+          "format": "date-time",
+          "pattern": "^(?:(?:\\d\\d[2468][048]|\\d\\d[13579][26]|\\d\\d0[48]|[02468][048]00|[13579][26]00)-02-29|\\d{4}-(?:(?:0[13578]|1[02])-(?:0[1-9]|[12]\\d|3[01])|(?:0[469]|11)-(?:0[1-9]|[12]\\d|30)|(?:02)-(?:0[1-9]|1\\d|2[0-8])))T(?:(?:[01]\\d|2[0-3]):[0-5]\\d:[0-5]\\d(?:\\.\\d+)?(?:Z|([+-](?:[01]\\d|2[0-3]):[0-5]\\d)))$",
+          "description": "When the annotation was made, as an ISO 8601 date-time with an offset. XFDF writes a PDF date string (D:20261019120000Z). Absent means unknown.",
+          "x-xfdf": "creationdate"
+        },
+        "modifiedAt": {
+          "type": "string",
+          "format": "date-time",
+          "pattern": "^(?:(?:\\d\\d[2468][048]|\\d\\d[13579][26]|\\d\\d0[48]|[02468][048]00|[13579][26]00)-02-29|\\d{4}-(?:(?:0[13578]|1[02])-(?:0[1-9]|[12]\\d|3[01])|(?:0[469]|11)-(?:0[1-9]|[12]\\d|30)|(?:02)-(?:0[1-9]|1\\d|2[0-8])))T(?:(?:[01]\\d|2[0-3]):[0-5]\\d:[0-5]\\d(?:\\.\\d+)?(?:Z|([+-](?:[01]\\d|2[0-3]):[0-5]\\d)))$",
+          "description": "When the annotation last changed, as an ISO 8601 date-time with an offset. XFDF writes a PDF date string. Absent means unknown.",
+          "x-xfdf": "date"
+        },
+        "subject": {
+          "type": "string",
+          "description": "A short label for what the mark is. Absent means no label.",
+          "x-xfdf": "subject"
+        },
+        "intent": {
+          "description": "What the mark is for, such as a callout or an arrow. Absent means the type's plain form.",
+          "x-xfdf": "intent",
+          "$ref": "#/$defs/Intent"
+        },
+        "custom": {
+          "type": "object",
+          "propertyNames": { "type": "string" },
+          "additionalProperties": {},
+          "description": "Data of your own. Gloss readers keep it as it is and never interpret it. Absent means none."
+        },
+        "shape": {
+          "type": "string",
+          "enum": ["rect", "ellipse"],
+          "description": "What stays clear: the rectangle rect itself, or the ellipse inscribed in it."
+        },
+        "dim": {
+          "default": 0.5,
+          "type": "number",
+          "minimum": 0,
+          "maximum": 1,
+          "description": "How strongly the dimming covers, from 0 (none) to 1 (opaque). Absent means 0.5."
+        }
+      },
+      "required": ["type", "id", "page", "rect", "shape"],
+      "additionalProperties": {},
+      "title": "Mask",
+      "description": "Dims everything on the page outside shape drawn in rect. color is the dimming colour. One per page: a second one replaces the first. An extension; XFDF has no equivalent.",
+      "examples": [
+        {
+          "type": "mask",
+          "id": "a1",
+          "page": 0,
+          "author": "Ana",
+          "createdAt": "2026-10-19T12:00:00Z",
+          "rect": { "x": 72, "y": 400, "width": 300, "height": 200 },
+          "shape": "ellipse",
+          "dim": 0.7
+        }
+      ]
+    },
+    "Redact": {
+      "type": "object",
+      "properties": {
+        "type": {
+          "type": "string",
+          "const": "redact",
+          "description": "The annotation type. Always redact."
+        },
+        "id": {
+          "type": "string",
+          "minLength": 1,
+          "description": "Unique within the document. Never reused for a different annotation.",
+          "x-xfdf": "name"
+        },
+        "page": {
+          "type": "integer",
+          "minimum": 0,
+          "maximum": 9007199254740991,
+          "description": "The page the annotation is on, counted from 0.",
+          "x-xfdf": "page"
+        },
+        "rect": {
+          "description": "The bounding box, in PDF user space.",
+          "x-xfdf": "rect",
+          "$ref": "#/$defs/Rect"
+        },
+        "color": {
+          "description": "The annotation's colour. Absent: the reader chooses the colour.",
+          "x-xfdf": "color",
+          "$ref": "#/$defs/Color"
+        },
+        "opacity": {
+          "default": 1,
+          "type": "number",
+          "minimum": 0,
+          "maximum": 1,
+          "description": "Opacity, from 0 (invisible) to 1 (opaque). Absent means opaque.",
+          "x-xfdf": "opacity"
+        },
+        "author": {
+          "type": "string",
+          "description": "Who made the annotation. Absent means unknown.",
+          "x-xfdf": "title"
+        },
+        "contents": {
+          "type": "string",
+          "description": "The annotation's text, such as a comment or a note. Absent means no text.",
+          "x-xfdf": "contents"
+        },
+        "inReplyTo": {
+          "type": "string",
+          "description": "The id of the annotation this one replies to. Replies form threads. Absent means the annotation is not a reply.",
+          "x-xfdf": "inreplyto"
+        },
+        "createdAt": {
+          "type": "string",
+          "format": "date-time",
+          "pattern": "^(?:(?:\\d\\d[2468][048]|\\d\\d[13579][26]|\\d\\d0[48]|[02468][048]00|[13579][26]00)-02-29|\\d{4}-(?:(?:0[13578]|1[02])-(?:0[1-9]|[12]\\d|3[01])|(?:0[469]|11)-(?:0[1-9]|[12]\\d|30)|(?:02)-(?:0[1-9]|1\\d|2[0-8])))T(?:(?:[01]\\d|2[0-3]):[0-5]\\d:[0-5]\\d(?:\\.\\d+)?(?:Z|([+-](?:[01]\\d|2[0-3]):[0-5]\\d)))$",
+          "description": "When the annotation was made, as an ISO 8601 date-time with an offset. XFDF writes a PDF date string (D:20261019120000Z). Absent means unknown.",
+          "x-xfdf": "creationdate"
+        },
+        "modifiedAt": {
+          "type": "string",
+          "format": "date-time",
+          "pattern": "^(?:(?:\\d\\d[2468][048]|\\d\\d[13579][26]|\\d\\d0[48]|[02468][048]00|[13579][26]00)-02-29|\\d{4}-(?:(?:0[13578]|1[02])-(?:0[1-9]|[12]\\d|3[01])|(?:0[469]|11)-(?:0[1-9]|[12]\\d|30)|(?:02)-(?:0[1-9]|1\\d|2[0-8])))T(?:(?:[01]\\d|2[0-3]):[0-5]\\d:[0-5]\\d(?:\\.\\d+)?(?:Z|([+-](?:[01]\\d|2[0-3]):[0-5]\\d)))$",
+          "description": "When the annotation last changed, as an ISO 8601 date-time with an offset. XFDF writes a PDF date string. Absent means unknown.",
+          "x-xfdf": "date"
+        },
+        "subject": {
+          "type": "string",
+          "description": "A short label for what the mark is. Absent means no label.",
+          "x-xfdf": "subject"
+        },
+        "intent": {
+          "description": "What the mark is for, such as a callout or an arrow. Absent means the type's plain form.",
+          "x-xfdf": "intent",
+          "$ref": "#/$defs/Intent"
+        },
+        "custom": {
+          "type": "object",
+          "propertyNames": { "type": "string" },
+          "additionalProperties": {},
+          "description": "Data of your own. Gloss readers keep it as it is and never interpret it. Absent means none."
+        },
+        "quads": {
+          "minItems": 1,
+          "type": "array",
+          "items": { "$ref": "#/$defs/Quad" },
+          "description": "The runs of text the mark covers, one quad per line. Absent for a mark over an area rather than text.",
+          "x-xfdf": "coords"
+        },
+        "interiorColor": {
+          "description": "The fill once the redaction is applied. Absent: the reader chooses the fill.",
+          "x-xfdf": "interior-color",
+          "$ref": "#/$defs/Color"
+        },
+        "overlayText": {
+          "type": "string",
+          "description": "Text drawn over the fill once applied. Absent means none.",
+          "x-xfdf": "overlay-text"
+        },
+        "origin": {
+          "default": "user",
+          "type": "string",
+          "enum": ["user", "suggested"],
+          "description": "user for a mark a person made or accepted, suggested for one waiting for review. Absent means user. An extension; XFDF has no equivalent."
+        },
+        "suggestion": {
+          "description": "Why the mark was suggested. Kept after a person accepts it. Absent for a mark a person made.",
+          "$ref": "#/$defs/Suggestion"
+        }
+      },
+      "required": ["type", "id", "page", "rect"],
+      "additionalProperties": {},
+      "title": "Redact",
+      "description": "A mark over content to be removed. Applying it removes the content and fills the area. XFDF element redact.",
+      "x-xfdf": "redact",
+      "examples": [
+        {
+          "type": "redact",
+          "id": "a1",
+          "page": 0,
+          "author": "Ana",
+          "createdAt": "2026-10-19T12:00:00Z",
+          "rect": { "x": 72, "y": 700, "width": 120, "height": 14 },
+          "quads": [
+            {
+              "p1": { "x": 72, "y": 714 },
+              "p2": { "x": 192, "y": 714 },
+              "p3": { "x": 72, "y": 700 },
+              "p4": { "x": 192, "y": 700 }
+            }
+          ],
+          "origin": "suggested",
+          "suggestion": { "confidence": 0.92, "reason": "Person name" }
+        }
+      ]
+    },
+    "Suggestion": {
+      "type": "object",
+      "properties": {
+        "confidence": {
+          "type": "number",
+          "minimum": 0,
+          "maximum": 1,
+          "description": "How sure the detector is, from 0 to 1."
+        },
+        "jobId": {
+          "type": "string",
+          "description": "The detection run that made the suggestion. Absent means unknown."
+        },
+        "reason": {
+          "type": "string",
+          "description": "A short label for what was found, such as a name or an account number. Absent means none."
+        },
+        "explanation": {
+          "type": "string",
+          "description": "Why the text was suggested, for the reviewer. Absent means none."
+        },
+        "recommendation": {
+          "type": "string",
+          "enum": ["redact", "review", "keep"],
+          "description": "What the detector recommends doing with the mark. Absent means no recommendation."
+        }
+      },
+      "required": ["confidence"],
+      "additionalProperties": {},
+      "title": "Suggestion",
+      "description": "Why a redaction was suggested: what a detector found and how sure it is. An extension; XFDF has no equivalent.",
+      "examples": [
+        { "confidence": 0.92, "reason": "Person name", "recommendation": "redact" }
+      ]
+    },
+    "UnknownAnnotation": {
+      "type": "object",
+      "properties": {
+        "type": {
+          "type": "string",
+          "description": "An annotation type this version of Gloss doesn't define. A type Gloss defines must match its own definition instead.",
+          "not": {
+            "enum": [
+              "highlight",
+              "underline",
+              "strikeout",
+              "squiggly",
+              "text",
+              "freetext",
+              "square",
+              "circle",
+              "line",
+              "polyline",
+              "polygon",
+              "ink",
+              "stamp",
+              "loupe",
+              "mask",
+              "redact"
+            ]
+          }
+        },
+        "id": {
+          "type": "string",
+          "minLength": 1,
+          "description": "Unique within the document. Never reused for a different annotation."
+        },
+        "page": {
+          "type": "integer",
+          "minimum": 0,
+          "maximum": 9007199254740991,
+          "description": "The page the annotation is on, counted from 0."
+        }
+      },
+      "required": ["type", "id", "page"],
+      "additionalProperties": {},
+      "title": "UnknownAnnotation",
+      "description": "An annotation of a type this version of Gloss does not define, such as one from a newer writer. It needs a type, an id and a page. Readers may ignore it or pass it through.",
+      "examples": [{ "type": "sticker", "id": "a1", "page": 0, "sticker": "star" }]
+    },
+    "Common": {
+      "type": "object",
+      "properties": {
+        "type": {
+          "type": "string",
+          "description": "The annotation type, such as highlight or note. Readers keep a type they don't know."
+        },
+        "id": {
+          "type": "string",
+          "minLength": 1,
+          "description": "Unique within the document. Never reused for a different annotation.",
+          "x-xfdf": "name"
+        },
+        "page": {
+          "type": "integer",
+          "minimum": 0,
+          "maximum": 9007199254740991,
+          "description": "The page the annotation is on, counted from 0.",
+          "x-xfdf": "page"
+        },
+        "rect": {
+          "description": "The bounding box, in PDF user space.",
+          "x-xfdf": "rect",
+          "$ref": "#/$defs/Rect"
+        },
+        "color": {
+          "description": "The annotation's colour. Absent: the reader chooses the colour.",
+          "x-xfdf": "color",
+          "$ref": "#/$defs/Color"
+        },
+        "opacity": {
+          "default": 1,
+          "type": "number",
+          "minimum": 0,
+          "maximum": 1,
+          "description": "Opacity, from 0 (invisible) to 1 (opaque). Absent means opaque.",
+          "x-xfdf": "opacity"
+        },
+        "author": {
+          "type": "string",
+          "description": "Who made the annotation. Absent means unknown.",
+          "x-xfdf": "title"
+        },
+        "contents": {
+          "type": "string",
+          "description": "The annotation's text, such as a comment or a note. Absent means no text.",
+          "x-xfdf": "contents"
+        },
+        "inReplyTo": {
+          "type": "string",
+          "description": "The id of the annotation this one replies to. Replies form threads. Absent means the annotation is not a reply.",
+          "x-xfdf": "inreplyto"
+        },
+        "createdAt": {
+          "type": "string",
+          "format": "date-time",
+          "pattern": "^(?:(?:\\d\\d[2468][048]|\\d\\d[13579][26]|\\d\\d0[48]|[02468][048]00|[13579][26]00)-02-29|\\d{4}-(?:(?:0[13578]|1[02])-(?:0[1-9]|[12]\\d|3[01])|(?:0[469]|11)-(?:0[1-9]|[12]\\d|30)|(?:02)-(?:0[1-9]|1\\d|2[0-8])))T(?:(?:[01]\\d|2[0-3]):[0-5]\\d:[0-5]\\d(?:\\.\\d+)?(?:Z|([+-](?:[01]\\d|2[0-3]):[0-5]\\d)))$",
+          "description": "When the annotation was made, as an ISO 8601 date-time with an offset. XFDF writes a PDF date string (D:20261019120000Z). Absent means unknown.",
+          "x-xfdf": "creationdate"
+        },
+        "modifiedAt": {
+          "type": "string",
+          "format": "date-time",
+          "pattern": "^(?:(?:\\d\\d[2468][048]|\\d\\d[13579][26]|\\d\\d0[48]|[02468][048]00|[13579][26]00)-02-29|\\d{4}-(?:(?:0[13578]|1[02])-(?:0[1-9]|[12]\\d|3[01])|(?:0[469]|11)-(?:0[1-9]|[12]\\d|30)|(?:02)-(?:0[1-9]|1\\d|2[0-8])))T(?:(?:[01]\\d|2[0-3]):[0-5]\\d:[0-5]\\d(?:\\.\\d+)?(?:Z|([+-](?:[01]\\d|2[0-3]):[0-5]\\d)))$",
+          "description": "When the annotation last changed, as an ISO 8601 date-time with an offset. XFDF writes a PDF date string. Absent means unknown.",
+          "x-xfdf": "date"
+        },
+        "subject": {
+          "type": "string",
+          "description": "A short label for what the mark is. Absent means no label.",
+          "x-xfdf": "subject"
+        },
+        "intent": {
+          "description": "What the mark is for, such as a callout or an arrow. Absent means the type's plain form.",
+          "x-xfdf": "intent",
+          "$ref": "#/$defs/Intent"
+        },
+        "custom": {
+          "type": "object",
+          "propertyNames": { "type": "string" },
+          "additionalProperties": {},
+          "description": "Data of your own. Gloss readers keep it as it is and never interpret it. Absent means none."
+        }
+      },
+      "required": ["type", "id", "page", "rect"],
+      "additionalProperties": {},
+      "title": "Common",
+      "description": "The fields every annotation accepts. Each annotation type lists them alongside its own, and a schema of your own can refer to this definition."
+    }
+  }
+}
