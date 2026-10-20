@@ -1,5 +1,7 @@
 ---
 import Default from '@astrojs/starlight/components/Footer.astro'
+import { GLOSS_VERSION } from 'gloss-format'
+import pkg from 'gloss-format/package.json' with { type: 'json' }
 ---
 
 <Default>
@@ -9,11 +11,24 @@ import Default from '@astrojs/starlight/components/Footer.astro'
   From the creators of <a href="https://inkbar.dev">Inkbar</a> and{' '}
   <a href="https://redactr.io">Redactr</a>.
 </p>
+<p class="version">
+  Format version {GLOSS_VERSION} ·{' '}
+  <a href="https://www.npmjs.com/package/gloss-format">gloss-format {pkg.version}</a>
+</p>
 
 <style>
-  .credit {
+  .credit,
+  .version {
     margin-top: 1.5rem;
     font-size: var(--sl-text-sm);
     color: var(--sl-color-gray-3);
+  }
+  .credit a,
+  .version a {
+    color: var(--sl-color-accent);
+  }
+  .version {
+    margin-top: 0.25rem;
+    font-family: var(--sl-font-mono);
   }
 </style>

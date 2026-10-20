@@ -94,6 +94,47 @@ describe('the built site under a preview base', () => {
     expect(readFileSync(join(dist, 'llms.txt'), 'utf8')).toMatch(/^# Gloss\n/)
   })
 
+  it('gives every page a Markdown copy and links to it', () => {
+    for (const page of ['', 'using-gloss', 'xfdf', 'reference/redact']) {
+      const html = readFileSync(join(dist, page, 'index.html'), 'utf8')
+      const name = `${page || 'index'}.md`
+      expect(html, page).toContain(
+        `<link rel="alternate" type="text/markdown" href="/pr-preview/pr-1/${name}"`
+      )
+      expect(readFileSync(join(dist, name), 'utf8'), page).toMatch(/^# .+\n/)
+    }
+    const intro = readFileSync(join(dist, 'index.md'), 'utf8')
+    expect(intro).toContain('"format": "gloss"')
+    expect(intro).toContain('### What is Gloss?')
+  })
+
+  it('publishes the whole site as llms-full.txt', () => {
+    const full = readFileSync(join(dist, 'llms-full.txt'), 'utf8')
+    expect(full).toMatch(/^# An open JSON format for PDF annotations\n/)
+    expect(full).toContain('\n# Redact\n')
+    expect(full).toContain('\n# Gloss and XFDF\n')
+  })
+
+  it('states the questions, the steps and each page as structured data', () => {
+    const ld = (page: string) =>
+      [
+        ...readFileSync(join(dist, page, 'index.html'), 'utf8').matchAll(
+          /<script type="application\/ld\+json">(.*?)<\/script>/gs
+        ),
+      ].map(([, json]) => JSON.parse(json) as Record<string, unknown>)
+    expect(ld('').map((d) => d['@type'])).toContain('FAQPage')
+    expect(ld('using-gloss').map((d) => d['@type'])).toEqual(
+      expect.arrayContaining(['HowTo', 'TechArticle'])
+    )
+    const article = ld('reference/redact').find((d) => d['@type'] === 'TechArticle')
+    expect(article?.['headline']).toBe('Redact')
+  })
+
+  it('names the format and package version on every page', () => {
+    const html = readFileSync(join(reference, 'redact', 'index.html'), 'utf8')
+    expect(html).toMatch(/Format version 1 · <a [^>]*>gloss-format \d+\.\d+\.\d+<\/a>/)
+  })
+
   it('publishes the schema', () => {
     expect(existsSync(join(dist, 'schema', 'v1.json'))).toBe(true)
   })

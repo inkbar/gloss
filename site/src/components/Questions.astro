@@ -1,0 +1,29 @@
+---
+// The introduction's questions, as headings with answers, plus the same copy as FAQPage
+// structured data.
+import { inlineHtml, jsonLd, plainText, QUESTIONS } from '../answers.ts'
+
+const slug = (text: string) =>
+  text
+    .toLowerCase()
+    .replace(/[^a-z0-9]+/g, '-')
+    .replace(/^-|-$/g, '')
+
+const structured = jsonLd({
+  '@context': 'https://schema.org',
+  '@type': 'FAQPage',
+  mainEntity: QUESTIONS.map(({ question, answer }) => ({
+    '@type': 'Question',
+    name: question,
+    acceptedAnswer: { '@type': 'Answer', text: plainText(answer) },
+  })),
+})
+---
+
+{QUESTIONS.map(({ question, answer }) => (
+  <>
+    <h3 id={slug(question)}>{question}</h3>
+    <p set:html={inlineHtml(answer)} />
+  </>
+))}
+<script type="application/ld+json" set:html={structured} />

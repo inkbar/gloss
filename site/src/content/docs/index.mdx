@@ -11,20 +11,33 @@ head:
   - tag: script
     attrs:
       type: application/ld+json
-    content: '{"@context":"https://schema.org","@graph":[{"@type":"WebSite","name":"Gloss","url":"https://gloss-format.org/","description":"An open JSON format for PDF annotations."},{"@type":"SoftwareSourceCode","name":"gloss-format","description":"The Gloss JSON Schema, with zod schemas and TypeScript types for every definition.","codeRepository":"https://github.com/inkbar/gloss","programmingLanguage":"TypeScript","license":"https://opensource.org/licenses/MIT","url":"https://www.npmjs.com/package/gloss-format"}]}'
+    content: '{"@context":"https://schema.org","@graph":[{"@type":"WebSite","@id":"https://gloss-format.org/#website","name":"Gloss","alternateName":["Gloss format","gloss-format"],"url":"https://gloss-format.org/","description":"An open JSON format for PDF annotations.","publisher":{"@id":"https://redactr.io/#organization"}},{"@type":"Organization","@id":"https://redactr.io/#organization","name":"Redactr","url":"https://redactr.io/"},{"@type":"SoftwareSourceCode","name":"gloss-format","description":"The Gloss JSON Schema, with zod schemas and TypeScript types for every definition.","codeRepository":"https://github.com/inkbar/gloss","programmingLanguage":"TypeScript","license":"https://opensource.org/licenses/MIT","url":"https://www.npmjs.com/package/gloss-format","sameAs":["https://www.npmjs.com/package/gloss-format","https://github.com/inkbar/gloss"],"publisher":{"@id":"https://redactr.io/#organization"}}]}'
 ---
 
 import Glossed from '../../components/Glossed.astro'
+import Questions from '../../components/Questions.astro'
 
 import minimal from '../../samples/minimal.gloss.json?raw'
 
-Gloss is an open JSON format for PDF annotations. A Gloss document lists the highlights, notes, shapes and redactions on one PDF, each with its page and position. Gloss is for systems that pass annotations between them, where one writes the file and another reads it back.
+Gloss is an open, viewer-neutral JSON format for PDF annotations. A Gloss document lists the highlights, notes, shapes and redactions on one PDF, each with its page and position. Gloss is for systems that pass annotations between them, where one writes the file and another reads it back.
 
 ## Gloss and XFDF
 
-XFDF is the XML format for PDF annotations, standardised as ISO 19444-1. Gloss has the same annotation types and uses the same coordinates. Where XFDF has a name for something, Gloss uses it: a sticky note is `text`, as in XFDF. A few fields read better in JSON under another name, such as `author` for XFDF's `title`. The reference gives the XFDF name of every field that has one, and [Gloss and XFDF](xfdf/) maps them all on one page.
+XFDF is the XML format for PDF annotations, standardised as [ISO 19444-1](https://www.pdfa.org/resource/iso-19444-xfdf/). Gloss has the same annotation types and uses the same coordinates. Where XFDF has a name for something, Gloss uses it: a sticky note is `text`, as in XFDF. A few fields read better in JSON under another name, such as `author` for XFDF's `title`. The reference gives the XFDF name of every field that has one, and [Gloss and XFDF](xfdf/) maps them all on one page.
 
 Gloss also adds what XFDF lacks: fields for suggested redactions, and `custom` for data of your own.
+
+## How Gloss compares
+
+Gloss carries the same annotations as XFDF, in JSON, with a JSON Schema at a stable URL. A PDF SDK's own JSON format also uses JSON, but it belongs to that SDK and changes with it. Gloss belongs to no viewer, so a document moves between systems unchanged.
+
+|                                           | Gloss                             | XFDF        | A PDF SDK's own JSON    |
+| ----------------------------------------- | --------------------------------- | ----------- | ----------------------- |
+| Encoding                                  | JSON                              | XML         | JSON                    |
+| Defined by                                | An open JSON Schema, MIT licensed | ISO 19444-1 | The SDK's documentation |
+| Tied to one viewer                        | No                                | No          | Yes                     |
+| Usable in your own JSON Schema or OpenAPI | Yes, by `$ref` to a URL           | No          | Depends on the SDK      |
+| Suggested redactions awaiting review      | Yes                               | No          | Depends on the SDK      |
 
 ## Media type and extension
 
@@ -58,7 +71,7 @@ Every annotation has a `type`, an `id` and a `page`, plus the geometry its type 
 
 ## Coordinates
 
-Every coordinate is in PDF user space: points, origin bottom-left, before the page's `/Rotate`. These are the numbers in the PDF file and in XFDF, so a mark keeps its values at any zoom or rotation.
+Every coordinate is in PDF user space, as [ISO 32000-2](https://www.iso.org/standard/75839.html) defines it: points, origin bottom-left, before the page's `/Rotate`. These are the numbers in the PDF file and in XFDF, so a mark keeps its values at any zoom or rotation.
 
 A page's crop box can start away from `0 0`, so treat coordinates as raw user space and don't measure them from the corner of the page.
 
@@ -106,3 +119,7 @@ npm install gloss-format
 The package is [on npm](https://www.npmjs.com/package/gloss-format). The source of the package, the schema and this site is [on GitHub](https://github.com/inkbar/gloss).
 
 Every definition has a page in the reference, starting with [Document](reference/document/).
+
+## Questions
+
+<Questions />

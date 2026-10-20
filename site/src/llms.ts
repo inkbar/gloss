@@ -27,6 +27,7 @@ export function renderLlms(schema: JsonSchema, groups: SidebarGroup[]): string {
     `- [Using Gloss in your schemas](${url('using-gloss/')}): refer to Gloss definitions by URL and require the fields your system needs.`,
     `- [Gloss and XFDF](${url('xfdf/')}): the Gloss type for each XFDF element and the Gloss field for each XFDF attribute.`,
     `- [JSON Schema](${url('schema/v1.json')}): every definition, as JSON Schema 2020-12.`,
+    `- [Full text](${url('llms-full.txt')}): every page as Markdown in one file. Each page also has its own copy: add \`.md\` to its path, as in ${url('using-gloss.md')}.`,
     '',
     ...groups.flatMap((group) => [
       `## Reference: ${group.label}`,

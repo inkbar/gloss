@@ -19,6 +19,7 @@ describe('renderLlms', () => {
   it('links the docs with production URLs', () => {
     expect(text).toContain('- [Gloss and XFDF](https://gloss-format.org/xfdf/): ')
     expect(text).toContain('- [JSON Schema](https://gloss-format.org/schema/v1.json): ')
+    expect(text).toContain('- [Full text](https://gloss-format.org/llms-full.txt): ')
   })
 
   it('lists each reference page with its first sentence', () => {

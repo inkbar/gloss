@@ -59,9 +59,9 @@ jobs:
 
       # public/CNAME lands in every build, and the deploy actions never delete a CNAME, so a
       # preview's copy would outlive the preview. A preview's pages are noindex, so it keeps no
-      # sitemap, robots.txt or llms.txt for crawlers to find either.
+      # sitemap, robots.txt, llms.txt or llms-full.txt for crawlers to find either.
       - if: github.event_name == 'pull_request' && github.event.action != 'closed'
-        run: rm site/dist/CNAME site/dist/robots.txt site/dist/llms.txt site/dist/sitemap-*.xml
+        run: rm site/dist/CNAME site/dist/robots.txt site/dist/llms.txt site/dist/llms-full.txt site/dist/sitemap-*.xml
       - if: github.event_name == 'pull_request'
         uses: rossjrw/pr-preview-action@v1
         with:

@@ -1,0 +1,22 @@
+---
+// The guide's validation steps, as a numbered list plus the same copy as HowTo structured data.
+import { inlineHtml, jsonLd, plainText, VALIDATION_STEPS } from '../answers.ts'
+
+const structured = jsonLd({
+  '@context': 'https://schema.org',
+  '@type': 'HowTo',
+  name: 'Validate a Gloss document',
+  step: VALIDATION_STEPS.map((text, i) => ({
+    '@type': 'HowToStep',
+    position: i + 1,
+    text: plainText(text),
+  })),
+})
+---
+
+<ol>
+  {VALIDATION_STEPS.map((step) => (
+    <li set:html={inlineHtml(step)} />
+  ))}
+</ol>
+<script type="application/ld+json" set:html={structured} />
