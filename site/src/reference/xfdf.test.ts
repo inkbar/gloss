@@ -18,10 +18,8 @@ describe('renderXfdf', () => {
     expect(page).toContain('| `<redact>` | [`redact`](../reference/redact/) |')
   })
 
-  it('names the types XFDF has no element for', () => {
-    expect(page).toContain(
-      '[`loupe`](../reference/loupe/) and [`mask`](../reference/mask/) are extensions, with no XFDF element.'
-    )
+  it('has an element for every type', () => {
+    expect(page).not.toContain('with no XFDF element')
   })
 
   it('maps the attributes every annotation takes, with what XFDF writes', () => {

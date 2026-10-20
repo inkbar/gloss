@@ -27,8 +27,6 @@ export const ANNOTATION_TYPES = [
   'polygon',
   'ink',
   'stamp',
-  'loupe',
-  'mask',
   'redact',
 ] as const
 
@@ -511,69 +509,6 @@ export const Stamp = define(
 )
 export type Stamp = z.infer<typeof Stamp>
 export type StampInput = z.input<typeof Stamp>
-
-export const Loupe = define(
-  'Loupe',
-  z.looseObject({
-    type: typeField('loupe'),
-    ...commonFields,
-    magnification: field(z.number().gt(1), {
-      description:
-        'How many times larger the content under the centre is drawn. Above 1. Absent means 2.',
-    }).default(2),
-    width: strokeWidth(2, "The rim's width in points."),
-  }),
-  {
-    title: 'Loupe',
-    description:
-      'A magnifier: a circle inscribed in rect that shows the page content under its own centre, magnified. color and width draw its rim.',
-    examples: [
-      {
-        type: 'loupe',
-        ...sample,
-        rect: { x: 200, y: 300, width: 120, height: 120 },
-        magnification: 3,
-      },
-    ],
-  }
-)
-export type Loupe = z.infer<typeof Loupe>
-export type LoupeInput = z.input<typeof Loupe>
-
-export const Mask = define(
-  'Mask',
-  z.looseObject({
-    type: typeField('mask'),
-    ...commonFields,
-    color: field(Color, {
-      description: 'The dimming colour. Absent means black.',
-    }).default('#000000'),
-    shape: field(z.enum(['rect', 'ellipse']), {
-      description:
-        'What stays clear: the rectangle rect itself, or the ellipse inscribed in it.',
-    }),
-    dim: field(z.number().min(0).max(1), {
-      description:
-        'How strongly the dimming covers, from 0 (none) to 1 (opaque). Absent means 0.5.',
-    }).default(0.5),
-  }),
-  {
-    title: 'Mask',
-    description:
-      'Dims everything on the page outside shape drawn in rect. color is the dimming colour. One per page: a second one replaces the first.',
-    examples: [
-      {
-        type: 'mask',
-        ...sample,
-        rect: { x: 72, y: 400, width: 300, height: 200 },
-        shape: 'ellipse',
-        dim: 0.7,
-      },
-    ],
-  }
-)
-export type Mask = z.infer<typeof Mask>
-export type MaskInput = z.input<typeof Mask>
 
 export const Suggestion = define(
   'Suggestion',

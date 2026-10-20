@@ -1,5 +1,6 @@
 import { createRequire } from 'node:module'
 
+import { ANNOTATION_TYPES } from 'gloss-format'
 import { describe, expect, it } from 'vitest'
 
 import {
@@ -167,7 +168,9 @@ describe('renderDefinition', () => {
 
   it("lists the Annotation union's types", () => {
     const page = renderDefinition('Annotation', defs['Annotation'], { schemaId })
-    expect(page.match(/^- \[\w+\]\(\.\.\/[\w-]+\/\)/gm)).toHaveLength(16)
+    expect(page.match(/^- \[\w+\]\(\.\.\/[\w-]+\/\)/gm)).toHaveLength(
+      ANNOTATION_TYPES.length
+    )
   })
 
   it('lists the definitions that use it', () => {

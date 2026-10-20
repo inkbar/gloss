@@ -73,8 +73,6 @@ describe('schema.json', () => {
         'Polygon',
         'Ink',
         'Stamp',
-        'Loupe',
-        'Mask',
         'Suggestion',
         'Redact',
       ])
@@ -198,17 +196,9 @@ describe('schema.json', () => {
     })
   })
 
-  it('writes the opacity and mask colour defaults', () => {
+  it('writes the opacity default', () => {
     const common = defs.Common?.properties as Record<string, Record<string, unknown>>
     expect(common.opacity?.default).toBe(1)
-    const mask = defs.Mask as {
-      required: string[]
-      properties: Record<string, Record<string, unknown>>
-    }
-    expect(mask.required).not.toContain('color')
-    expect(mask.properties.color?.default).toBe('#000000')
-    expect(mask.properties.color?.$ref).toBe('#/$defs/Color')
-    expect(mask.properties.color?.description).toMatch(/dimming colour/)
   })
 
   it('roots the schema at the document', () => {

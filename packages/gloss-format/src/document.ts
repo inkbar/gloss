@@ -7,8 +7,6 @@ import {
   Highlight,
   Ink,
   Line,
-  Loupe,
-  Mask,
   Note,
   Polygon,
   Polyline,
@@ -41,8 +39,6 @@ export const Annotation = define(
     Polygon,
     Ink,
     Stamp,
-    Loupe,
-    Mask,
     Redact,
   ]),
   {
