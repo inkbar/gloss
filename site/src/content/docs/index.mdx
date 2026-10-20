@@ -1,0 +1,79 @@
+---
+title: Gloss
+description: An open JSON format for PDF annotations.
+---
+
+import { Code } from '@astrojs/starlight/components'
+
+import minimal from '../../samples/minimal.gloss.json?raw'
+
+Gloss is an open JSON format for PDF annotations. A Gloss document lists the highlights, notes, shapes and redactions on one PDF, each with its page and position. Gloss is for systems that pass annotations between them, where one writes the file and another reads it back.
+
+## Gloss and XFDF
+
+XFDF is the XML format for PDF annotations, standardised as ISO 19444-1. Gloss has the same annotation types and uses the same coordinates. Where XFDF has a name for something, Gloss uses it: a sticky note is `text`, as in XFDF. A few fields read better in JSON under another name, such as `author` for XFDF's `title`. The reference gives the XFDF name of every field that has one.
+
+Gloss also adds what XFDF lacks: fields for suggested redactions, and `custom` for data of your own.
+
+## Media type and extension
+
+Send Gloss as `application/vnd.gloss.annotations+json`. Save it with the `.gloss.json` extension.
+
+The version is in the document, so the media type takes no parameter.
+
+## A document
+
+<Code code={minimal} lang="json" title="minimal.gloss.json" />
+
+`format` and `version` mark the file as Gloss 1. `annotations` lists the marks in drawing order. This one is a highlight on the first page, since pages count from 0.
+
+Every annotation has a `type`, an `id` and a `page`, plus the geometry its type needs. A highlight needs a `rect` and the `quads` over the text. The [Document](reference/document/) page lists the rest.
+
+## Coordinates
+
+Every coordinate is in PDF user space: points, origin bottom-left, before the page's `/Rotate`. These are the numbers in the PDF file and in XFDF, so a mark keeps its values at any zoom or rotation.
+
+A page's crop box can start away from `0 0`, so treat coordinates as raw user space and don't measure them from the corner of the page.
+
+A [`rect`](reference/rect/) is `{ x, y, width, height }`, where `x` and `y` are the bottom-left corner. A [quad](reference/quad/) is `{ p1, p2, p3, p4 }`, in the corner order PDF uses for `/QuadPoints`: top-left, top-right, bottom-left, bottom-right.
+
+## Versioning
+
+The format version is the integer in the document and in the schema URL. A `version: 1` document validates against `v1.json`.
+
+- **`v1.json` changes, but never breaks.** It gains fields, types and enum values over time. If you need a fixed copy, pin a version of the `gloss-format` package.
+- **Changes only add.** A change that would reject a document `v1.json` used to accept goes into `v2.json`, published beside `v1.json`. The package version is a separate number from the format version.
+- **Unknown fields are allowed.** No definition rejects a field it doesn't list, so a document from a newer writer still validates against an older schema. Readers may ignore unknown fields or pass them through. The schema won't flag a misspelled field name.
+- **Unknown types are allowed.** An item with a string `type`, a string `id` and a page number is an annotation, even if Gloss doesn't know its type. Readers may ignore it or pass it through. An item whose type Gloss does know must match that type's definition.
+- **Fields are optional by default.** Gloss requires only what makes an item an annotation: `type`, `id`, `page`, and the geometry its type can't be placed without. Where a field has a default, the schema records it and the reference shows it.
+
+A document with one bad item fails as a whole. To keep the good items, validate each one against [`Annotation`](reference/annotation/) or [`UnknownAnnotation`](reference/unknown-annotation/) on its own.
+
+If your system needs a field Gloss leaves optional, require it in your own schema. [Using Gloss in your schemas](using-gloss/) shows how.
+
+## Your own data
+
+Every annotation accepts `custom`, an object for data of your own, such as a case number or a review note. Gloss readers keep it as it is and never interpret it.
+
+Keep host data in `custom` rather than in new top-level fields. A later version of Gloss may add a field with the same name.
+
+## Suggested redactions
+
+XFDF has nothing for a redaction that a detector proposed and a person hasn't reviewed yet. Two fields on [`redact`](reference/redact/) carry it:
+
+- `origin`: `user` for a mark a person made or accepted, `suggested` for one waiting for review. Defaults to `user`.
+- [`suggestion`](reference/suggestion/): `confidence` from 0 to 1, with optional `reason`, `explanation`, `recommendation` (`redact`, `review` or `keep`) and `jobId`.
+
+An accepted suggestion keeps its `suggestion`, so you can still tell where it came from.
+
+## Get the schema
+
+The schema is JSON Schema 2020-12, published at [https://gloss-format.org/schema/v1.json](schema/v1.json).
+
+The `gloss-format` package ships the same file as `gloss-format/schema.json`, with a zod schema and a TypeScript type for every definition:
+
+```sh
+npm install gloss-format
+```
+
+Every definition has a page in the reference, starting with [Document](reference/document/).

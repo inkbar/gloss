@@ -47,6 +47,7 @@ export default defineConfig({
       plugins: [starlightLinksValidator({ errorOnRelativeLinks: false })],
       sidebar: [
         { label: 'Introduction', slug: 'index' },
+        { label: 'Using Gloss in your schemas', slug: 'using-gloss' },
         {
           label: 'Reference',
           items: reference.map((g) => ({ label: g.label, items: g.items })),

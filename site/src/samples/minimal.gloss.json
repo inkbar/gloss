@@ -1,0 +1,20 @@
+{
+  "format": "gloss",
+  "version": 1,
+  "annotations": [
+    {
+      "type": "highlight",
+      "id": "a1",
+      "page": 0,
+      "rect": { "x": 72, "y": 700, "width": 120, "height": 14 },
+      "quads": [
+        {
+          "p1": { "x": 72, "y": 714 },
+          "p2": { "x": 192, "y": 714 },
+          "p3": { "x": 72, "y": 700 },
+          "p4": { "x": 192, "y": 700 }
+        }
+      ]
+    }
+  ]
+}

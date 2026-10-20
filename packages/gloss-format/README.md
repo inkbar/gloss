@@ -33,7 +33,7 @@ Every definition is exported as a zod schema with a type of the same name, such 
 ## Validate with Ajv
 
 ```ts
-import Ajv2020 from 'ajv/dist/2020'
+import { Ajv2020 } from 'ajv/dist/2020.js'
 import schema from 'gloss-format/schema.json' with { type: 'json' }
 
 const ajv = new Ajv2020({ strict: false, validateFormats: false })

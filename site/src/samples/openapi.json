@@ -1,0 +1,29 @@
+{
+  "openapi": "3.1.0",
+  "info": { "title": "Documents API", "version": "1.0.0" },
+  "paths": {
+    "/documents/{id}/redactions": {
+      "get": {
+        "summary": "List a document's redactions",
+        "parameters": [
+          { "name": "id", "in": "path", "required": true, "schema": { "type": "string" } }
+        ],
+        "responses": {
+          "200": {
+            "description": "The redactions on the document, in drawing order.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "array",
+                  "items": {
+                    "$ref": "https://gloss-format.org/schema/v1.json#/$defs/Redact"
+                  }
+                }
+              }
+            }
+          }
+        }
+      }
+    }
+  }
+}

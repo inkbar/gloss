@@ -24,6 +24,8 @@ jobs:
           node-version-file: .nvmrc
           cache: pnpm
       - run: pnpm install --frozen-lockfile
+      # The site imports gloss-format from its dist/, so lint and typecheck need it built.
+      - run: pnpm --filter gloss-format build
       - run: pnpm format:check
       - run: pnpm lint
       - run: pnpm typecheck
