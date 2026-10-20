@@ -532,6 +532,9 @@ export const Mask = define(
   z.looseObject({
     type: typeField('mask'),
     ...commonFields,
+    color: field(Color, {
+      description: 'The dimming colour. Absent means black.',
+    }).default('#000000'),
     shape: field(z.enum(['rect', 'ellipse']), {
       description:
         'What stays clear: the rectangle rect itself, or the ellipse inscribed in it.',

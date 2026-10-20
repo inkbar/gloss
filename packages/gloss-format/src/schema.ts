@@ -1,23 +1,9 @@
 import { z } from 'zod'
 
-import './annotations'
+import { ANNOTATION_TYPES } from './annotations'
 import { GLOSS_SCHEMA_ID } from './constants'
-import { define, field, gloss, registeredDefinitions } from './registry'
-import { Common, Dashes, Fringe, LineEnding, NoteIcon, Quad } from './shapes'
-
-/** A stand-in for the document until the annotation types exist. It refers to every shape. */
-const Document = define(
-  'Document',
-  z.looseObject({
-    common: field(Common, { description: 'An annotation.' }).optional(),
-    quads: field(Quad.array(), { description: 'Quads.' }).optional(),
-    fringe: field(Fringe, { description: 'Insets.' }).optional(),
-    dashes: field(Dashes, { description: 'A dash pattern.' }).optional(),
-    head: field(LineEnding, { description: 'A line ending.' }).optional(),
-    icon: field(NoteIcon, { description: 'A note icon.' }).optional(),
-  }),
-  { title: 'Document', description: 'A Gloss document.' }
-)
+import { GlossDocument, UnknownAnnotation } from './document'
+import { gloss, registeredDefinitions } from './registry'
 
 const DESCRIPTION =
   'Gloss: a JSON format for PDF annotations. Coordinates are PDF user space in points, origin bottom-left, before /Rotate.'
@@ -26,7 +12,7 @@ const DESCRIPTION =
  * The Gloss JSON Schema, rooted at `root`. `$defs` holds every registered definition, including
  * ones the root doesn't reach.
  */
-export function buildSchema(root: z.ZodType = Document): Record<string, unknown> {
+export function buildSchema(root: z.ZodType = GlossDocument): Record<string, unknown> {
   // One object that refers to the root and to every definition, so zod emits them all as $defs.
   const all = z.object({
     root,
@@ -39,6 +25,11 @@ export function buildSchema(root: z.ZodType = Document): Record<string, unknown>
     io: 'input',
     metadata: gloss,
     unrepresentable: 'any',
+    override: ({ zodSchema, jsonSchema }) => {
+      // zod can't express the refine that keeps known types out of UnknownAnnotation.
+      if (zodSchema === UnknownAnnotation.shape.type)
+        jsonSchema.not = { enum: [...ANNOTATION_TYPES] }
+    },
   }) as unknown as {
     $schema: string
     properties: { root: Record<string, unknown> }

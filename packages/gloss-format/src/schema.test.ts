@@ -4,12 +4,31 @@ import { Ajv2020 } from 'ajv/dist/2020'
 import { describe, expect, it } from 'vitest'
 
 import { ANNOTATION_TYPES } from './annotations'
+import { GLOSS_SCHEMA_ID } from './constants'
+import { registeredDefinitions } from './registry'
 import { buildSchema } from './schema'
 
 const schema = JSON.parse(
   readFileSync(new URL('../schema.json', import.meta.url), 'utf8')
 ) as Record<string, unknown>
 const defs = schema.$defs as Record<string, Record<string, unknown>>
+
+/** An ajv instance holding the Gloss schema. Formats aren't checked; the zod parse covers them. */
+function glossAjv(
+  options: { strictTypes?: boolean; strictRequired?: boolean } = {}
+): Ajv2020 {
+  const ajv = new Ajv2020({ strict: true, validateFormats: false, ...options })
+  ajv.addKeyword('x-xfdf')
+  ajv.addSchema(schema)
+  return ajv
+}
+
+/** The validator for the definition `name`. */
+function validator(ajv: Ajv2020, name: string) {
+  const validate = ajv.getSchema(`${GLOSS_SCHEMA_ID}#/$defs/${name}`)
+  if (!validate) throw new Error(`no definition ${name}`)
+  return validate
+}
 
 /** Calls `visit` on every object in `value`, depth first. */
 function walk(value: unknown, visit: (node: Record<string, unknown>) => void): void {
@@ -72,10 +91,7 @@ describe('schema.json', () => {
     expect(note.properties.icon?.$ref).toBe('#/$defs/NoteIcon')
   })
 
-  it('every type has an example that validates', () => {
-    const ajv = new Ajv2020({ strict: true, validateFormats: false })
-    ajv.addKeyword('x-xfdf')
-    ajv.addSchema(schema)
+  it('gives every annotation type an example', () => {
     const types = Object.entries(defs).filter(([, def]) => {
       const type = (def.properties as Record<string, Record<string, unknown>> | undefined)
         ?.type
@@ -89,12 +105,37 @@ describe('schema.json', () => {
     ).toEqual(expect.arrayContaining([...ANNOTATION_TYPES]))
     expect(types).toHaveLength(ANNOTATION_TYPES.length)
     for (const [name, def] of types) {
-      const validate = ajv.getSchema(`${String(schema.$id)}#/$defs/${name}`)
-      expect(validate, name).toBeDefined()
-      const examples = def.examples as unknown[] | undefined
-      expect(examples?.length, name).toBeGreaterThan(0)
-      for (const example of examples ?? []) {
-        expect(validate?.(example), `${name}: ${JSON.stringify(validate?.errors)}`).toBe(
+      expect((def.examples as unknown[] | undefined)?.length, name).toBeGreaterThan(0)
+    }
+  })
+
+  it('validates every example against its definition', () => {
+    const ajv = glossAjv()
+    const withExamples = Object.entries(defs).filter(([, def]) =>
+      Array.isArray(def.examples)
+    )
+    expect(withExamples.map(([name]) => name)).toEqual(
+      expect.arrayContaining(['FreeTextStyle', 'Suggestion', 'Highlight', 'Redact'])
+    )
+    for (const [name, def] of withExamples) {
+      const validate = validator(ajv, name)
+      for (const example of def.examples as unknown[]) {
+        expect(validate(example), `${name}: ${JSON.stringify(validate.errors)}`).toBe(
+          true
+        )
+      }
+    }
+  })
+
+  it('parses every example with its zod definition', () => {
+    const zodDefs = registeredDefinitions()
+    for (const [name, def] of Object.entries(defs)) {
+      if (!Array.isArray(def.examples)) continue
+      const zod = zodDefs.get(name)
+      expect(zod, name).toBeDefined()
+      for (const example of def.examples as unknown[]) {
+        const result = zod?.safeParse(example)
+        expect(result?.success, `${name}: ${JSON.stringify(result?.error?.issues)}`).toBe(
           true
         )
       }
@@ -155,5 +196,145 @@ describe('schema.json', () => {
         expect(Object.keys(properties)).not.toContain('locked')
       }
     })
+  })
+
+  it('writes the opacity and mask colour defaults', () => {
+    const common = defs.Common?.properties as Record<string, Record<string, unknown>>
+    expect(common.opacity?.default).toBe(1)
+    const mask = defs.Mask as {
+      required: string[]
+      properties: Record<string, Record<string, unknown>>
+    }
+    expect(mask.required).not.toContain('color')
+    expect(mask.properties.color?.default).toBe('#000000')
+    expect(mask.properties.color?.$ref).toBe('#/$defs/Color')
+    expect(mask.properties.color?.description).toMatch(/dimming colour/)
+  })
+
+  it('roots the schema at the document', () => {
+    expect(schema.$ref).toBe('#/$defs/Document')
+    expect(Object.keys(defs)).toEqual(
+      expect.arrayContaining(['Annotation', 'UnknownAnnotation', 'Document'])
+    )
+    const document = defs.Document as { required: string[] }
+    expect([...document.required].sort()).toEqual(['annotations', 'format', 'version'])
+  })
+
+  it('excludes the known types from UnknownAnnotation', () => {
+    const properties = defs.UnknownAnnotation?.properties as Record<
+      string,
+      Record<string, unknown>
+    >
+    expect(properties.type?.not).toEqual({ enum: [...ANNOTATION_TYPES] })
+  })
+})
+
+describe('validating with the schema', () => {
+  const rect = { x: 72, y: 700, width: 120, height: 14 }
+
+  it('accepts a minimal document', () => {
+    const validate = validator(glossAjv(), 'Document')
+    expect(validate({ format: 'gloss', version: 1, annotations: [] })).toBe(true)
+  })
+
+  it('rejects the wrong format or version', () => {
+    const validate = validator(glossAjv(), 'Document')
+    expect(validate({ format: 'inkbar/annotations', version: 1, annotations: [] })).toBe(
+      false
+    )
+    expect(validate({ format: 'gloss', version: 2, annotations: [] })).toBe(false)
+  })
+
+  it('requires format, version and annotations', () => {
+    const validate = validator(glossAjv(), 'Document')
+    const minimal = { format: 'gloss', version: 1, annotations: [] }
+    for (const key of Object.keys(minimal)) {
+      const rest: Record<string, unknown> = { ...minimal }
+      delete rest[key]
+      expect(validate(rest), key).toBe(false)
+    }
+  })
+
+  it('validates a whole document through the root', () => {
+    const ajv = glossAjv()
+    const validate = ajv.getSchema(GLOSS_SCHEMA_ID)
+    expect(validate?.({ format: 'gloss', version: 1, annotations: [] })).toBe(true)
+    expect(validate?.({ format: 'gloss', version: 2, annotations: [] })).toBe(false)
+  })
+
+  it('accepts unknown types with type, id and page', () => {
+    const ajv = glossAjv()
+    const item = { type: 'sticker', id: 'a', page: 0, anything: 1 }
+    expect(validator(ajv, 'UnknownAnnotation')(item)).toBe(true)
+    expect(
+      validator(ajv, 'Document')({ format: 'gloss', version: 1, annotations: [item] })
+    ).toBe(true)
+  })
+
+  it('rejects an unknown type without id or page', () => {
+    const ajv = glossAjv()
+    expect(validator(ajv, 'UnknownAnnotation')({ type: 'sticker', page: 0 })).toBe(false)
+    expect(validator(ajv, 'UnknownAnnotation')({ type: 'sticker', id: 'a' })).toBe(false)
+  })
+
+  it('does not let a broken known type pass as unknown', () => {
+    const ajv = glossAjv()
+    const broken = { type: 'highlight', id: 'a', page: 0, rect }
+    expect(validator(ajv, 'UnknownAnnotation')(broken)).toBe(false)
+    expect(validator(ajv, 'Annotation')(broken)).toBe(false)
+    expect(
+      validator(ajv, 'Document')({ format: 'gloss', version: 1, annotations: [broken] })
+    ).toBe(false)
+  })
+
+  it('validates a document holding every example', () => {
+    const validate = validator(glossAjv(), 'Document')
+    const annotations = Object.values(defs)
+      .filter((def) => {
+        const type = (
+          def.properties as Record<string, Record<string, unknown>> | undefined
+        )?.type
+        return typeof type?.const === 'string'
+      })
+      .map((def) => (def.examples as unknown[])[0])
+    expect(annotations).toHaveLength(ANNOTATION_TYPES.length)
+    const document = {
+      format: 'gloss',
+      version: 1,
+      annotations: [...annotations, { type: 'sticker', id: 'x', page: 2 }],
+    }
+    expect(validate(document), JSON.stringify(validate.errors)).toBe(true)
+  })
+
+  // The consumer's schema puts `required` beside `allOf`, without `type` or `properties`, which
+  // ajv's strict lints flag. Gloss's schema itself still compiles under full strict mode.
+  it('lets a consumer tighten a definition by URL', () => {
+    const ajv = glossAjv({ strictTypes: false, strictRequired: false })
+    const validate = ajv.compile({
+      $id: 'https://example.test/api.json',
+      allOf: [{ $ref: 'https://gloss-format.org/schema/v1.json#/$defs/Redact' }],
+      required: ['origin'],
+    })
+    const redaction = { type: 'redact', id: 'r1', page: 0, rect }
+    expect(validate(redaction)).toBe(false)
+    expect(
+      validate({ ...redaction, origin: 'suggested' }),
+      JSON.stringify(validate.errors)
+    ).toBe(true)
+  })
+
+  it('works inside an OpenAPI 3.1 component', () => {
+    const ajv = glossAjv()
+    const validate = ajv.compile({
+      $id: 'https://example.test/components.json',
+      type: 'array',
+      items: { $ref: 'https://gloss-format.org/schema/v1.json#/$defs/Redact' },
+    })
+    const list = [
+      { type: 'redact', id: 'r1', page: 0, rect },
+      { type: 'redact', id: 'r2', page: 1, rect, origin: 'suggested' },
+    ]
+    expect(validate(list), JSON.stringify(validate.errors)).toBe(true)
+    expect(validate([{ type: 'redact', id: 'r3', page: 0 }])).toBe(false)
   })
 })
