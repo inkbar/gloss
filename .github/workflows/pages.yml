@@ -1,0 +1,74 @@
+name: pages
+
+# Pages serves the gh-pages branch. Publishing a release rebuilds the site at its root from the
+# release's tag, so the live docs and /schema/v1.json match what's on npm. Each pull request
+# gets a preview under pr-preview/pr-<number>/, removed again when the pull request closes.
+on:
+  release:
+    types: [published]
+  pull_request:
+    types: [opened, reopened, synchronize, closed]
+    paths-ignore:
+      - README.md
+      - LICENSE
+  workflow_dispatch:
+
+permissions:
+  contents: write
+  pull-requests: write
+
+# Every run pushes to gh-pages, so runs queue rather than race.
+concurrency:
+  group: gh-pages
+  cancel-in-progress: false
+
+jobs:
+  deploy:
+    # A fork's token cannot push to gh-pages, so fork pull requests get no preview.
+    if: >-
+      (github.event_name == 'pull_request' &&
+       github.event.pull_request.head.repo.full_name == github.repository) ||
+      github.event_name != 'pull_request'
+    runs-on: ubuntu-latest
+    steps:
+      # On a release, build the tag the release names, not whatever main happens to be. Other
+      # events leave ref empty, which checks out the default.
+      - uses: actions/checkout@v7
+        with:
+          ref: ${{ github.event.release.tag_name }}
+      - if: github.event.action != 'closed'
+        uses: pnpm/action-setup@v6
+      - if: github.event.action != 'closed'
+        uses: actions/setup-node@v7
+        with:
+          node-version-file: .nvmrc
+          cache: pnpm
+      - if: github.event.action != 'closed'
+        run: pnpm install --frozen-lockfile && pnpm --filter gloss-format build && pnpm --filter gloss-site build
+        env:
+          SITE_BASE: ${{ github.event_name == 'pull_request' && format('/pr-preview/pr-{0}/', github.event.number) || '/' }}
+
+      # Only the site root needs this. The deploy actions never delete .nojekyll, so in a
+      # preview it would outlive the preview's removal. Without it, Pages drops the _astro/
+      # directory.
+      - if: github.event_name != 'pull_request'
+        run: touch site/dist/.nojekyll
+      - if: github.event_name != 'pull_request'
+        uses: JamesIves/github-pages-deploy-action@v4
+        with:
+          folder: site/dist
+          branch: gh-pages
+          clean-exclude: pr-preview/
+
+      # public/CNAME lands in every build, and the deploy actions never delete a CNAME, so a
+      # preview's copy would outlive the preview.
+      - if: github.event_name == 'pull_request' && github.event.action != 'closed'
+        run: rm site/dist/CNAME
+      - if: github.event_name == 'pull_request'
+        uses: rossjrw/pr-preview-action@v1
+        with:
+          source-dir: site/dist
+          preview-branch: gh-pages
+          umbrella-dir: pr-preview
+          pages-base-url: gloss-format.org
+          qr-code: false

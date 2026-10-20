@@ -27,5 +27,7 @@ jobs:
       - run: pnpm format:check
       - run: pnpm lint
       - run: pnpm typecheck
+      # pnpm -r builds gloss-format before the site that depends on it.
       - run: pnpm build
+      - run: test -f site/dist/schema/v1.json
       - run: pnpm test

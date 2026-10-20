@@ -1,0 +1,29 @@
+{
+  "name": "gloss-site",
+  "private": true,
+  "version": "0.0.0",
+  "license": "MIT",
+  "type": "module",
+  "scripts": {
+    "dev": "astro dev",
+    "build": "astro build",
+    "preview": "astro preview",
+    "typecheck": "astro check",
+    "lint": "eslint src",
+    "test": "vitest run"
+  },
+  "dependencies": {
+    "@astrojs/markdown-satteri": "0.4.3",
+    "@astrojs/starlight": "^0.42.6",
+    "astro": "^7.3.8",
+    "gloss-format": "workspace:*",
+    "satteri": "0.10.5",
+    "starlight-links-validator": "^0.27.0"
+  },
+  "devDependencies": {
+    "@astrojs/check": "^0.9.10",
+    "ajv": "^8.20.0",
+    "typescript": "^6.0.3",
+    "vitest": "^5.0.4"
+  }
+}

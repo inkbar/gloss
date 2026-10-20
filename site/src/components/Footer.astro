@@ -1,0 +1,16 @@
+---
+import Default from '@astrojs/starlight/components/Footer.astro'
+---
+
+<Default>
+  <slot />
+</Default>
+<p class="credit">From the creators of <a href="https://inkbar.dev">Inkbar</a> and Redactr.</p>
+
+<style>
+  .credit {
+    margin-top: 1.5rem;
+    font-size: var(--sl-text-sm);
+    color: var(--sl-color-gray-3);
+  }
+</style>
