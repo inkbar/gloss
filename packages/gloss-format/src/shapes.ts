@@ -204,7 +204,7 @@ export const commonFields = {
   opacity: field(z.number().min(0).max(1), {
     description: 'Opacity, from 0 (invisible) to 1 (opaque). Absent means opaque.',
     'x-xfdf': 'opacity',
-  }).optional(),
+  }).default(1),
   author: field(z.string(), {
     description: 'Who made the annotation. Absent means unknown.',
     'x-xfdf': 'title',
