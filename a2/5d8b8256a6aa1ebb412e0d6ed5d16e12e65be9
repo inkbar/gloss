@@ -1,0 +1,46 @@
+site/src/reference/xfdf.test.ts
+  s_53bc7b36f6063e::t_52103ea7ccd7b7 36
+site/src/content/docs/index.mdx
+  s_53bc7b36f6063e::t_52103ea7ccd7b7 28
+site/src/content/docs/using-gloss.mdx
+  s_53bc7b36f6063e::t_52103ea7ccd7b7 10,31,33,55
+packages/gloss-format/README.md
+  s_53bc7b36f6063e::t_f1b17a3bd0e2ff 33
+site/src/samples/samples.test.ts
+  s_53bc7b36f6063e::t_52103ea7ccd7b7 48-50,52-53,56-57,60,62-65,70,105
+  s_53bc7b36f6063e::t_4942e13a4f94ab 141
+site/src/samples/validate-zod.ts
+  s_53bc7b36f6063e::t_52103ea7ccd7b7 23
+packages/gloss-format/src/annotations.test.ts
+  s_53bc7b36f6063e::t_795fee13b209c2 20
+  s_53bc7b36f6063e::t_0ab99395605bc2 150,153,173-182,185
+  s_53bc7b36f6063e::t_7bf5dcab1dcb67 183-184
+  s_53bc7b36f6063e::t_c6dc4b53741d5d 187-189
+  s_53bc7b36f6063e::t_7819afa731b9d4 186
+site/src/samples/audited-redaction.schema.json
+  s_53bc7b36f6063e::t_c6dc4b53741d5d 3-5,7
+packages/gloss-format/src/schema.test.ts
+  s_53bc7b36f6063e::t_795fee13b209c2 116,332,335-337,339
+  s_53bc7b36f6063e::t_f1b17a3bd0e2ff 353
+  s_53bc7b36f6063e::t_e7da9394b4a945 79
+packages/gloss-format/schema.json
+  s_53bc7b36f6063e::t_52cc39d8e70e45 844,1096,2014
+packages/gloss-format/src/annotations.ts
+  s_53bc7b36f6063e::t_71eb8f55d53352 221-222,267-268,415-425
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.7.5",
+  "base_commit_sha": "a25d8b8256a6aa1ebb412e0d6ed5d16e12e65be9",
+  "prompts": {},
+  "sessions": {
+    "s_53bc7b36f6063e": {
+      "agent_id": {
+        "tool": "claude",
+        "id": "cc4ab85f-ebb1-4dc0-8290-66c99694838b",
+        "model": "claude-opus-5-5"
+      },
+      "human_author": "Edward Coleridge Smith <edcoleridgesmith@gmail.com>"
+    }
+  }
+}
