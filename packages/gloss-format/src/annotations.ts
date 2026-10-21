@@ -33,8 +33,6 @@ export const ANNOTATION_TYPES = [
 /** A PNG or JPEG image as a base64 `data:` URL. */
 export const IMAGE_DATA_URL = /^data:image\/(png|jpeg);base64,/
 
-const EXTENSION = 'An extension; XFDF has no equivalent.'
-
 /** The `type` field of a definition: always `value`. */
 function typeField<const T extends string>(value: T) {
   return field(z.literal(value), { description: `The annotation type. Always ${value}.` })
@@ -217,13 +215,11 @@ export const FreeText = define(
       description: "The box's fill. Absent means no fill.",
       'x-xfdf': 'color',
     }).optional(),
-    borderColor: field(Color, {
-      description: `The border's colour. Absent: the reader chooses the colour. ${EXTENSION}`,
-    }).optional(),
     width: strokeWidth(0, "The border's width in points; 0 draws no border."),
     dashes: dashes(),
     cornerRadius: field(z.number().nonnegative(), {
-      description: `The radius of the box's corners in points. Absent means square corners. ${EXTENSION}`,
+      description:
+        "The radius of the box's corners in points, written to PDF /Border as both the horizontal and vertical radius. Absent means square corners.",
     }).optional(),
     defaultStyle: field(FreeTextStyle, {
       description: "The text style. Absent: each style field's own default applies.",
@@ -268,7 +264,8 @@ export const Square = define(
     dashes: dashes(),
     interiorColor: interiorColor(),
     cornerRadius: field(z.number().nonnegative(), {
-      description: `The radius of the corners in points. Absent means square corners. ${EXTENSION}`,
+      description:
+        'The radius of the corners in points, written to PDF /Border as both the horizontal and vertical radius. Absent means square corners.',
     }).optional(),
   }),
   {
@@ -413,42 +410,19 @@ export const Polygon = define(
 export type Polygon = z.infer<typeof Polygon>
 export type PolygonInput = z.input<typeof Polygon>
 
-/** Pressure must have one value per point of each stroke. */
-function checkPressure(
-  a: { inklist: unknown[][]; pressure?: unknown[][] | undefined },
-  ctx: z.core.$RefinementCtx
-): void {
-  if (!a.pressure) return
-  const ok =
-    a.pressure.length === a.inklist.length &&
-    a.pressure.every((p, i) => p.length === a.inklist[i]?.length)
-  if (!ok)
-    ctx.addIssue({
-      code: 'custom',
-      path: ['pressure'],
-      message: 'pressure must have the same shape as inklist',
-    })
-}
-
 export const Ink = define(
   'Ink',
-  z
-    .looseObject({
-      type: typeField('ink'),
-      ...commonFields,
-      inklist: field(Point.array().min(1).array().min(1), {
-        description:
-          'The strokes, each a list of points in the order they were drawn. At least one stroke of at least one point.',
-        'x-xfdf': 'inklist',
-      }),
-      pressure: field(z.array(z.array(z.number().min(0).max(1))), {
-        description:
-          'Pen pressure per point, from 0 to 1. It has the same shape as inklist: one list per stroke, one value per point. JSON Schema cannot check that rule, so a validator must. Absent means no pressure data, as with mouse input.',
-      }).optional(),
-      width: strokeWidth(2),
-      dashes: dashes(),
-    })
-    .superRefine(checkPressure),
+  z.looseObject({
+    type: typeField('ink'),
+    ...commonFields,
+    inklist: field(Point.array().min(1).array().min(1), {
+      description:
+        'The strokes, each a list of points in the order they were drawn. At least one stroke of at least one point.',
+      'x-xfdf': 'inklist',
+    }),
+    width: strokeWidth(2),
+    dashes: dashes(),
+  }),
   {
     title: 'Ink',
     description: 'Freehand strokes.',
@@ -510,36 +484,6 @@ export const Stamp = define(
 export type Stamp = z.infer<typeof Stamp>
 export type StampInput = z.input<typeof Stamp>
 
-export const Suggestion = define(
-  'Suggestion',
-  z.looseObject({
-    confidence: field(z.number().min(0).max(1), {
-      description: 'How sure the detector is, from 0 to 1.',
-    }),
-    jobId: field(z.string(), {
-      description: 'The detection run that made the suggestion. Absent means unknown.',
-    }).optional(),
-    reason: field(z.string(), {
-      description:
-        'A short label for what was found, such as a name or an account number. Absent means none.',
-    }).optional(),
-    explanation: field(z.string(), {
-      description: 'Why the text was suggested, for the reviewer. Absent means none.',
-    }).optional(),
-    recommendation: field(z.enum(['redact', 'review', 'keep']), {
-      description:
-        'What the detector recommends doing with the mark. Absent means no recommendation.',
-    }).optional(),
-  }),
-  {
-    title: 'Suggestion',
-    description: `Why a redaction was suggested: what a detector found and how sure it is. ${EXTENSION}`,
-    examples: [{ confidence: 0.92, reason: 'Person name', recommendation: 'redact' }],
-  }
-)
-export type Suggestion = z.infer<typeof Suggestion>
-export type SuggestionInput = z.input<typeof Suggestion>
-
 export const Redact = define(
   'Redact',
   z.looseObject({
@@ -559,13 +503,6 @@ export const Redact = define(
       description: 'Text drawn over the fill once applied. Absent means none.',
       'x-xfdf': 'overlay-text',
     }).optional(),
-    origin: field(z.enum(['user', 'suggested']), {
-      description: `user for a mark a person made or accepted, suggested for one waiting for review. Absent means user. ${EXTENSION}`,
-    }).default('user'),
-    suggestion: field(Suggestion, {
-      description:
-        'Why the mark was suggested. Kept after a person accepts it. Absent for a mark a person made.',
-    }).optional(),
   }),
   {
     title: 'Redact',
@@ -578,8 +515,6 @@ export const Redact = define(
         ...sample,
         rect: sampleTextRect,
         quads: sampleQuads,
-        origin: 'suggested',
-        suggestion: { confidence: 0.92, reason: 'Person name' },
       },
     ],
   }

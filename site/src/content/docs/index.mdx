@@ -25,7 +25,7 @@ Gloss is an open, viewer-neutral JSON format for PDF annotations. A Gloss docume
 
 XFDF is the XML format for PDF annotations, standardised as [ISO 19444-1](https://www.pdfa.org/resource/iso-19444-xfdf/). Gloss has the same annotation types and uses the same coordinates. Where XFDF has a name for something, Gloss uses it: a sticky note is `text`, as in XFDF. A few fields read better in JSON under another name, such as `author` for XFDF's `title`. The reference gives the XFDF name of every field that has one, and [Gloss and XFDF](xfdf/) maps them all on one page.
 
-Gloss also adds what XFDF lacks: fields for suggested redactions, and `custom` for data of your own.
+Gloss also adds `custom`, for data of your own.
 
 ## How Gloss compares
 
@@ -37,7 +37,6 @@ Gloss carries the same annotations as XFDF, in JSON, with a JSON Schema at a sta
 | Defined by                                | An open JSON Schema, MIT licensed | ISO 19444-1 | The SDK's documentation |
 | Tied to one viewer                        | No                                | No          | Yes                     |
 | Usable in your own JSON Schema or OpenAPI | Yes, by `$ref` to a URL           | No          | Depends on the SDK      |
-| Suggested redactions awaiting review      | Yes                               | No          | Depends on the SDK      |
 
 ## Media type and extension
 
@@ -96,15 +95,6 @@ If your system needs a field Gloss leaves optional, require it in your own schem
 Every annotation accepts `custom`, an object for data of your own, such as a case number or a review note. Gloss readers keep it as it is and never interpret it.
 
 Keep host data in `custom` rather than in new top-level fields. A later version of Gloss may add a field with the same name.
-
-## Suggested redactions
-
-XFDF has nothing for a redaction that a detector proposed and a person hasn't reviewed yet. Two fields on [`redact`](reference/redact/) carry it:
-
-- `origin`: `user` for a mark a person made or accepted, `suggested` for one waiting for review. Defaults to `user`.
-- [`suggestion`](reference/suggestion/): `confidence` from 0 to 1, with optional `reason`, `explanation`, `recommendation` (`redact`, `review` or `keep`) and `jobId`.
-
-An accepted suggestion keeps its `suggestion`, so you can still tell where it came from.
 
 ## Get the schema
 

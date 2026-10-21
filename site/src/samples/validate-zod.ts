@@ -20,4 +20,4 @@ const redaction: Redact = Redact.parse({
   page: 0,
   rect: { x: 72, y: 700, width: 120, height: 14 },
 })
-console.log(redaction.origin) // 'user', the default
+console.log(redaction.opacity) // 1, the default

@@ -7,7 +7,7 @@ import { Code } from '@astrojs/starlight/components'
 
 import ValidationSteps from '../../components/ValidationSteps.astro'
 
-import consumer from '../../samples/reviewed-redaction.schema.json?raw'
+import consumer from '../../samples/audited-redaction.schema.json?raw'
 import openapi from '../../samples/openapi.json?raw'
 import validateAjv from '../../samples/validate-ajv.ts?raw'
 import validateZod from '../../samples/validate-zod.ts?raw'
@@ -28,9 +28,9 @@ Load the [Gloss schema](../schema/v1.json) into your validator before you compil
 
 Gloss requires as little as it can, so that any system can read the data. Your API can ask for more. Wrap a Gloss definition in `allOf` and add your rules beside it.
 
-This schema is for an API that only accepts reviewed redactions. It makes `origin` required and allows only `user`, so the API turns away a suggestion nobody has reviewed:
+This schema is for an API that needs to know who made each redaction and when. It makes `author` and `createdAt` required, so the API turns away a redaction that lacks either:
 
-<Code code={consumer} lang="json" title="reviewed-redaction.schema.json" />
+<Code code={consumer} lang="json" title="audited-redaction.schema.json" />
 
 The rest comes from Gloss. A redaction with no `rect` still fails, because Gloss requires one.
 
@@ -52,7 +52,7 @@ The `gloss-format` package exports a zod schema for every definition, with a Typ
 
 <Code code={validateZod} lang="ts" title="validate-zod.ts" />
 
-Parsing keeps fields Gloss doesn't define, and keeps items of a type it doesn't know. It also fills in defaults, so a redaction with no `origin` comes back with `origin: 'user'`.
+Parsing keeps fields Gloss doesn't define, and keeps items of a type it doesn't know. It also fills in defaults, so a redaction with no `opacity` comes back with `opacity: 1`.
 
 So each definition has two types. `Redact` is what a parse returns, with every default filled in. `RedactInput` is what you write, where fields with a default are optional. Use the `Input` type for data you build before you parse or send it. `isAnnotation(item)` tells you whether a document item is a type Gloss defines, and narrows its type.
 

@@ -45,27 +45,29 @@ describe('minimal.gloss.json', () => {
   })
 })
 
-describe('reviewed-redaction.schema.json', () => {
-  const validate = () => gloss().compile(json('reviewed-redaction.schema.json') as object)
+describe('audited-redaction.schema.json', () => {
+  const validate = () => gloss().compile(json('audited-redaction.schema.json') as object)
+  const createdAt = '2026-10-20T09:30:00Z'
 
-  it('rejects a redaction without an origin', () => {
-    expect(validate()(redaction)).toBe(false)
+  it('rejects a redaction without an author', () => {
+    expect(validate()({ ...redaction, createdAt })).toBe(false)
   })
 
-  it('rejects a suggestion nobody has reviewed', () => {
-    expect(validate()({ ...redaction, origin: 'suggested' })).toBe(false)
+  it('rejects a redaction without a creation time', () => {
+    expect(validate()({ ...redaction, author: 'Ed' })).toBe(false)
   })
 
-  it('accepts a reviewed redaction', () => {
+  it('accepts a redaction with both', () => {
     const check = validate()
-    expect(check({ ...redaction, origin: 'user' }), JSON.stringify(check.errors)).toBe(
-      true
-    )
+    expect(
+      check({ ...redaction, author: 'Ed', createdAt }),
+      JSON.stringify(check.errors)
+    ).toBe(true)
   })
 
   it('still applies the Gloss definition', () => {
     const { rect: _rect, ...noRect } = redaction
-    expect(validate()({ ...noRect, origin: 'user' })).toBe(false)
+    expect(validate()({ ...noRect, author: 'Ed', createdAt })).toBe(false)
   })
 })
 
@@ -100,7 +102,7 @@ describe('openapi.json', () => {
       responses: { 200: { content: { 'application/json': { schema: object } } } }
     }
     const check = gloss().compile(get.responses[200].content['application/json'].schema)
-    const list = [redaction, { ...redaction, id: 'r2', origin: 'suggested' }]
+    const list = [redaction, { ...redaction, id: 'r2' }]
     expect(check(list), JSON.stringify(check.errors)).toBe(true)
     expect(check([{ ...redaction, type: 'highlight' }])).toBe(false)
   })
@@ -136,7 +138,7 @@ describe('the TypeScript samples', () => {
 
   // Each sample logs what its comments say it prints.
   it.each([
-    ['validate-zod.ts', [['highlight', 'a1', 'on page', 0], ['user']]],
+    ['validate-zod.ts', [['highlight', 'a1', 'on page', 0], [1]]],
     ['validate-ajv.ts', [[true]]],
   ])('%s runs and prints what it says', async (file, printed) => {
     const log = vi.spyOn(console, 'log').mockImplementation(() => {})

@@ -33,6 +33,6 @@ describe('renderXfdf', () => {
   it('maps the attributes of each element, and marks extensions', () => {
     expect(page).toContain('## `<redact>`')
     expect(page).toContain('| `overlay-text` | [`overlayText`](../reference/redact/) |')
-    expect(page).toContain('| none, an extension | [`origin`](../reference/redact/) |  |')
+    expect(page).toContain('| none, an extension | [`custom`](../reference/common/) |  |')
   })
 })
