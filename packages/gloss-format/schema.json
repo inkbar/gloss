@@ -162,7 +162,7 @@
           "type": "object",
           "propertyNames": { "type": "string" },
           "additionalProperties": {},
-          "description": "Data of your own. Gloss readers keep it as it is and never interpret it. Absent means none."
+          "description": "Data of your own, under a key of your own, such as your product's name: { \"acme\": { ... } }. Gloss readers keep it as it is and never interpret it. Absent means none."
         },
         "quads": {
           "minItems": 1,
@@ -345,7 +345,7 @@
           "type": "object",
           "propertyNames": { "type": "string" },
           "additionalProperties": {},
-          "description": "Data of your own. Gloss readers keep it as it is and never interpret it. Absent means none."
+          "description": "Data of your own, under a key of your own, such as your product's name: { \"acme\": { ... } }. Gloss readers keep it as it is and never interpret it. Absent means none."
         },
         "quads": {
           "minItems": 1,
@@ -462,7 +462,7 @@
           "type": "object",
           "propertyNames": { "type": "string" },
           "additionalProperties": {},
-          "description": "Data of your own. Gloss readers keep it as it is and never interpret it. Absent means none."
+          "description": "Data of your own, under a key of your own, such as your product's name: { \"acme\": { ... } }. Gloss readers keep it as it is and never interpret it. Absent means none."
         },
         "quads": {
           "minItems": 1,
@@ -579,7 +579,7 @@
           "type": "object",
           "propertyNames": { "type": "string" },
           "additionalProperties": {},
-          "description": "Data of your own. Gloss readers keep it as it is and never interpret it. Absent means none."
+          "description": "Data of your own, under a key of your own, such as your product's name: { \"acme\": { ... } }. Gloss readers keep it as it is and never interpret it. Absent means none."
         },
         "quads": {
           "minItems": 1,
@@ -696,7 +696,7 @@
           "type": "object",
           "propertyNames": { "type": "string" },
           "additionalProperties": {},
-          "description": "Data of your own. Gloss readers keep it as it is and never interpret it. Absent means none."
+          "description": "Data of your own, under a key of your own, such as your product's name: { \"acme\": { ... } }. Gloss readers keep it as it is and never interpret it. Absent means none."
         },
         "icon": {
           "default": "Note",
@@ -824,7 +824,7 @@
           "type": "object",
           "propertyNames": { "type": "string" },
           "additionalProperties": {},
-          "description": "Data of your own. Gloss readers keep it as it is and never interpret it. Absent means none."
+          "description": "Data of your own, under a key of your own, such as your product's name: { \"acme\": { ... } }. Gloss readers keep it as it is and never interpret it. Absent means none."
         },
         "width": {
           "default": 0,
@@ -1071,7 +1071,7 @@
           "type": "object",
           "propertyNames": { "type": "string" },
           "additionalProperties": {},
-          "description": "Data of your own. Gloss readers keep it as it is and never interpret it. Absent means none."
+          "description": "Data of your own, under a key of your own, such as your product's name: { \"acme\": { ... } }. Gloss readers keep it as it is and never interpret it. Absent means none."
         },
         "width": {
           "default": 1,
@@ -1196,7 +1196,7 @@
           "type": "object",
           "propertyNames": { "type": "string" },
           "additionalProperties": {},
-          "description": "Data of your own. Gloss readers keep it as it is and never interpret it. Absent means none."
+          "description": "Data of your own, under a key of your own, such as your product's name: { \"acme\": { ... } }. Gloss readers keep it as it is and never interpret it. Absent means none."
         },
         "width": {
           "default": 1,
@@ -1316,7 +1316,7 @@
           "type": "object",
           "propertyNames": { "type": "string" },
           "additionalProperties": {},
-          "description": "Data of your own. Gloss readers keep it as it is and never interpret it. Absent means none."
+          "description": "Data of your own, under a key of your own, such as your product's name: { \"acme\": { ... } }. Gloss readers keep it as it is and never interpret it. Absent means none."
         },
         "start": {
           "description": "Where the line starts.",
@@ -1452,7 +1452,7 @@
           "type": "object",
           "propertyNames": { "type": "string" },
           "additionalProperties": {},
-          "description": "Data of your own. Gloss readers keep it as it is and never interpret it. Absent means none."
+          "description": "Data of your own, under a key of your own, such as your product's name: { \"acme\": { ... } }. Gloss readers keep it as it is and never interpret it. Absent means none."
         },
         "vertices": {
           "minItems": 2,
@@ -1593,7 +1593,7 @@
           "type": "object",
           "propertyNames": { "type": "string" },
           "additionalProperties": {},
-          "description": "Data of your own. Gloss readers keep it as it is and never interpret it. Absent means none."
+          "description": "Data of your own, under a key of your own, such as your product's name: { \"acme\": { ... } }. Gloss readers keep it as it is and never interpret it. Absent means none."
         },
         "vertices": {
           "minItems": 2,
@@ -1724,7 +1724,7 @@
           "type": "object",
           "propertyNames": { "type": "string" },
           "additionalProperties": {},
-          "description": "Data of your own. Gloss readers keep it as it is and never interpret it. Absent means none."
+          "description": "Data of your own, under a key of your own, such as your product's name: { \"acme\": { ... } }. Gloss readers keep it as it is and never interpret it. Absent means none."
         },
         "inklist": {
           "minItems": 1,
@@ -1856,7 +1856,7 @@
           "type": "object",
           "propertyNames": { "type": "string" },
           "additionalProperties": {},
-          "description": "Data of your own. Gloss readers keep it as it is and never interpret it. Absent means none."
+          "description": "Data of your own, under a key of your own, such as your product's name: { \"acme\": { ... } }. Gloss readers keep it as it is and never interpret it. Absent means none."
         },
         "imagedata": {
           "type": "string",
@@ -1971,7 +1971,7 @@
           "type": "object",
           "propertyNames": { "type": "string" },
           "additionalProperties": {},
-          "description": "Data of your own. Gloss readers keep it as it is and never interpret it. Absent means none."
+          "description": "Data of your own, under a key of your own, such as your product's name: { \"acme\": { ... } }. Gloss readers keep it as it is and never interpret it. Absent means none."
         },
         "quads": {
           "minItems": 1,
@@ -2057,7 +2057,7 @@
       "required": ["type", "id", "page"],
       "additionalProperties": {},
       "title": "UnknownAnnotation",
-      "description": "An annotation of a type this version of Gloss does not define, such as one from a newer writer or a host's own. It needs a type, an id and a page. Readers may ignore it or pass it through. Types match case-sensitively, so Highlight is an unknown type. Gloss never defines a type that starts with x-, so a host's own types should use that prefix: no later version can then reject them.",
+      "description": "An annotation of a type this version of Gloss does not define, such as one from a newer writer or a host's own. It needs a type, an id and a page. Readers may ignore it or pass it through. Types match case-sensitively, so Highlight is an unknown type. To add an annotation of your own, write it as the nearest Gloss type and record its kind in custom.",
       "examples": [{ "type": "sticker", "id": "a1", "page": 0, "sticker": "star" }]
     },
     "Common": {
@@ -2141,7 +2141,7 @@
           "type": "object",
           "propertyNames": { "type": "string" },
           "additionalProperties": {},
-          "description": "Data of your own. Gloss readers keep it as it is and never interpret it. Absent means none."
+          "description": "Data of your own, under a key of your own, such as your product's name: { \"acme\": { ... } }. Gloss readers keep it as it is and never interpret it. Absent means none."
         }
       },
       "required": ["type", "id", "page", "rect"],

@@ -36,6 +36,10 @@ The rest comes from Gloss. A redaction with no `rect` still fails, because Gloss
 
 You can narrow an enum or add a pattern to any field the same way. To turn away fields Gloss doesn't list, give the names you accept in `propertyNames`. `unevaluatedProperties: false` won't do it, because Gloss definitions accept any extra field and so count every field as evaluated.
 
+## Keep your own data
+
+Gloss holds what a PDF annotation can hold. Put anything else in `custom`, under a key named for your product, such as `custom: { "acme": { "caseNumber": "C-104" } }`. For an annotation kind Gloss lacks, write the nearest Gloss type and record the kind at `custom.acme.type`. [Your own data](../#your-own-data) has examples.
+
 ## OpenAPI 3.1
 
 OpenAPI 3.1 uses JSON Schema 2020-12, so a response can point at a Gloss definition. This one returns a document's redactions as a list of `Redact`:

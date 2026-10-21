@@ -28,12 +28,12 @@ export const QUESTIONS: Answer[] = [
   {
     question: 'Which annotation types does Gloss support?',
     answer:
-      "Gloss defines `highlight`, `underline`, `strikeout`, `squiggly`, `text` (a note), `freetext`, `square`, `circle`, `line`, `polyline`, `polygon`, `ink`, `stamp` and `redact`, the annotation types XFDF defines. A viewer can add its own types, and a document can carry types Gloss doesn't define.",
+      'Gloss defines `highlight`, `underline`, `strikeout`, `squiggly`, `text` (a note), `freetext`, `square`, `circle`, `line`, `polyline`, `polygon`, `ink`, `stamp` and `redact`, the annotation types XFDF defines. A document can also carry types a newer version of Gloss defines.',
   },
   {
     question: 'Can I add my own data?',
     answer:
-      'Yes. Every annotation accepts `custom`, an object Gloss readers keep as it is and never interpret. For a mark of your own, use a type that starts with `x-`, such as `x-sticker`. Gloss will never define a type with that prefix, so no later version of the schema can reject it.',
+      'Yes. Every annotation accepts `custom`, an object Gloss readers keep as it is and never interpret. Put your data under a key of your own, such as `custom: { "acme": { "caseNumber": "C-104" } }`. For a kind of mark Gloss lacks, write the nearest Gloss type and record the kind in `custom.acme.type`, so other readers still draw the shape.',
   },
   {
     question: 'How do I validate a Gloss document?',
