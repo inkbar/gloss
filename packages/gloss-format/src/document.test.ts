@@ -1,6 +1,5 @@
 import { describe, expect, expectTypeOf, it } from 'vitest'
 
-import { ANNOTATION_TYPES } from './annotations'
 import { Annotation, GlossDocument, isAnnotation, UnknownAnnotation } from './document'
 
 import type { Redact, RedactInput } from './annotations'
@@ -121,10 +120,6 @@ describe('GlossDocument', () => {
 })
 
 describe('annotation types', () => {
-  it('never start with x-, which is left for host types', () => {
-    expect(ANNOTATION_TYPES.filter((t) => t.startsWith('x-'))).toEqual([])
-  })
-
   it('match case-sensitively', () => {
     const item = { type: 'Highlight', id: 'a', page: 0 }
     expect(UnknownAnnotation.safeParse(item).success).toBe(true)
@@ -139,7 +134,7 @@ describe('isAnnotation', () => {
       version: 1,
       annotations: [
         { type: 'redact', id: 'r1', page: 0, rect },
-        { type: 'x-sticker', id: 's1', page: 0 },
+        { type: 'sticker', id: 's1', page: 0 },
       ],
     })
     expect(annotations.map(isAnnotation)).toEqual([true, false])

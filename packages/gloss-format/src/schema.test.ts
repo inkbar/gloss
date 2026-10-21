@@ -46,6 +46,15 @@ describe('schema.json', () => {
     expect(schema).toEqual(buildSchema())
   })
 
+  it('describes custom as namespaced by owner', () => {
+    const props = defs.Common?.properties as Record<string, { description?: string }>
+    expect(props.custom?.description).toMatch(/under a key of your own/)
+  })
+
+  it('gives no x- naming advice', () => {
+    expect(JSON.stringify(schema)).not.toMatch(/x-sticker|starts with x-/)
+  })
+
   it('names every shared shape and annotation type', () => {
     expect(Object.keys(defs)).toEqual(
       expect.arrayContaining([

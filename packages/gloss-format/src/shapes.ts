@@ -249,7 +249,7 @@ export const commonFields = {
   }).optional(),
   custom: field(z.record(z.string(), z.unknown()), {
     description:
-      'Data of your own. Gloss readers keep it as it is and never interpret it. Absent means none.',
+      'Data of your own, under a key of your own, such as your product\'s name: { "acme": { ... } }. Gloss readers keep it as it is and never interpret it. Absent means none.',
   }).optional(),
 }
 
