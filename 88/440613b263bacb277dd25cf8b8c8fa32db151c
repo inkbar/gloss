@@ -1,0 +1,33 @@
+packages/gloss-format/src/schema.test.ts
+  s_53bc7b36f6063e::t_f9fea2e1b4b42c 49-57
+packages/gloss-format/src/shapes.ts
+  s_53bc7b36f6063e::t_f9fea2e1b4b42c 252
+packages/gloss-format/src/document.test.ts
+  s_53bc7b36f6063e::t_f9fea2e1b4b42c 137
+site/src/answers.ts
+  s_53bc7b36f6063e::t_f9fea2e1b4b42c 31,36
+site/src/content/docs/index.mdx
+  s_53bc7b36f6063e::t_f9fea2e1b4b42c 86,97-124
+site/src/content/docs/using-gloss.mdx
+  s_53bc7b36f6063e::t_f9fea2e1b4b42c 39-42
+packages/gloss-format/src/document.ts
+  s_53bc7b36f6063e::t_f9fea2e1b4b42c 70
+packages/gloss-format/schema.json
+  s_53bc7b36f6063e::t_f9fea2e1b4b42c 165,348,465,582,699,827,1074,1199,1319,1455,1596,1727,1859,1974,2060,2144
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.7.5",
+  "base_commit_sha": "88440613b263bacb277dd25cf8b8c8fa32db151c",
+  "prompts": {},
+  "sessions": {
+    "s_53bc7b36f6063e": {
+      "agent_id": {
+        "tool": "claude",
+        "id": "cc4ab85f-ebb1-4dc0-8290-66c99694838b",
+        "model": "claude-opus-5-5"
+      },
+      "human_author": "Edward Coleridge Smith <edcoleridgesmith@gmail.com>"
+    }
+  }
+}
