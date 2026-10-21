@@ -67,7 +67,7 @@ export const UnknownAnnotation = define(
   {
     title: 'UnknownAnnotation',
     description:
-      "An annotation of a type this version of Gloss does not define, such as one from a newer writer or a host's own. It needs a type, an id and a page. Readers may ignore it or pass it through. Types match case-sensitively, so Highlight is an unknown type. To add an annotation of your own, write it as the nearest Gloss type and record its kind in custom.",
+      'An annotation of a type this version of Gloss does not define, such as one from a newer writer. It needs a type, an id and a page. Readers may ignore it or pass it through. Types match case-sensitively, so Highlight is an unknown type. To add an annotation of your own, write it as the nearest Gloss type and record its kind under your own key in custom.',
     examples: [{ type: 'sticker', id: 'a1', page: 0, sticker: 'star' }],
   }
 )

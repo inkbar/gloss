@@ -97,11 +97,22 @@ function fieldTable(
     .filter(([field]) => field !== 'type')
     .map(([field, prop]) => {
       const xfdf =
-        typeof prop['x-xfdf'] === 'string' ? code(prop['x-xfdf']) : 'none, an extension'
+        typeof prop['x-xfdf'] === 'string'
+          ? code(prop['x-xfdf'])
+          : namesPdfKey(prop)
+            ? 'none'
+            : 'none, an extension'
       const notes = xfdfSentences(prop, defs)
       return `| ${[xfdf, `[${code(field)}](../reference/${slug}/)`, notes].map(cell).join(' | ')} |`
     })
   return ['| XFDF | Gloss | Notes |', '| --- | --- | --- |', ...rows]
+}
+
+/** True when the description says where the value lives in PDF, as in "written to PDF /Border". */
+function namesPdfKey(prop: JsonSchema): boolean {
+  return (
+    typeof prop['description'] === 'string' && /\bPDF \/[A-Z]/.test(prop['description'])
+  )
 }
 
 /** The sentences of a field's description, and of the definition it refers to, that mention XFDF. */

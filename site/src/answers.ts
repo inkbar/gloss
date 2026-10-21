@@ -28,7 +28,7 @@ export const QUESTIONS: Answer[] = [
   {
     question: 'Which annotation types does Gloss support?',
     answer:
-      'Gloss defines `highlight`, `underline`, `strikeout`, `squiggly`, `text` (a note), `freetext`, `square`, `circle`, `line`, `polyline`, `polygon`, `ink`, `stamp` and `redact`, the annotation types XFDF defines. A document can also carry types a newer version of Gloss defines.',
+      'Gloss defines `highlight`, `underline`, `strikeout`, `squiggly`, `text` (a note), `freetext`, `square`, `circle`, `line`, `polyline`, `polygon`, `ink`, `stamp` and `redact`, the annotation types XFDF defines. A reader keeps types it does not know, so a file from a newer version of Gloss still loads.',
   },
   {
     question: 'Can I add my own data?',
