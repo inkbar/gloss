@@ -8,7 +8,7 @@ Gloss is an open, viewer-neutral JSON format for PDF annotations. A Gloss docume
 
 XFDF is the XML format for PDF annotations, standardised as [ISO 19444-1](https://www.pdfa.org/resource/iso-19444-xfdf/). Gloss has the same annotation types and uses the same coordinates. Where XFDF has a name for something, Gloss uses it: a sticky note is `text`, as in XFDF. A few fields read better in JSON under another name, such as `author` for XFDF's `title`. The reference gives the XFDF name of every field that has one, and [Gloss and XFDF](https://gloss-format.org/xfdf/) maps them all on one page.
 
-Gloss also adds what XFDF lacks: fields for suggested redactions, and `custom` for data of your own.
+Gloss also adds `custom`, for data of your own.
 
 ## How Gloss compares
 
@@ -20,7 +20,6 @@ Gloss carries the same annotations as XFDF, in JSON, with a JSON Schema at a sta
 | Defined by                                | An open JSON Schema, MIT licensed | ISO 19444-1 | The SDK's documentation |
 | Tied to one viewer                        | No                                | No          | Yes                     |
 | Usable in your own JSON Schema or OpenAPI | Yes, by `$ref` to a URL           | No          | Depends on the SDK      |
-| Suggested redactions awaiting review      | Yes                               | No          | Depends on the SDK      |
 
 ## Media type and extension
 
@@ -77,7 +76,7 @@ The format version is the integer in the document and in the schema URL. A `vers
 - **`v1.json` changes, but never breaks.** It gains fields, types and enum values over time. If you need a fixed copy, pin a version of the `gloss-format` package.
 - **Changes only add.** A change that would reject a document `v1.json` used to accept goes into `v2.json`, published beside `v1.json`. The package version is a separate number from the format version.
 - **Unknown fields are allowed.** No definition rejects a field it doesn't list, so a document from a newer writer still validates against an older schema. Readers may ignore unknown fields or pass them through. The schema won't flag a misspelled field name.
-- **Unknown types are allowed.** An item with a string `type`, a string `id` and a page number is an annotation, even if Gloss doesn't know its type. Readers may ignore it or pass it through. An item whose type Gloss does know must match that type's definition, and a later version may define a type that is unknown today. Gloss will never define a type that starts with `x-`, so give your own types that prefix, such as `x-sticker`, and no later `v1.json` can reject them. Types are case-sensitive: `Highlight` is an unknown type, not a highlight.
+- **Unknown types are allowed.** An item with a string `type`, a string `id` and a page number is an annotation, even if Gloss doesn't know its type. Readers may ignore it or pass it through. An item whose type Gloss does know must match that type's definition, and a later version may define a type that is unknown today. Types are case-sensitive: `Highlight` is an unknown type, not a highlight.
 - **Fields are optional by default.** Gloss requires only what makes an item an annotation: `type`, `id`, `page`, and the geometry its type can't be placed without. Where a field has a default, the schema records it and the reference shows it.
 
 A document with one bad item fails as a whole. To keep the good items, validate each one against [`Annotation`](https://gloss-format.org/reference/annotation/) or [`UnknownAnnotation`](https://gloss-format.org/reference/unknown-annotation/) on its own.
@@ -88,16 +87,34 @@ If your system needs a field Gloss leaves optional, require it in your own schem
 
 Every annotation accepts `custom`, an object for data of your own, such as a case number or a review note. Gloss readers keep it as it is and never interpret it.
 
-Keep host data in `custom` rather than in new top-level fields. A later version of Gloss may add a field with the same name.
+Three rules decide where a piece of data goes.
 
-## Suggested redactions
+1. **Gloss holds what a PDF annotation dictionary can store, with the same meaning.**
+2. **Everything else goes in `custom`, under your own key.** Use your product's name, so your data and another system's stay apart:
 
-XFDF has nothing for a redaction that a detector proposed and a person hasn't reviewed yet. Two fields on [`redact`](https://gloss-format.org/reference/redact/) carry it:
+   ```json
+   {
+     "type": "square",
+     "id": "a1",
+     "page": 0,
+     "rect": { "x": 72, "y": 700, "width": 120, "height": 14 },
+     "custom": { "acme": { "caseNumber": "C-104" } }
+   }
+   ```
 
-- `origin`: `user` for a mark a person made or accepted, `suggested` for one waiting for review. Defaults to `user`.
-- [`suggestion`](https://gloss-format.org/reference/suggestion/): `confidence` from 0 to 1, with optional `reason`, `explanation`, `recommendation` (`redact`, `review` or `keep`) and `jobId`.
+3. **A kind of annotation Gloss lacks is written as the nearest Gloss type.** Name the kind in your `custom` key. Any reader still draws the plain shape in the right place, and you read your own kind back:
 
-An accepted suggestion keeps its `suggestion`, so you can still tell where it came from.
+   ```json
+   {
+     "type": "circle",
+     "id": "a2",
+     "page": 0,
+     "rect": { "x": 72, "y": 650, "width": 40, "height": 40 },
+     "custom": { "acme": { "type": "magnifier" } }
+   }
+   ```
+
+Readers keep types they don't know so that a file from a newer version of Gloss survives; that is not a place for types of your own.
 
 ## Get the schema
 
@@ -129,11 +146,11 @@ Gloss carries the same annotations as XFDF, the XML format standardised as ISO 1
 
 ### Which annotation types does Gloss support?
 
-Gloss defines `highlight`, `underline`, `strikeout`, `squiggly`, `text` (a note), `freetext`, `square`, `circle`, `line`, `polyline`, `polygon`, `ink`, `stamp` and `redact`, the annotation types XFDF defines. A viewer can add its own types, and a document can carry types Gloss doesn't define.
+Gloss defines `highlight`, `underline`, `strikeout`, `squiggly`, `text` (a note), `freetext`, `square`, `circle`, `line`, `polyline`, `polygon`, `ink`, `stamp` and `redact`, the annotation types XFDF defines. A reader keeps types it does not know, so a file from a newer version of Gloss still loads.
 
 ### Can I add my own data?
 
-Yes. Every annotation accepts `custom`, an object Gloss readers keep as it is and never interpret. For a mark of your own, use a type that starts with `x-`, such as `x-sticker`. Gloss will never define a type with that prefix, so no later version of the schema can reject it.
+Yes. Every annotation accepts `custom`, an object Gloss readers keep as it is and never interpret. Put your data under a key of your own, such as `custom: { "acme": { "caseNumber": "C-104" } }`. For a kind of mark Gloss lacks, write the nearest Gloss type and record the kind in `custom.acme.type`, so other readers still draw the shape.
 
 ### How do I validate a Gloss document?
 

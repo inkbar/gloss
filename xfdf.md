@@ -77,10 +77,9 @@ Every element takes these. The element name gives the Gloss `type`.
 
 | XFDF | Gloss | Notes |
 | --- | --- | --- |
-| none, an extension | [`borderColor`](https://gloss-format.org/reference/free-text/) |  |
 | `width` | [`width`](https://gloss-format.org/reference/free-text/) |  |
 | `dashes` | [`dashes`](https://gloss-format.org/reference/free-text/) | A dash pattern in points: lengths on, then off, repeating (XFDF dashes, PDF /D). |
-| none, an extension | [`cornerRadius`](https://gloss-format.org/reference/free-text/) |  |
+| none | [`cornerRadius`](https://gloss-format.org/reference/free-text/) | XFDF has no attribute for it. |
 | `defaultstyle` | [`defaultStyle`](https://gloss-format.org/reference/free-text/) | The keys are the CSS property names XFDF writes in its defaultstyle string, in camel case. |
 | `fringe` | [`fringe`](https://gloss-format.org/reference/free-text/) | Insets from an annotation's rect to the area it draws in, in points (PDF /RD, XFDF fringe, both in this order). |
 | `callout` | [`callout`](https://gloss-format.org/reference/free-text/) |  |
@@ -93,7 +92,7 @@ Every element takes these. The element name gives the Gloss `type`.
 | `width` | [`width`](https://gloss-format.org/reference/square/) |  |
 | `dashes` | [`dashes`](https://gloss-format.org/reference/square/) | A dash pattern in points: lengths on, then off, repeating (XFDF dashes, PDF /D). |
 | `interior-color` | [`interiorColor`](https://gloss-format.org/reference/square/) |  |
-| none, an extension | [`cornerRadius`](https://gloss-format.org/reference/square/) |  |
+| none | [`cornerRadius`](https://gloss-format.org/reference/square/) | XFDF has no attribute for it. |
 
 ## `<circle>`
 
@@ -139,7 +138,6 @@ Every element takes these. The element name gives the Gloss `type`.
 | XFDF | Gloss | Notes |
 | --- | --- | --- |
 | `inklist` | [`inklist`](https://gloss-format.org/reference/ink/) |  |
-| none, an extension | [`pressure`](https://gloss-format.org/reference/ink/) |  |
 | `width` | [`width`](https://gloss-format.org/reference/ink/) |  |
 | `dashes` | [`dashes`](https://gloss-format.org/reference/ink/) | A dash pattern in points: lengths on, then off, repeating (XFDF dashes, PDF /D). |
 
@@ -157,5 +155,3 @@ Every element takes these. The element name gives the Gloss `type`.
 | `coords` | [`quads`](https://gloss-format.org/reference/redact/) |  |
 | `interior-color` | [`interiorColor`](https://gloss-format.org/reference/redact/) |  |
 | `overlay-text` | [`overlayText`](https://gloss-format.org/reference/redact/) |  |
-| none, an extension | [`origin`](https://gloss-format.org/reference/redact/) |  |
-| none, an extension | [`suggestion`](https://gloss-format.org/reference/redact/) |  |

@@ -8,7 +8,7 @@ Gloss is an open, viewer-neutral JSON format for PDF annotations. A Gloss docume
 
 XFDF is the XML format for PDF annotations, standardised as [ISO 19444-1](https://www.pdfa.org/resource/iso-19444-xfdf/). Gloss has the same annotation types and uses the same coordinates. Where XFDF has a name for something, Gloss uses it: a sticky note is `text`, as in XFDF. A few fields read better in JSON under another name, such as `author` for XFDF's `title`. The reference gives the XFDF name of every field that has one, and [Gloss and XFDF](https://gloss-format.org/xfdf/) maps them all on one page.
 
-Gloss also adds what XFDF lacks: fields for suggested redactions, and `custom` for data of your own.
+Gloss also adds `custom`, for data of your own.
 
 ## How Gloss compares
 
@@ -20,7 +20,6 @@ Gloss carries the same annotations as XFDF, in JSON, with a JSON Schema at a sta
 | Defined by                                | An open JSON Schema, MIT licensed | ISO 19444-1 | The SDK's documentation |
 | Tied to one viewer                        | No                                | No          | Yes                     |
 | Usable in your own JSON Schema or OpenAPI | Yes, by `$ref` to a URL           | No          | Depends on the SDK      |
-| Suggested redactions awaiting review      | Yes                               | No          | Depends on the SDK      |
 
 ## Media type and extension
 
@@ -77,7 +76,7 @@ The format version is the integer in the document and in the schema URL. A `vers
 - **`v1.json` changes, but never breaks.** It gains fields, types and enum values over time. If you need a fixed copy, pin a version of the `gloss-format` package.
 - **Changes only add.** A change that would reject a document `v1.json` used to accept goes into `v2.json`, published beside `v1.json`. The package version is a separate number from the format version.
 - **Unknown fields are allowed.** No definition rejects a field it doesn't list, so a document from a newer writer still validates against an older schema. Readers may ignore unknown fields or pass them through. The schema won't flag a misspelled field name.
-- **Unknown types are allowed.** An item with a string `type`, a string `id` and a page number is an annotation, even if Gloss doesn't know its type. Readers may ignore it or pass it through. An item whose type Gloss does know must match that type's definition, and a later version may define a type that is unknown today. Gloss will never define a type that starts with `x-`, so give your own types that prefix, such as `x-sticker`, and no later `v1.json` can reject them. Types are case-sensitive: `Highlight` is an unknown type, not a highlight.
+- **Unknown types are allowed.** An item with a string `type`, a string `id` and a page number is an annotation, even if Gloss doesn't know its type. Readers may ignore it or pass it through. An item whose type Gloss does know must match that type's definition, and a later version may define a type that is unknown today. Types are case-sensitive: `Highlight` is an unknown type, not a highlight.
 - **Fields are optional by default.** Gloss requires only what makes an item an annotation: `type`, `id`, `page`, and the geometry its type can't be placed without. Where a field has a default, the schema records it and the reference shows it.
 
 A document with one bad item fails as a whole. To keep the good items, validate each one against [`Annotation`](https://gloss-format.org/reference/annotation/) or [`UnknownAnnotation`](https://gloss-format.org/reference/unknown-annotation/) on its own.
@@ -88,16 +87,34 @@ If your system needs a field Gloss leaves optional, require it in your own schem
 
 Every annotation accepts `custom`, an object for data of your own, such as a case number or a review note. Gloss readers keep it as it is and never interpret it.
 
-Keep host data in `custom` rather than in new top-level fields. A later version of Gloss may add a field with the same name.
+Three rules decide where a piece of data goes.
 
-## Suggested redactions
+1. **Gloss holds what a PDF annotation dictionary can store, with the same meaning.**
+2. **Everything else goes in `custom`, under your own key.** Use your product's name, so your data and another system's stay apart:
 
-XFDF has nothing for a redaction that a detector proposed and a person hasn't reviewed yet. Two fields on [`redact`](https://gloss-format.org/reference/redact/) carry it:
+   ```json
+   {
+     "type": "square",
+     "id": "a1",
+     "page": 0,
+     "rect": { "x": 72, "y": 700, "width": 120, "height": 14 },
+     "custom": { "acme": { "caseNumber": "C-104" } }
+   }
+   ```
 
-- `origin`: `user` for a mark a person made or accepted, `suggested` for one waiting for review. Defaults to `user`.
-- [`suggestion`](https://gloss-format.org/reference/suggestion/): `confidence` from 0 to 1, with optional `reason`, `explanation`, `recommendation` (`redact`, `review` or `keep`) and `jobId`.
+3. **A kind of annotation Gloss lacks is written as the nearest Gloss type.** Name the kind in your `custom` key. Any reader still draws the plain shape in the right place, and you read your own kind back:
 
-An accepted suggestion keeps its `suggestion`, so you can still tell where it came from.
+   ```json
+   {
+     "type": "circle",
+     "id": "a2",
+     "page": 0,
+     "rect": { "x": 72, "y": 650, "width": 40, "height": 40 },
+     "custom": { "acme": { "type": "magnifier" } }
+   }
+   ```
+
+Readers keep types they don't know so that a file from a newer version of Gloss survives; that is not a place for types of your own.
 
 ## Get the schema
 
@@ -129,11 +146,11 @@ Gloss carries the same annotations as XFDF, the XML format standardised as ISO 1
 
 ### Which annotation types does Gloss support?
 
-Gloss defines `highlight`, `underline`, `strikeout`, `squiggly`, `text` (a note), `freetext`, `square`, `circle`, `line`, `polyline`, `polygon`, `ink`, `stamp` and `redact`, the annotation types XFDF defines. A viewer can add its own types, and a document can carry types Gloss doesn't define.
+Gloss defines `highlight`, `underline`, `strikeout`, `squiggly`, `text` (a note), `freetext`, `square`, `circle`, `line`, `polyline`, `polygon`, `ink`, `stamp` and `redact`, the annotation types XFDF defines. A reader keeps types it does not know, so a file from a newer version of Gloss still loads.
 
 ### Can I add my own data?
 
-Yes. Every annotation accepts `custom`, an object Gloss readers keep as it is and never interpret. For a mark of your own, use a type that starts with `x-`, such as `x-sticker`. Gloss will never define a type with that prefix, so no later version of the schema can reject it.
+Yes. Every annotation accepts `custom`, an object Gloss readers keep as it is and never interpret. Put your data under a key of your own, such as `custom: { "acme": { "caseNumber": "C-104" } }`. For a kind of mark Gloss lacks, write the nearest Gloss type and record the kind in `custom.acme.type`, so other readers still draw the shape.
 
 ### How do I validate a Gloss document?
 
@@ -163,27 +180,28 @@ Load the [Gloss schema](https://gloss-format.org/schema/v1.json) into your valid
 
 Gloss requires as little as it can, so that any system can read the data. Your API can ask for more. Wrap a Gloss definition in `allOf` and add your rules beside it.
 
-This schema is for an API that only accepts reviewed redactions. It makes `origin` required and allows only `user`, so the API turns away a suggestion nobody has reviewed:
+This schema is for an API that needs to know who made each redaction and when. It makes `author` and `createdAt` required, so the API turns away a redaction that lacks either:
 
-reviewed-redaction.schema.json:
+audited-redaction.schema.json:
 
 ```json
 {
   "$schema": "https://json-schema.org/draft/2020-12/schema",
-  "$id": "https://api.example.com/schemas/reviewed-redaction.json",
-  "title": "Reviewed redaction",
-  "description": "A Gloss redaction that a person has made or accepted.",
+  "$id": "https://api.example.com/schemas/audited-redaction.json",
+  "title": "Audited redaction",
+  "description": "A Gloss redaction that says who made it and when.",
   "allOf": [{ "$ref": "https://gloss-format.org/schema/v1.json#/$defs/Redact" }],
-  "required": ["origin"],
-  "properties": {
-    "origin": { "const": "user" }
-  }
+  "required": ["author", "createdAt"]
 }
 ```
 
 The rest comes from Gloss. A redaction with no `rect` still fails, because Gloss requires one.
 
 You can narrow an enum or add a pattern to any field the same way. To turn away fields Gloss doesn't list, give the names you accept in `propertyNames`. `unevaluatedProperties: false` won't do it, because Gloss definitions accept any extra field and so count every field as evaluated.
+
+## Keep your own data
+
+Gloss holds what a PDF annotation can hold. Put anything else in `custom`, under a key named for your product, such as `custom: { "acme": { "caseNumber": "C-104" } }`. For an annotation kind Gloss lacks, write the nearest Gloss type and record the kind at `custom.acme.type`. [Your own data](https://gloss-format.org/#your-own-data) has examples.
 
 ## OpenAPI 3.1
 
@@ -256,10 +274,10 @@ const redaction: Redact = Redact.parse({
   page: 0,
   rect: { x: 72, y: 700, width: 120, height: 14 },
 })
-console.log(redaction.origin) // 'user', the default
+console.log(redaction.opacity) // 1, the default
 ```
 
-Parsing keeps fields Gloss doesn't define, and keeps items of a type it doesn't know. It also fills in defaults, so a redaction with no `origin` comes back with `origin: 'user'`.
+Parsing keeps fields Gloss doesn't define, and keeps items of a type it doesn't know. It also fills in defaults, so a redaction with no `opacity` comes back with `opacity: 1`.
 
 So each definition has two types. `Redact` is what a parse returns, with every default filled in. `RedactInput` is what you write, where fields with a default are optional. Use the `Input` type for data you build before you parse or send it. `isAnnotation(item)` tells you whether a document item is a type Gloss defines, and narrows its type.
 
@@ -389,10 +407,9 @@ Every element takes these. The element name gives the Gloss `type`.
 
 | XFDF | Gloss | Notes |
 | --- | --- | --- |
-| none, an extension | [`borderColor`](https://gloss-format.org/reference/free-text/) |  |
 | `width` | [`width`](https://gloss-format.org/reference/free-text/) |  |
 | `dashes` | [`dashes`](https://gloss-format.org/reference/free-text/) | A dash pattern in points: lengths on, then off, repeating (XFDF dashes, PDF /D). |
-| none, an extension | [`cornerRadius`](https://gloss-format.org/reference/free-text/) |  |
+| none | [`cornerRadius`](https://gloss-format.org/reference/free-text/) | XFDF has no attribute for it. |
 | `defaultstyle` | [`defaultStyle`](https://gloss-format.org/reference/free-text/) | The keys are the CSS property names XFDF writes in its defaultstyle string, in camel case. |
 | `fringe` | [`fringe`](https://gloss-format.org/reference/free-text/) | Insets from an annotation's rect to the area it draws in, in points (PDF /RD, XFDF fringe, both in this order). |
 | `callout` | [`callout`](https://gloss-format.org/reference/free-text/) |  |
@@ -405,7 +422,7 @@ Every element takes these. The element name gives the Gloss `type`.
 | `width` | [`width`](https://gloss-format.org/reference/square/) |  |
 | `dashes` | [`dashes`](https://gloss-format.org/reference/square/) | A dash pattern in points: lengths on, then off, repeating (XFDF dashes, PDF /D). |
 | `interior-color` | [`interiorColor`](https://gloss-format.org/reference/square/) |  |
-| none, an extension | [`cornerRadius`](https://gloss-format.org/reference/square/) |  |
+| none | [`cornerRadius`](https://gloss-format.org/reference/square/) | XFDF has no attribute for it. |
 
 ## `<circle>`
 
@@ -451,7 +468,6 @@ Every element takes these. The element name gives the Gloss `type`.
 | XFDF | Gloss | Notes |
 | --- | --- | --- |
 | `inklist` | [`inklist`](https://gloss-format.org/reference/ink/) |  |
-| none, an extension | [`pressure`](https://gloss-format.org/reference/ink/) |  |
 | `width` | [`width`](https://gloss-format.org/reference/ink/) |  |
 | `dashes` | [`dashes`](https://gloss-format.org/reference/ink/) | A dash pattern in points: lengths on, then off, repeating (XFDF dashes, PDF /D). |
 
@@ -469,8 +485,6 @@ Every element takes these. The element name gives the Gloss `type`.
 | `coords` | [`quads`](https://gloss-format.org/reference/redact/) |  |
 | `interior-color` | [`interiorColor`](https://gloss-format.org/reference/redact/) |  |
 | `overlay-text` | [`overlayText`](https://gloss-format.org/reference/redact/) |  |
-| none, an extension | [`origin`](https://gloss-format.org/reference/redact/) |  |
-| none, an extension | [`suggestion`](https://gloss-format.org/reference/redact/) |  |
 
 ---
 
@@ -548,7 +562,7 @@ A field marked (required) must be present.
 | `modifiedAt` | string; format `date-time` (RFC 3339 with seconds and an offset, e.g. `2026-10-20T09:30:00Z`) |  | `date` | When the annotation last changed, as an ISO 8601 date-time with an offset. XFDF writes a PDF date string. Absent means unknown. |
 | `subject` | string |  | `subject` | A short label for what the mark is. Absent means no label. |
 | `intent` | [Intent](https://gloss-format.org/reference/intent/) |  | `intent` | What the mark is for, such as a callout or an arrow. Absent means the type's plain form. |
-| `custom` | object |  | — | Data of your own. Gloss readers keep it as it is and never interpret it. Absent means none. |
+| `custom` | object |  | — | Data of your own, under a key of your own, such as your product's name: { "acme": { ... } }. Gloss readers keep it as it is and never interpret it. Absent means none. |
 | `width` | number; ≥ 0 | `1` | `width` | The stroke width in points. Absent means 1. |
 | `dashes` | [Dashes](https://gloss-format.org/reference/dashes/) |  | `dashes` | The dash pattern of the stroke. Absent means a solid line. |
 | `interiorColor` | [Color](https://gloss-format.org/reference/color/) |  | `interior-color` | The fill inside the shape. Absent means no fill. |
@@ -651,7 +665,7 @@ A field marked (required) must be present.
 | `modifiedAt` | string; format `date-time` (RFC 3339 with seconds and an offset, e.g. `2026-10-20T09:30:00Z`) |  | `date` | When the annotation last changed, as an ISO 8601 date-time with an offset. XFDF writes a PDF date string. Absent means unknown. |
 | `subject` | string |  | `subject` | A short label for what the mark is. Absent means no label. |
 | `intent` | [Intent](https://gloss-format.org/reference/intent/) |  | `intent` | What the mark is for, such as a callout or an arrow. Absent means the type's plain form. |
-| `custom` | object |  | — | Data of your own. Gloss readers keep it as it is and never interpret it. Absent means none. |
+| `custom` | object |  | — | Data of your own, under a key of your own, such as your product's name: { "acme": { ... } }. Gloss readers keep it as it is and never interpret it. Absent means none. |
 
 ---
 
@@ -789,11 +803,10 @@ A field marked (required) must be present.
 | `modifiedAt` | string; format `date-time` (RFC 3339 with seconds and an offset, e.g. `2026-10-20T09:30:00Z`) |  | `date` | When the annotation last changed, as an ISO 8601 date-time with an offset. XFDF writes a PDF date string. Absent means unknown. |
 | `subject` | string |  | `subject` | A short label for what the mark is. Absent means no label. |
 | `intent` | [Intent](https://gloss-format.org/reference/intent/) |  | `intent` | What the mark is for, such as a callout or an arrow. Absent means the type's plain form. |
-| `custom` | object |  | — | Data of your own. Gloss readers keep it as it is and never interpret it. Absent means none. |
-| `borderColor` | [Color](https://gloss-format.org/reference/color/) |  | — | The border's colour. Absent: the reader chooses the colour. An extension; XFDF has no equivalent. |
+| `custom` | object |  | — | Data of your own, under a key of your own, such as your product's name: { "acme": { ... } }. Gloss readers keep it as it is and never interpret it. Absent means none. |
 | `width` | number; ≥ 0 | `0` | `width` | The border's width in points; 0 draws no border. Absent means 0. |
 | `dashes` | [Dashes](https://gloss-format.org/reference/dashes/) |  | `dashes` | The dash pattern of the stroke. Absent means a solid line. |
-| `cornerRadius` | number; ≥ 0 |  | — | The radius of the box's corners in points. Absent means square corners. An extension; XFDF has no equivalent. |
+| `cornerRadius` | number; ≥ 0 |  | — | The radius of the box's corners in points, written to PDF /Border as both the horizontal and vertical radius. XFDF has no attribute for it. Absent means square corners. |
 | `defaultStyle` | [FreeTextStyle](https://gloss-format.org/reference/free-text-style/) |  | `defaultstyle` | The text style. Absent: each style field's own default applies. |
 | `fringe` | [Fringe](https://gloss-format.org/reference/fringe/) |  | `fringe` | The insets from rect to the text box. Absent means the box is rect. |
 | `callout` | [Point](https://gloss-format.org/reference/point/)[]; 2 to 3 items |  | `callout` | A callout's leader line: the tip, an optional bend, and the point where it meets the box (PDF /CL). Absent means no leader line. |
@@ -936,7 +949,7 @@ A field marked (required) must be present.
 | `modifiedAt` | string; format `date-time` (RFC 3339 with seconds and an offset, e.g. `2026-10-20T09:30:00Z`) |  | `date` | When the annotation last changed, as an ISO 8601 date-time with an offset. XFDF writes a PDF date string. Absent means unknown. |
 | `subject` | string |  | `subject` | A short label for what the mark is. Absent means no label. |
 | `intent` | [Intent](https://gloss-format.org/reference/intent/) |  | `intent` | What the mark is for, such as a callout or an arrow. Absent means the type's plain form. |
-| `custom` | object |  | — | Data of your own. Gloss readers keep it as it is and never interpret it. Absent means none. |
+| `custom` | object |  | — | Data of your own, under a key of your own, such as your product's name: { "acme": { ... } }. Gloss readers keep it as it is and never interpret it. Absent means none. |
 | `quads` (required) | [Quad](https://gloss-format.org/reference/quad/)[]; at least 1 item |  | `coords` | The runs of text the mark covers, one quad per line. At least one. |
 
 ## Example
@@ -1019,9 +1032,8 @@ A field marked (required) must be present.
 | `modifiedAt` | string; format `date-time` (RFC 3339 with seconds and an offset, e.g. `2026-10-20T09:30:00Z`) |  | `date` | When the annotation last changed, as an ISO 8601 date-time with an offset. XFDF writes a PDF date string. Absent means unknown. |
 | `subject` | string |  | `subject` | A short label for what the mark is. Absent means no label. |
 | `intent` | [Intent](https://gloss-format.org/reference/intent/) |  | `intent` | What the mark is for, such as a callout or an arrow. Absent means the type's plain form. |
-| `custom` | object |  | — | Data of your own. Gloss readers keep it as it is and never interpret it. Absent means none. |
+| `custom` | object |  | — | Data of your own, under a key of your own, such as your product's name: { "acme": { ... } }. Gloss readers keep it as it is and never interpret it. Absent means none. |
 | `inklist` (required) | [Point](https://gloss-format.org/reference/point/)[][]; at least 1 item; each at least 1 item |  | `inklist` | The strokes, each a list of points in the order they were drawn. At least one stroke of at least one point. |
-| `pressure` | number[][]; each 0 to 1 |  | — | Pen pressure per point, from 0 to 1. It has the same shape as inklist: one list per stroke, one value per point. JSON Schema cannot check that rule, so a validator must. Absent means no pressure data, as with mouse input. |
 | `width` | number; ≥ 0 | `2` | `width` | The stroke width in points. Absent means 2. |
 | `dashes` | [Dashes](https://gloss-format.org/reference/dashes/) |  | `dashes` | The dash pattern of the stroke. Absent means a solid line. |
 
@@ -1139,7 +1151,7 @@ A field marked (required) must be present.
 | `modifiedAt` | string; format `date-time` (RFC 3339 with seconds and an offset, e.g. `2026-10-20T09:30:00Z`) |  | `date` | When the annotation last changed, as an ISO 8601 date-time with an offset. XFDF writes a PDF date string. Absent means unknown. |
 | `subject` | string |  | `subject` | A short label for what the mark is. Absent means no label. |
 | `intent` | [Intent](https://gloss-format.org/reference/intent/) |  | `intent` | What the mark is for, such as a callout or an arrow. Absent means the type's plain form. |
-| `custom` | object |  | — | Data of your own. Gloss readers keep it as it is and never interpret it. Absent means none. |
+| `custom` | object |  | — | Data of your own, under a key of your own, such as your product's name: { "acme": { ... } }. Gloss readers keep it as it is and never interpret it. Absent means none. |
 | `start` (required) | [Point](https://gloss-format.org/reference/point/) |  | `start` | Where the line starts. |
 | `end` (required) | [Point](https://gloss-format.org/reference/point/) |  | `end` | Where the line ends. |
 | `width` | number; ≥ 0 | `1` | `width` | The stroke width in points. Absent means 1. |
@@ -1241,7 +1253,7 @@ A field marked (required) must be present.
 | `modifiedAt` | string; format `date-time` (RFC 3339 with seconds and an offset, e.g. `2026-10-20T09:30:00Z`) |  | `date` | When the annotation last changed, as an ISO 8601 date-time with an offset. XFDF writes a PDF date string. Absent means unknown. |
 | `subject` | string |  | `subject` | A short label for what the mark is. Absent means no label. |
 | `intent` | [Intent](https://gloss-format.org/reference/intent/) |  | `intent` | What the mark is for, such as a callout or an arrow. Absent means the type's plain form. |
-| `custom` | object |  | — | Data of your own. Gloss readers keep it as it is and never interpret it. Absent means none. |
+| `custom` | object |  | — | Data of your own, under a key of your own, such as your product's name: { "acme": { ... } }. Gloss readers keep it as it is and never interpret it. Absent means none. |
 | `icon` | [NoteIcon](https://gloss-format.org/reference/note-icon/) | `"Note"` | `icon` | The icon the note shows on the page. Absent means Note. |
 
 ## Example
@@ -1363,7 +1375,7 @@ A field marked (required) must be present.
 | `modifiedAt` | string; format `date-time` (RFC 3339 with seconds and an offset, e.g. `2026-10-20T09:30:00Z`) |  | `date` | When the annotation last changed, as an ISO 8601 date-time with an offset. XFDF writes a PDF date string. Absent means unknown. |
 | `subject` | string |  | `subject` | A short label for what the mark is. Absent means no label. |
 | `intent` | [Intent](https://gloss-format.org/reference/intent/) |  | `intent` | What the mark is for, such as a callout or an arrow. Absent means the type's plain form. |
-| `custom` | object |  | — | Data of your own. Gloss readers keep it as it is and never interpret it. Absent means none. |
+| `custom` | object |  | — | Data of your own, under a key of your own, such as your product's name: { "acme": { ... } }. Gloss readers keep it as it is and never interpret it. Absent means none. |
 | `vertices` (required) | [Point](https://gloss-format.org/reference/point/)[]; at least 2 items |  | `vertices` | The points the lines join, in order. At least two. |
 | `width` | number; ≥ 0 | `1` | `width` | The stroke width in points. Absent means 1. |
 | `dashes` | [Dashes](https://gloss-format.org/reference/dashes/) |  | `dashes` | The dash pattern of the stroke. Absent means a solid line. |
@@ -1443,7 +1455,7 @@ A field marked (required) must be present.
 | `modifiedAt` | string; format `date-time` (RFC 3339 with seconds and an offset, e.g. `2026-10-20T09:30:00Z`) |  | `date` | When the annotation last changed, as an ISO 8601 date-time with an offset. XFDF writes a PDF date string. Absent means unknown. |
 | `subject` | string |  | `subject` | A short label for what the mark is. Absent means no label. |
 | `intent` | [Intent](https://gloss-format.org/reference/intent/) |  | `intent` | What the mark is for, such as a callout or an arrow. Absent means the type's plain form. |
-| `custom` | object |  | — | Data of your own. Gloss readers keep it as it is and never interpret it. Absent means none. |
+| `custom` | object |  | — | Data of your own, under a key of your own, such as your product's name: { "acme": { ... } }. Gloss readers keep it as it is and never interpret it. Absent means none. |
 | `vertices` (required) | [Point](https://gloss-format.org/reference/point/)[]; at least 2 items |  | `vertices` | The points the lines join, in order. At least two. |
 | `width` | number; ≥ 0 | `1` | `width` | The stroke width in points. Absent means 1. |
 | `dashes` | [Dashes](https://gloss-format.org/reference/dashes/) |  | `dashes` | The dash pattern of the stroke. Absent means a solid line. |
@@ -1605,12 +1617,10 @@ A field marked (required) must be present.
 | `modifiedAt` | string; format `date-time` (RFC 3339 with seconds and an offset, e.g. `2026-10-20T09:30:00Z`) |  | `date` | When the annotation last changed, as an ISO 8601 date-time with an offset. XFDF writes a PDF date string. Absent means unknown. |
 | `subject` | string |  | `subject` | A short label for what the mark is. Absent means no label. |
 | `intent` | [Intent](https://gloss-format.org/reference/intent/) |  | `intent` | What the mark is for, such as a callout or an arrow. Absent means the type's plain form. |
-| `custom` | object |  | — | Data of your own. Gloss readers keep it as it is and never interpret it. Absent means none. |
+| `custom` | object |  | — | Data of your own, under a key of your own, such as your product's name: { "acme": { ... } }. Gloss readers keep it as it is and never interpret it. Absent means none. |
 | `quads` | [Quad](https://gloss-format.org/reference/quad/)[]; at least 1 item |  | `coords` | The runs of text the mark covers, one quad per line. Absent for a mark over an area rather than text. |
 | `interiorColor` | [Color](https://gloss-format.org/reference/color/) |  | `interior-color` | The fill once the redaction is applied. Absent: the reader chooses the fill. |
 | `overlayText` | string |  | `overlay-text` | Text drawn over the fill once applied. Absent means none. |
-| `origin` | string; one of `"user"`, `"suggested"` | `"user"` | — | user for a mark a person made or accepted, suggested for one waiting for review. Absent means user. An extension; XFDF has no equivalent. |
-| `suggestion` | [Suggestion](https://gloss-format.org/reference/suggestion/) |  | — | Why the mark was suggested. Kept after a person accepts it. Absent for a mark a person made. |
 
 ## Example
 
@@ -1646,12 +1656,7 @@ A field marked (required) must be present.
         "y": 700
       }
     }
-  ],
-  "origin": "suggested",
-  "suggestion": {
-    "confidence": 0.92,
-    "reason": "Person name"
-  }
+  ]
 }
 ```
 
@@ -1696,11 +1701,11 @@ A field marked (required) must be present.
 | `modifiedAt` | string; format `date-time` (RFC 3339 with seconds and an offset, e.g. `2026-10-20T09:30:00Z`) |  | `date` | When the annotation last changed, as an ISO 8601 date-time with an offset. XFDF writes a PDF date string. Absent means unknown. |
 | `subject` | string |  | `subject` | A short label for what the mark is. Absent means no label. |
 | `intent` | [Intent](https://gloss-format.org/reference/intent/) |  | `intent` | What the mark is for, such as a callout or an arrow. Absent means the type's plain form. |
-| `custom` | object |  | — | Data of your own. Gloss readers keep it as it is and never interpret it. Absent means none. |
+| `custom` | object |  | — | Data of your own, under a key of your own, such as your product's name: { "acme": { ... } }. Gloss readers keep it as it is and never interpret it. Absent means none. |
 | `width` | number; ≥ 0 | `1` | `width` | The stroke width in points. Absent means 1. |
 | `dashes` | [Dashes](https://gloss-format.org/reference/dashes/) |  | `dashes` | The dash pattern of the stroke. Absent means a solid line. |
 | `interiorColor` | [Color](https://gloss-format.org/reference/color/) |  | `interior-color` | The fill inside the shape. Absent means no fill. |
-| `cornerRadius` | number; ≥ 0 |  | — | The radius of the corners in points. Absent means square corners. An extension; XFDF has no equivalent. |
+| `cornerRadius` | number; ≥ 0 |  | — | The radius of the corners in points, written to PDF /Border as both the horizontal and vertical radius. XFDF has no attribute for it. Absent means square corners. |
 
 ## Example
 
@@ -1763,7 +1768,7 @@ A field marked (required) must be present.
 | `modifiedAt` | string; format `date-time` (RFC 3339 with seconds and an offset, e.g. `2026-10-20T09:30:00Z`) |  | `date` | When the annotation last changed, as an ISO 8601 date-time with an offset. XFDF writes a PDF date string. Absent means unknown. |
 | `subject` | string |  | `subject` | A short label for what the mark is. Absent means no label. |
 | `intent` | [Intent](https://gloss-format.org/reference/intent/) |  | `intent` | What the mark is for, such as a callout or an arrow. Absent means the type's plain form. |
-| `custom` | object |  | — | Data of your own. Gloss readers keep it as it is and never interpret it. Absent means none. |
+| `custom` | object |  | — | Data of your own, under a key of your own, such as your product's name: { "acme": { ... } }. Gloss readers keep it as it is and never interpret it. Absent means none. |
 | `quads` (required) | [Quad](https://gloss-format.org/reference/quad/)[]; at least 1 item |  | `coords` | The runs of text the mark covers, one quad per line. At least one. |
 
 ## Example
@@ -1846,7 +1851,7 @@ A field marked (required) must be present.
 | `modifiedAt` | string; format `date-time` (RFC 3339 with seconds and an offset, e.g. `2026-10-20T09:30:00Z`) |  | `date` | When the annotation last changed, as an ISO 8601 date-time with an offset. XFDF writes a PDF date string. Absent means unknown. |
 | `subject` | string |  | `subject` | A short label for what the mark is. Absent means no label. |
 | `intent` | [Intent](https://gloss-format.org/reference/intent/) |  | `intent` | What the mark is for, such as a callout or an arrow. Absent means the type's plain form. |
-| `custom` | object |  | — | Data of your own. Gloss readers keep it as it is and never interpret it. Absent means none. |
+| `custom` | object |  | — | Data of your own, under a key of your own, such as your product's name: { "acme": { ... } }. Gloss readers keep it as it is and never interpret it. Absent means none. |
 | `imagedata` (required) | string; matches `^data:image\/(png\|jpeg);base64,` |  | `imagedata` | The image, as a base64 PNG or JPEG data URL. |
 | `rotation` | number; one of `0`, `90`, `180`, `270` |  | `rotation` | Quarter turns, in degrees anticlockwise, the image is turned within rect. Absent means upright in user space. |
 
@@ -1911,7 +1916,7 @@ A field marked (required) must be present.
 | `modifiedAt` | string; format `date-time` (RFC 3339 with seconds and an offset, e.g. `2026-10-20T09:30:00Z`) |  | `date` | When the annotation last changed, as an ISO 8601 date-time with an offset. XFDF writes a PDF date string. Absent means unknown. |
 | `subject` | string |  | `subject` | A short label for what the mark is. Absent means no label. |
 | `intent` | [Intent](https://gloss-format.org/reference/intent/) |  | `intent` | What the mark is for, such as a callout or an arrow. Absent means the type's plain form. |
-| `custom` | object |  | — | Data of your own. Gloss readers keep it as it is and never interpret it. Absent means none. |
+| `custom` | object |  | — | Data of your own, under a key of your own, such as your product's name: { "acme": { ... } }. Gloss readers keep it as it is and never interpret it. Absent means none. |
 | `quads` (required) | [Quad](https://gloss-format.org/reference/quad/)[]; at least 1 item |  | `coords` | The runs of text the mark covers, one quad per line. At least one. |
 
 ## Example
@@ -1959,48 +1964,6 @@ A field marked (required) must be present.
 
 ---
 
-# Suggestion
-
-> Why a redaction was suggested: what a detector found and how sure it is. Reference for Suggestion in Gloss, a JSON format for PDF annotations.
-
-Why a redaction was suggested: what a detector found and how sure it is. An extension; XFDF has no equivalent.
-
-## Use it
-
-```json
-{
-  "$ref": "https://gloss-format.org/schema/v1.json#/$defs/Suggestion"
-}
-```
-
-## Fields
-
-A field marked (required) must be present.
-
-| Field | Type | Default | XFDF | Description |
-| --- | --- | --- | --- | --- |
-| `confidence` (required) | number; 0 to 1 |  | — | How sure the detector is, from 0 to 1. |
-| `jobId` | string |  | — | The detection run that made the suggestion. Absent means unknown. |
-| `reason` | string |  | — | A short label for what was found, such as a name or an account number. Absent means none. |
-| `explanation` | string |  | — | Why the text was suggested, for the reviewer. Absent means none. |
-| `recommendation` | string; one of `"redact"`, `"review"`, `"keep"` |  | — | What the detector recommends doing with the mark. Absent means no recommendation. |
-
-## Example
-
-```json
-{
-  "confidence": 0.92,
-  "reason": "Person name",
-  "recommendation": "redact"
-}
-```
-
-## Used by
-
-- [Redact](https://gloss-format.org/reference/redact/)
-
----
-
 # Underline
 
 > A line under a run of text. The fields, defaults and XFDF names of the Underline annotation in Gloss, a JSON format for PDF annotations.
@@ -2036,7 +1999,7 @@ A field marked (required) must be present.
 | `modifiedAt` | string; format `date-time` (RFC 3339 with seconds and an offset, e.g. `2026-10-20T09:30:00Z`) |  | `date` | When the annotation last changed, as an ISO 8601 date-time with an offset. XFDF writes a PDF date string. Absent means unknown. |
 | `subject` | string |  | `subject` | A short label for what the mark is. Absent means no label. |
 | `intent` | [Intent](https://gloss-format.org/reference/intent/) |  | `intent` | What the mark is for, such as a callout or an arrow. Absent means the type's plain form. |
-| `custom` | object |  | — | Data of your own. Gloss readers keep it as it is and never interpret it. Absent means none. |
+| `custom` | object |  | — | Data of your own, under a key of your own, such as your product's name: { "acme": { ... } }. Gloss readers keep it as it is and never interpret it. Absent means none. |
 | `quads` (required) | [Quad](https://gloss-format.org/reference/quad/)[]; at least 1 item |  | `coords` | The runs of text the mark covers, one quad per line. At least one. |
 
 ## Example
@@ -2086,9 +2049,9 @@ A field marked (required) must be present.
 
 # UnknownAnnotation
 
-> An annotation of a type this version of Gloss does not define, such as one from a newer writer or a host's own. Reference for UnknownAnnotation in Gloss, a JSON format for PDF annotations.
+> An annotation of a type this version of Gloss does not define, such as one from a newer writer. Reference for UnknownAnnotation in Gloss, a JSON format for PDF annotations.
 
-An annotation of a type this version of Gloss does not define, such as one from a newer writer or a host's own. It needs a type, an id and a page. Readers may ignore it or pass it through. Types match case-sensitively, so Highlight is an unknown type. Gloss never defines a type that starts with x-, so a host's own types should use that prefix: no later version can then reject them.
+An annotation of a type this version of Gloss does not define, such as one from a newer writer. It needs a type, an id and a page. Readers may ignore it or pass it through. Types match case-sensitively, so Highlight is an unknown type. To add an annotation of your own, write it as the nearest Gloss type and record its kind under your own key in custom.
 
 ## Use it
 

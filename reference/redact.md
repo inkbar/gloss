@@ -33,12 +33,10 @@ A field marked (required) must be present.
 | `modifiedAt` | string; format `date-time` (RFC 3339 with seconds and an offset, e.g. `2026-10-20T09:30:00Z`) |  | `date` | When the annotation last changed, as an ISO 8601 date-time with an offset. XFDF writes a PDF date string. Absent means unknown. |
 | `subject` | string |  | `subject` | A short label for what the mark is. Absent means no label. |
 | `intent` | [Intent](https://gloss-format.org/reference/intent/) |  | `intent` | What the mark is for, such as a callout or an arrow. Absent means the type's plain form. |
-| `custom` | object |  | — | Data of your own. Gloss readers keep it as it is and never interpret it. Absent means none. |
+| `custom` | object |  | — | Data of your own, under a key of your own, such as your product's name: { "acme": { ... } }. Gloss readers keep it as it is and never interpret it. Absent means none. |
 | `quads` | [Quad](https://gloss-format.org/reference/quad/)[]; at least 1 item |  | `coords` | The runs of text the mark covers, one quad per line. Absent for a mark over an area rather than text. |
 | `interiorColor` | [Color](https://gloss-format.org/reference/color/) |  | `interior-color` | The fill once the redaction is applied. Absent: the reader chooses the fill. |
 | `overlayText` | string |  | `overlay-text` | Text drawn over the fill once applied. Absent means none. |
-| `origin` | string; one of `"user"`, `"suggested"` | `"user"` | — | user for a mark a person made or accepted, suggested for one waiting for review. Absent means user. An extension; XFDF has no equivalent. |
-| `suggestion` | [Suggestion](https://gloss-format.org/reference/suggestion/) |  | — | Why the mark was suggested. Kept after a person accepts it. Absent for a mark a person made. |
 
 ## Example
 
@@ -74,12 +72,7 @@ A field marked (required) must be present.
         "y": 700
       }
     }
-  ],
-  "origin": "suggested",
-  "suggestion": {
-    "confidence": 0.92,
-    "reason": "Person name"
-  }
+  ]
 }
 ```
 

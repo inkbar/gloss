@@ -33,11 +33,10 @@ A field marked (required) must be present.
 | `modifiedAt` | string; format `date-time` (RFC 3339 with seconds and an offset, e.g. `2026-10-20T09:30:00Z`) |  | `date` | When the annotation last changed, as an ISO 8601 date-time with an offset. XFDF writes a PDF date string. Absent means unknown. |
 | `subject` | string |  | `subject` | A short label for what the mark is. Absent means no label. |
 | `intent` | [Intent](https://gloss-format.org/reference/intent/) |  | `intent` | What the mark is for, such as a callout or an arrow. Absent means the type's plain form. |
-| `custom` | object |  | — | Data of your own. Gloss readers keep it as it is and never interpret it. Absent means none. |
-| `borderColor` | [Color](https://gloss-format.org/reference/color/) |  | — | The border's colour. Absent: the reader chooses the colour. An extension; XFDF has no equivalent. |
+| `custom` | object |  | — | Data of your own, under a key of your own, such as your product's name: { "acme": { ... } }. Gloss readers keep it as it is and never interpret it. Absent means none. |
 | `width` | number; ≥ 0 | `0` | `width` | The border's width in points; 0 draws no border. Absent means 0. |
 | `dashes` | [Dashes](https://gloss-format.org/reference/dashes/) |  | `dashes` | The dash pattern of the stroke. Absent means a solid line. |
-| `cornerRadius` | number; ≥ 0 |  | — | The radius of the box's corners in points. Absent means square corners. An extension; XFDF has no equivalent. |
+| `cornerRadius` | number; ≥ 0 |  | — | The radius of the box's corners in points, written to PDF /Border as both the horizontal and vertical radius. XFDF has no attribute for it. Absent means square corners. |
 | `defaultStyle` | [FreeTextStyle](https://gloss-format.org/reference/free-text-style/) |  | `defaultstyle` | The text style. Absent: each style field's own default applies. |
 | `fringe` | [Fringe](https://gloss-format.org/reference/fringe/) |  | `fringe` | The insets from rect to the text box. Absent means the box is rect. |
 | `callout` | [Point](https://gloss-format.org/reference/point/)[]; 2 to 3 items |  | `callout` | A callout's leader line: the tip, an optional bend, and the point where it meets the box (PDF /CL). Absent means no leader line. |

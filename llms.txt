@@ -14,7 +14,7 @@
 
 - [Document](https://gloss-format.org/reference/document/): A Gloss document: the annotations on one PDF.
 - [Annotation](https://gloss-format.org/reference/annotation/): Any annotation type Gloss defines, chosen by its type field.
-- [UnknownAnnotation](https://gloss-format.org/reference/unknown-annotation/): An annotation of a type this version of Gloss does not define, such as one from a newer writer or a host's own.
+- [UnknownAnnotation](https://gloss-format.org/reference/unknown-annotation/): An annotation of a type this version of Gloss does not define, such as one from a newer writer.
 
 ## Reference: Annotation types
 
@@ -42,7 +42,6 @@
 - [Dashes](https://gloss-format.org/reference/dashes/): A dash pattern in points: lengths on, then off, repeating (XFDF dashes, PDF /D).
 - [FreeTextStyle](https://gloss-format.org/reference/free-text-style/): A free-text box's text style.
 - [Fringe](https://gloss-format.org/reference/fringe/): Insets from an annotation's rect to the area it draws in, in points (PDF /RD, XFDF fringe, both in this order).
-- [Suggestion](https://gloss-format.org/reference/suggestion/): Why a redaction was suggested: what a detector found and how sure it is.
 - [Common](https://gloss-format.org/reference/common/): The fields every annotation accepts.
 
 ## Reference: Enums

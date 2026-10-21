@@ -20,27 +20,28 @@ Load the [Gloss schema](https://gloss-format.org/schema/v1.json) into your valid
 
 Gloss requires as little as it can, so that any system can read the data. Your API can ask for more. Wrap a Gloss definition in `allOf` and add your rules beside it.
 
-This schema is for an API that only accepts reviewed redactions. It makes `origin` required and allows only `user`, so the API turns away a suggestion nobody has reviewed:
+This schema is for an API that needs to know who made each redaction and when. It makes `author` and `createdAt` required, so the API turns away a redaction that lacks either:
 
-reviewed-redaction.schema.json:
+audited-redaction.schema.json:
 
 ```json
 {
   "$schema": "https://json-schema.org/draft/2020-12/schema",
-  "$id": "https://api.example.com/schemas/reviewed-redaction.json",
-  "title": "Reviewed redaction",
-  "description": "A Gloss redaction that a person has made or accepted.",
+  "$id": "https://api.example.com/schemas/audited-redaction.json",
+  "title": "Audited redaction",
+  "description": "A Gloss redaction that says who made it and when.",
   "allOf": [{ "$ref": "https://gloss-format.org/schema/v1.json#/$defs/Redact" }],
-  "required": ["origin"],
-  "properties": {
-    "origin": { "const": "user" }
-  }
+  "required": ["author", "createdAt"]
 }
 ```
 
 The rest comes from Gloss. A redaction with no `rect` still fails, because Gloss requires one.
 
 You can narrow an enum or add a pattern to any field the same way. To turn away fields Gloss doesn't list, give the names you accept in `propertyNames`. `unevaluatedProperties: false` won't do it, because Gloss definitions accept any extra field and so count every field as evaluated.
+
+## Keep your own data
+
+Gloss holds what a PDF annotation can hold. Put anything else in `custom`, under a key named for your product, such as `custom: { "acme": { "caseNumber": "C-104" } }`. For an annotation kind Gloss lacks, write the nearest Gloss type and record the kind at `custom.acme.type`. [Your own data](https://gloss-format.org/#your-own-data) has examples.
 
 ## OpenAPI 3.1
 
@@ -113,10 +114,10 @@ const redaction: Redact = Redact.parse({
   page: 0,
   rect: { x: 72, y: 700, width: 120, height: 14 },
 })
-console.log(redaction.origin) // 'user', the default
+console.log(redaction.opacity) // 1, the default
 ```
 
-Parsing keeps fields Gloss doesn't define, and keeps items of a type it doesn't know. It also fills in defaults, so a redaction with no `origin` comes back with `origin: 'user'`.
+Parsing keeps fields Gloss doesn't define, and keeps items of a type it doesn't know. It also fills in defaults, so a redaction with no `opacity` comes back with `opacity: 1`.
 
 So each definition has two types. `Redact` is what a parse returns, with every default filled in. `RedactInput` is what you write, where fields with a default are optional. Use the `Input` type for data you build before you parse or send it. `isAnnotation(item)` tells you whether a document item is a type Gloss defines, and narrows its type.
 
