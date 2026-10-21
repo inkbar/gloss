@@ -30,7 +30,7 @@ if (result.success) {
 
 Every definition is exported as a zod schema with a type of the same name, such as `Redact`, `Highlight` and `Annotation`. Fields a type does not define pass through unchanged. An item whose `type` is not one Gloss knows is kept as an unknown annotation. An item with a known `type` and invalid fields fails.
 
-The type of the same name is what a parse returns, with defaults filled in: a `Redact` always has `origin` and `opacity`. Each definition also has an `Input` type for the data you write, before defaults: `RedactInput`, `HighlightInput`, `GlossDocumentInput` and so on.
+The type of the same name is what a parse returns, with defaults filled in: a `Redact` always has `opacity`. Each definition also has an `Input` type for the data you write, before defaults: `RedactInput`, `HighlightInput`, `GlossDocumentInput` and so on.
 
 ```ts
 import type { RedactInput } from 'gloss-format'

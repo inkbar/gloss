@@ -17,6 +17,7 @@ import {
   Strikeout,
   Underline,
 } from './annotations'
+import { gloss } from './registry'
 
 import type { z } from 'zod'
 
@@ -128,15 +129,10 @@ describe('annotation types', () => {
     expect(
       Stamp.safeParse({ ...minStamp, imagedata: 'data:image/gif;base64,R0' }).success
     ).toBe(false)
-    expect(
-      Redact.safeParse({ ...minRedact, suggestion: { confidence: 1.5 } }).success
-    ).toBe(false)
-    expect(Redact.safeParse({ ...minRedact, suggestion: {} }).success).toBe(false)
   })
 
   it('fills documented defaults', () => {
     expect(Note.parse(minNote).icon).toBe('Note')
-    expect(Redact.parse(minRedact).origin).toBe('user')
     expect(Line.parse(minLine).width).toBe(1)
     expect(Ink.parse(minInk).width).toBe(2)
     expect(FreeText.parse(minFreeText).width).toBe(0)
@@ -151,10 +147,10 @@ describe('annotation types', () => {
     const parsed = Redact.parse({
       ...minRedact,
       reviewer: 'x',
-      suggestion: { confidence: 0.9, model: 'm' },
+      reviewNote: 'm',
     }) as Record<string, unknown>
     expect(parsed.reviewer).toBe('x')
-    expect((parsed.suggestion as Record<string, unknown>).model).toBe('m')
+    expect(parsed.reviewNote).toBe('m')
     const text = FreeText.parse({
       ...minFreeText,
       defaultStyle: { lineHeight: 1.2 },
@@ -174,9 +170,22 @@ describe('annotation types', () => {
     ).toBe(true)
   })
 
-  it('checks pressure against inklist', () => {
-    expect(Ink.safeParse({ ...minInk, pressure: [[0.5]] }).success).toBe(true)
-    expect(Ink.safeParse({ ...minInk, pressure: [[0.5, 0.6]] }).success).toBe(false)
-    expect(Ink.safeParse({ ...minInk, pressure: [] }).success).toBe(false)
+  it('has no fields a PDF cannot store', () => {
+    expect(Redact.shape).not.toHaveProperty('origin')
+    expect(Redact.shape).not.toHaveProperty('suggestion')
+    expect(Ink.shape).not.toHaveProperty('pressure')
+    expect(FreeText.shape).not.toHaveProperty('borderColor')
+  })
+
+  it('keeps a removed field as an unknown field', () => {
+    expect(Redact.parse({ ...minRedact, origin: 'suggested' }).origin).toBe('suggested')
+    expect(Ink.safeParse({ ...minInk, pressure: [[2]] }).success).toBe(true)
+  })
+
+  it('describes cornerRadius as the PDF /Border radius', () => {
+    expect(gloss.get(Square.shape.cornerRadius.unwrap())?.description).toMatch(/\/Border/)
+    expect(gloss.get(FreeText.shape.cornerRadius.unwrap())?.description).toMatch(
+      /\/Border/
+    )
   })
 })

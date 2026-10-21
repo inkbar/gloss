@@ -73,10 +73,10 @@ describe('schema.json', () => {
         'Polygon',
         'Ink',
         'Stamp',
-        'Suggestion',
         'Redact',
       ])
     )
+    expect(Object.keys(defs)).not.toContain('Suggestion')
   })
 
   it('marks defaults optional', () => {
@@ -113,7 +113,7 @@ describe('schema.json', () => {
       Array.isArray(def.examples)
     )
     expect(withExamples.map(([name]) => name)).toEqual(
-      expect.arrayContaining(['FreeTextStyle', 'Suggestion', 'Highlight', 'Redact'])
+      expect.arrayContaining(['FreeTextStyle', 'Highlight', 'Redact'])
     )
     for (const [name, def] of withExamples) {
       const validate = validator(ajv, name)
@@ -329,12 +329,14 @@ describe('validating with the schema', () => {
     const validate = ajv.compile({
       $id: 'https://example.test/api.json',
       allOf: [{ $ref: 'https://gloss-format.org/schema/v1.json#/$defs/Redact' }],
-      required: ['origin'],
+      required: ['author', 'createdAt'],
     })
     const redaction = { type: 'redact', id: 'r1', page: 0, rect }
-    expect(validate(redaction)).toBe(false)
+    const createdAt = '2026-10-20T09:30:00Z'
+    expect(validate({ ...redaction, createdAt })).toBe(false)
+    expect(validate({ ...redaction, author: 'Ed' })).toBe(false)
     expect(
-      validate({ ...redaction, origin: 'suggested' }),
+      validate({ ...redaction, author: 'Ed', createdAt }),
       JSON.stringify(validate.errors)
     ).toBe(true)
   })
@@ -348,7 +350,7 @@ describe('validating with the schema', () => {
     })
     const list = [
       { type: 'redact', id: 'r1', page: 0, rect },
-      { type: 'redact', id: 'r2', page: 1, rect, origin: 'suggested' },
+      { type: 'redact', id: 'r2', page: 1, rect },
     ]
     expect(validate(list), JSON.stringify(validate.errors)).toBe(true)
     expect(validate([{ type: 'redact', id: 'r3', page: 0 }])).toBe(false)

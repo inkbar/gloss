@@ -826,10 +826,6 @@
           "additionalProperties": {},
           "description": "Data of your own. Gloss readers keep it as it is and never interpret it. Absent means none."
         },
-        "borderColor": {
-          "description": "The border's colour. Absent: the reader chooses the colour. An extension; XFDF has no equivalent.",
-          "$ref": "#/$defs/Color"
-        },
         "width": {
           "default": 0,
           "type": "number",
@@ -845,7 +841,7 @@
         "cornerRadius": {
           "type": "number",
           "minimum": 0,
-          "description": "The radius of the box's corners in points. Absent means square corners. An extension; XFDF has no equivalent."
+          "description": "The radius of the box's corners in points, written to PDF /Border as both the horizontal and vertical radius. Absent means square corners."
         },
         "defaultStyle": {
           "description": "The text style. Absent: each style field's own default applies.",
@@ -1097,7 +1093,7 @@
         "cornerRadius": {
           "type": "number",
           "minimum": 0,
-          "description": "The radius of the corners in points. Absent means square corners. An extension; XFDF has no equivalent."
+          "description": "The radius of the corners in points, written to PDF /Border as both the horizontal and vertical radius. Absent means square corners."
         }
       },
       "required": ["type", "id", "page", "rect"],
@@ -1741,14 +1737,6 @@
           "description": "The strokes, each a list of points in the order they were drawn. At least one stroke of at least one point.",
           "x-xfdf": "inklist"
         },
-        "pressure": {
-          "type": "array",
-          "items": {
-            "type": "array",
-            "items": { "type": "number", "minimum": 0, "maximum": 1 }
-          },
-          "description": "Pen pressure per point, from 0 to 1. It has the same shape as inklist: one list per stroke, one value per point. JSON Schema cannot check that rule, so a validator must. Absent means no pressure data, as with mouse input."
-        },
         "width": {
           "default": 2,
           "type": "number",
@@ -2001,16 +1989,6 @@
           "type": "string",
           "description": "Text drawn over the fill once applied. Absent means none.",
           "x-xfdf": "overlay-text"
-        },
-        "origin": {
-          "default": "user",
-          "type": "string",
-          "enum": ["user", "suggested"],
-          "description": "user for a mark a person made or accepted, suggested for one waiting for review. Absent means user. An extension; XFDF has no equivalent."
-        },
-        "suggestion": {
-          "description": "Why the mark was suggested. Kept after a person accepts it. Absent for a mark a person made.",
-          "$ref": "#/$defs/Suggestion"
         }
       },
       "required": ["type", "id", "page", "rect"],
@@ -2033,45 +2011,8 @@
               "p3": { "x": 72, "y": 700 },
               "p4": { "x": 192, "y": 700 }
             }
-          ],
-          "origin": "suggested",
-          "suggestion": { "confidence": 0.92, "reason": "Person name" }
+          ]
         }
-      ]
-    },
-    "Suggestion": {
-      "type": "object",
-      "properties": {
-        "confidence": {
-          "type": "number",
-          "minimum": 0,
-          "maximum": 1,
-          "description": "How sure the detector is, from 0 to 1."
-        },
-        "jobId": {
-          "type": "string",
-          "description": "The detection run that made the suggestion. Absent means unknown."
-        },
-        "reason": {
-          "type": "string",
-          "description": "A short label for what was found, such as a name or an account number. Absent means none."
-        },
-        "explanation": {
-          "type": "string",
-          "description": "Why the text was suggested, for the reviewer. Absent means none."
-        },
-        "recommendation": {
-          "type": "string",
-          "enum": ["redact", "review", "keep"],
-          "description": "What the detector recommends doing with the mark. Absent means no recommendation."
-        }
-      },
-      "required": ["confidence"],
-      "additionalProperties": {},
-      "title": "Suggestion",
-      "description": "Why a redaction was suggested: what a detector found and how sure it is. An extension; XFDF has no equivalent.",
-      "examples": [
-        { "confidence": 0.92, "reason": "Person name", "recommendation": "redact" }
       ]
     },
     "UnknownAnnotation": {

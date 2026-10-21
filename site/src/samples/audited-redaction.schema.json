@@ -1,0 +1,8 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://api.example.com/schemas/audited-redaction.json",
+  "title": "Audited redaction",
+  "description": "A Gloss redaction that says who made it and when.",
+  "allOf": [{ "$ref": "https://gloss-format.org/schema/v1.json#/$defs/Redact" }],
+  "required": ["author", "createdAt"]
+}
