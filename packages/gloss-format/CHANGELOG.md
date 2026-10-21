@@ -1,5 +1,18 @@
 # Changelog
 
+## [1.2.0](https://github.com/inkbar/gloss/compare/v1.1.0...v1.2.0) (2026-10-21)
+
+
+### Features
+
+* ask hosts to keep their own data under their own key in custom ([#21](https://github.com/inkbar/gloss/issues/21)) ([8e1d494](https://github.com/inkbar/gloss/commit/8e1d4947ced52ca3beb5294864599e15bb56b1fb))
+* keep gloss to what a pdf annotation can store ([#20](https://github.com/inkbar/gloss/issues/20)) ([825b3c3](https://github.com/inkbar/gloss/commit/825b3c3a2d1d30eae04b755d3cf8dd37c3b6b293))
+
+
+### Bug Fixes
+
+* keep gloss's guidance on custom and corner radius consistent ([#22](https://github.com/inkbar/gloss/issues/22)) ([93b54c4](https://github.com/inkbar/gloss/commit/93b54c49e906d72ecc4f2b95ed61b25f38e866f4))
+
 ## [1.1.0](https://github.com/inkbar/gloss/compare/v1.0.0...v1.1.0) (2026-10-20)
 
 
