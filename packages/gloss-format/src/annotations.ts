@@ -219,7 +219,7 @@ export const FreeText = define(
     dashes: dashes(),
     cornerRadius: field(z.number().nonnegative(), {
       description:
-        "The radius of the box's corners in points, written to PDF /Border as both the horizontal and vertical radius. Absent means square corners.",
+        "The radius of the box's corners in points, written to PDF /Border as both the horizontal and vertical radius. XFDF has no attribute for it. Absent means square corners.",
     }).optional(),
     defaultStyle: field(FreeTextStyle, {
       description: "The text style. Absent: each style field's own default applies.",
@@ -265,7 +265,7 @@ export const Square = define(
     interiorColor: interiorColor(),
     cornerRadius: field(z.number().nonnegative(), {
       description:
-        'The radius of the corners in points, written to PDF /Border as both the horizontal and vertical radius. Absent means square corners.',
+        'The radius of the corners in points, written to PDF /Border as both the horizontal and vertical radius. XFDF has no attribute for it. Absent means square corners.',
     }).optional(),
   }),
   {

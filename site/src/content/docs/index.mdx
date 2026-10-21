@@ -96,7 +96,7 @@ Every annotation accepts `custom`, an object for data of your own, such as a cas
 
 Three rules decide where a piece of data goes.
 
-1. **Gloss holds what a PDF annotation can hold.** A field belongs in Gloss when a PDF annotation dictionary can store it with the same meaning.
+1. **Gloss holds what a PDF annotation dictionary can store, with the same meaning.**
 2. **Everything else goes in `custom`, under your own key.** Use your product's name, so your data and another system's stay apart:
 
    ```json
@@ -109,7 +109,7 @@ Three rules decide where a piece of data goes.
    }
    ```
 
-3. **An annotation kind of your own is written as the nearest Gloss type.** Put the kind in your `custom` key. A reader that doesn't know it still draws the plain shape in the right place, and you read your own kind back:
+3. **A kind of annotation Gloss lacks is written as the nearest Gloss type.** Name the kind in your `custom` key. Any reader still draws the plain shape in the right place, and you read your own kind back:
 
    ```json
    {
@@ -117,11 +117,11 @@ Three rules decide where a piece of data goes.
      "id": "a2",
      "page": 0,
      "rect": { "x": 72, "y": 650, "width": 40, "height": 40 },
-     "custom": { "acme": { "type": "stamp-approved" } }
+     "custom": { "acme": { "type": "magnifier" } }
    }
    ```
 
-Gloss still keeps annotation types it doesn't know, so a file from a newer writer survives. Don't invent types of your own.
+Readers keep types they don't know so that a file from a newer version of Gloss survives; that is not a place for types of your own.
 
 ## Get the schema
 

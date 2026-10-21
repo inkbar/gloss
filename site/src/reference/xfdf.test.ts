@@ -35,4 +35,14 @@ describe('renderXfdf', () => {
     expect(page).toContain('| `overlay-text` | [`overlayText`](../reference/redact/) |')
     expect(page).toContain('| none, an extension | [`custom`](../reference/common/) |  |')
   })
+
+  it('does not call cornerRadius an extension: PDF stores it in /Border', () => {
+    expect(page).toContain(
+      '| none | [`cornerRadius`](../reference/free-text/) | XFDF has no attribute for it. |'
+    )
+    expect(page).toContain(
+      '| none | [`cornerRadius`](../reference/square/) | XFDF has no attribute for it. |'
+    )
+    expect(page).not.toMatch(/none, an extension \| \[`cornerRadius`\]/)
+  })
 })

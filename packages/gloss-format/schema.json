@@ -841,7 +841,7 @@
         "cornerRadius": {
           "type": "number",
           "minimum": 0,
-          "description": "The radius of the box's corners in points, written to PDF /Border as both the horizontal and vertical radius. Absent means square corners."
+          "description": "The radius of the box's corners in points, written to PDF /Border as both the horizontal and vertical radius. XFDF has no attribute for it. Absent means square corners."
         },
         "defaultStyle": {
           "description": "The text style. Absent: each style field's own default applies.",
@@ -1093,7 +1093,7 @@
         "cornerRadius": {
           "type": "number",
           "minimum": 0,
-          "description": "The radius of the corners in points, written to PDF /Border as both the horizontal and vertical radius. Absent means square corners."
+          "description": "The radius of the corners in points, written to PDF /Border as both the horizontal and vertical radius. XFDF has no attribute for it. Absent means square corners."
         }
       },
       "required": ["type", "id", "page", "rect"],
@@ -2057,7 +2057,7 @@
       "required": ["type", "id", "page"],
       "additionalProperties": {},
       "title": "UnknownAnnotation",
-      "description": "An annotation of a type this version of Gloss does not define, such as one from a newer writer or a host's own. It needs a type, an id and a page. Readers may ignore it or pass it through. Types match case-sensitively, so Highlight is an unknown type. To add an annotation of your own, write it as the nearest Gloss type and record its kind in custom.",
+      "description": "An annotation of a type this version of Gloss does not define, such as one from a newer writer. It needs a type, an id and a page. Readers may ignore it or pass it through. Types match case-sensitively, so Highlight is an unknown type. To add an annotation of your own, write it as the nearest Gloss type and record its kind under your own key in custom.",
       "examples": [{ "type": "sticker", "id": "a1", "page": 0, "sticker": "star" }]
     },
     "Common": {
