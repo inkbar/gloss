@@ -7,7 +7,14 @@ export type JsonSchema = Record<string, unknown>
 
 export type Group = 'Document' | 'Annotation types' | 'Shared shapes' | 'Enums'
 
-const DOCUMENT_GROUP = new Set(['Document', 'Annotation', 'UnknownAnnotation'])
+const DOCUMENT_GROUP = new Set([
+  'Document',
+  'Annotation',
+  'UnknownAnnotation',
+  'Fields',
+  'FieldValue',
+  'SignatureFieldValue',
+])
 /** zod's `int()` bounds every integer by the safe-integer range. It isn't a real constraint. */
 const SAFE_INTEGER_BOUNDS = new Set([Number.MAX_SAFE_INTEGER, Number.MIN_SAFE_INTEGER])
 

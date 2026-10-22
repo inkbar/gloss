@@ -18,6 +18,7 @@ import {
   Underline,
 } from './annotations'
 import { GLOSS_FORMAT, GLOSS_VERSION } from './constants'
+import { Fields } from './fields'
 import { define, field } from './registry'
 import { commonFields } from './shapes'
 
@@ -97,10 +98,16 @@ export const GlossDocument = define(
       description:
         "The annotations, in drawing order. Each is a type Gloss defines or one it doesn't.",
     }),
+    fields: field(Fields, {
+      description:
+        'Optional. The values of the PDF form fields, keyed by full dotted field name. It maps to the fields element of XFDF.',
+      'x-xfdf': 'fields',
+    }).optional(),
   }),
   {
     title: 'Document',
-    description: 'A Gloss document: the annotations on one PDF.',
+    description:
+      'A Gloss document: the annotations on one PDF and, optionally, the values of its form fields.',
     examples: [
       {
         format: GLOSS_FORMAT,
@@ -121,6 +128,12 @@ export const GlossDocument = define(
             ],
           },
         ],
+      },
+      {
+        format: GLOSS_FORMAT,
+        version: GLOSS_VERSION,
+        annotations: [],
+        fields: { 'applicant.name': 'Ada', interests: ['maths', 'engines'] },
       },
     ],
   }
