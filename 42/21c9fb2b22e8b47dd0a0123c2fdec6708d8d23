@@ -1,0 +1,39 @@
+packages/gloss-format/schema.json
+  s_e6109f66fbb4ed::t_965fa8efc3f205 34-38,44,65-70,2074-2114
+site/src/samples/form.gloss.json
+  s_e6109f66fbb4ed::t_31452f197597aa 1-20
+site/src/reference/xfdf.test.ts
+  s_e6109f66fbb4ed::t_decd26384482a0 16-21
+packages/gloss-format/src/document.ts
+  s_e6109f66fbb4ed::t_a6de3755082e42 21,101-105,109-110,132-137
+packages/gloss-format/src/fields.ts
+  s_e6109f66fbb4ed::t_52fed879ded3b4 1-48
+site/src/reference/render.ts
+  s_e6109f66fbb4ed::t_682932f3e8dad1 10-17
+site/src/reference/xfdf.ts
+  s_e6109f66fbb4ed::t_4b010f875faa9f 82-98
+packages/gloss-format/src/index.ts
+  s_e6109f66fbb4ed::t_4615499dfe79ed 4
+packages/gloss-format/src/fields.test.ts
+  s_e6109f66fbb4ed::t_5ed7da97ddd2ef 1-36
+site/src/samples/samples.test.ts
+  s_e6109f66fbb4ed::t_3f13a575ef11e3 48-65
+packages/gloss-format/src/document.test.ts
+  s_e6109f66fbb4ed::t_24bc20930ccdda 17-43
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.7.5",
+  "base_commit_sha": "4221c9fb2b22e8b47dd0a0123c2fdec6708d8d23",
+  "prompts": {},
+  "sessions": {
+    "s_e6109f66fbb4ed": {
+      "agent_id": {
+        "tool": "claude",
+        "id": "05debb7a-28e3-41cd-ba81-971c90bba7df",
+        "model": "claude-opus-5-5"
+      },
+      "human_author": "Edward Coleridge Smith <edcoleridgesmith@gmail.com>"
+    }
+  }
+}
