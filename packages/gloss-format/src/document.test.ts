@@ -14,6 +14,33 @@ describe('GlossDocument', () => {
     ).toBe(true)
   })
 
+  it('accepts a document with fields', () => {
+    const doc = {
+      format: 'gloss',
+      version: 1,
+      annotations: [],
+      fields: { 'applicant.name': 'Ada', interests: ['maths'] },
+    }
+    expect(GlossDocument.safeParse(doc).success).toBe(true)
+  })
+
+  it('still accepts a document without fields', () => {
+    expect(
+      GlossDocument.safeParse({ format: 'gloss', version: 1, annotations: [] }).success
+    ).toBe(true)
+  })
+
+  it('rejects fields with a bad value', () => {
+    expect(
+      GlossDocument.safeParse({
+        format: 'gloss',
+        version: 1,
+        annotations: [],
+        fields: { a: 1 },
+      }).success
+    ).toBe(false)
+  })
+
   it('rejects the wrong format or version', () => {
     expect(
       GlossDocument.safeParse({

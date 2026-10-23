@@ -1,0 +1,20 @@
+{
+  "format": "gloss",
+  "version": 1,
+  "fields": {
+    "applicant.name": "Ada",
+    "applicant.newsletter": "Yes",
+    "interests": ["maths", "engines"],
+    "applicant.signature": { "signature": "s1" }
+  },
+  "annotations": [
+    {
+      "type": "stamp",
+      "id": "s1",
+      "page": 0,
+      "rect": { "x": 72, "y": 120, "width": 160, "height": 40 },
+      "imagedata": "data:image/png;base64,iVBORw0KGgo=",
+      "subject": "Signature"
+    }
+  ]
+}
