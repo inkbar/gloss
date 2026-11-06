@@ -13,6 +13,12 @@ describe('renderXfdf', () => {
     )
   })
 
+  it('maps the fields element to the fields property', () => {
+    expect(page).toContain('## Form fields')
+    expect(page).toContain('`<fields>`')
+    expect(page).toContain('(../reference/signature-field-value/)')
+  })
+
   it('maps each XFDF element to its Gloss type', () => {
     expect(page).toContain('| `<text>` | [`text`](../reference/note/) |')
     expect(page).toContain('| `<redact>` | [`redact`](../reference/redact/) |')

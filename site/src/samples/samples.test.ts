@@ -45,6 +45,24 @@ describe('minimal.gloss.json', () => {
   })
 })
 
+describe('form.gloss.json', () => {
+  it('is a valid Gloss document', () => {
+    const doc = json('form.gloss.json')
+    const validate = gloss().getSchema(GLOSS)!
+    expect(validate(doc), JSON.stringify(validate.errors)).toBe(true)
+    expect(GlossDocument.safeParse(doc).success).toBe(true)
+  })
+
+  it('names a signature annotation that is in the document', () => {
+    const doc = json('form.gloss.json') as {
+      fields: Record<string, unknown>
+      annotations: { id: string; subject?: string }[]
+    }
+    expect(doc.annotations.find((a) => a.id === 's1')?.subject).toBe('Signature')
+    expect(doc.fields['applicant.signature']).toEqual({ signature: 's1' })
+  })
+})
+
 describe('audited-redaction.schema.json', () => {
   const validate = () => gloss().compile(json('audited-redaction.schema.json') as object)
   const createdAt = '2026-10-20T09:30:00Z'

@@ -31,12 +31,17 @@
             ]
           },
           "description": "The annotations, in drawing order. Each is a type Gloss defines or one it doesn't."
+        },
+        "fields": {
+          "description": "Optional. The values of the PDF form fields, keyed by full dotted field name. It maps to the fields element of XFDF.",
+          "x-xfdf": "fields",
+          "$ref": "#/$defs/Fields"
         }
       },
       "required": ["format", "version", "annotations"],
       "additionalProperties": {},
       "title": "Document",
-      "description": "A Gloss document: the annotations on one PDF.",
+      "description": "A Gloss document: the annotations on one PDF and, optionally, the values of its form fields.",
       "examples": [
         {
           "format": "gloss",
@@ -57,6 +62,12 @@
               ]
             }
           ]
+        },
+        {
+          "format": "gloss",
+          "version": 1,
+          "annotations": [],
+          "fields": { "applicant.name": "Ada", "interests": ["maths", "engines"] }
         }
       ]
     },
@@ -2059,6 +2070,47 @@
       "title": "UnknownAnnotation",
       "description": "An annotation of a type this version of Gloss does not define, such as one from a newer writer. It needs a type, an id and a page. Readers may ignore it or pass it through. Types match case-sensitively, so Highlight is an unknown type. To add an annotation of your own, write it as the nearest Gloss type and record its kind under your own key in custom.",
       "examples": [{ "type": "sticker", "id": "a1", "page": 0, "sticker": "star" }]
+    },
+    "FieldValue": {
+      "anyOf": [
+        { "type": "string" },
+        { "type": "array", "items": { "type": "string" } },
+        { "$ref": "#/$defs/SignatureFieldValue" }
+      ],
+      "title": "FieldValue",
+      "description": "The value of one form field. A string fills a text, checkbox, radio, combo or single-select list field. Checkbox and radio values are appearance-state names, and \"Off\" is the unchecked state. An array of strings fills a multi-select list field, in option order. An object names a signature annotation. An empty string means the field is empty.",
+      "examples": ["Ada", "Off", ["maths", "engines"], { "signature": "a7" }]
+    },
+    "SignatureFieldValue": {
+      "type": "object",
+      "properties": {
+        "signature": {
+          "type": "string",
+          "minLength": 1,
+          "description": "The id of a stamp or ink annotation in the same document whose subject is Signature. That annotation is the signature's appearance."
+        }
+      },
+      "required": ["signature"],
+      "additionalProperties": {},
+      "title": "SignatureFieldValue",
+      "description": "The value of a signature field. It names a stamp or ink annotation with subject Signature in the same document, rather than holding the signature itself.",
+      "examples": [{ "signature": "a7" }]
+    },
+    "Fields": {
+      "type": "object",
+      "propertyNames": { "type": "string", "minLength": 1 },
+      "additionalProperties": { "$ref": "#/$defs/FieldValue" },
+      "title": "Fields",
+      "description": "Form field values, keyed by full dotted field name, such as applicant.name. A key that is absent means the document does not state that field. An empty string means the field is empty.",
+      "x-xfdf": "fields/field",
+      "examples": [
+        {
+          "applicant.name": "Ada",
+          "applicant.newsletter": "Yes",
+          "interests": ["maths", "engines"],
+          "applicant.signature": { "signature": "a7" }
+        }
+      ]
     },
     "Common": {
       "type": "object",

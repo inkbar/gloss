@@ -79,6 +79,23 @@ export function renderXfdf(schema: JsonSchema): string {
     )
   }
 
+  const fields = properties(defs['Document'] ?? {})['fields']
+  if (fields && typeof fields['x-xfdf'] === 'string') {
+    out.push(
+      '## Form fields',
+      '',
+      `The XFDF ${code(`<${fields['x-xfdf']}>`)} element holds the values of the form fields. Gloss writes them in the document's [${code('fields')}](../reference/document/) property: an object keyed by full dotted field name, in place of one ${code('<field>')} element per name. XFDF nests ${code('<field>')} elements for a field hierarchy; Gloss joins the nested names with ${code('.')}, so a ${code('<field name="b">')} inside ${code('<field name="a">')} becomes ${code('"a.b"')}. A field that is absent from ${code('fields')} differs from one set to an empty string: absent means no value is carried, while an empty string clears the field. A string fills a text, checkbox, radio, combo or single-select list field. An array of strings fills a multi-select list. An object with a ${code('signature')} key names a signature annotation in the same document.`,
+      '',
+      '| XFDF | Gloss |',
+      '| --- | --- |',
+      `| ${code('<field name="a.b"><value>x</value></field>')} | ${code('"a.b": "x"')} |`,
+      `| ${code('<field name="c"><value>x</value><value>y</value></field>')} | ${code('"c": ["x", "y"]')} |`,
+      '',
+      `See [${code('Fields')}](../reference/fields/), [${code('FieldValue')}](../reference/field-value/) and [${code('SignatureFieldValue')}](../reference/signature-field-value/).`,
+      ''
+    )
+  }
+
   return out.join('\n')
 }
 
