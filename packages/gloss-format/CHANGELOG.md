@@ -1,5 +1,12 @@
 # Changelog
 
+## [1.3.0](https://github.com/inkbar/gloss/compare/v1.2.0...v1.3.0) (2026-11-06)
+
+
+### Features
+
+* add form field values to gloss ([#25](https://github.com/inkbar/gloss/issues/25)) ([7832ef3](https://github.com/inkbar/gloss/commit/7832ef3447ee0efe9b92f952857207eef2f99fba))
+
 ## [1.2.0](https://github.com/inkbar/gloss/compare/v1.1.0...v1.2.0) (2026-10-21)
 
 
