@@ -486,6 +486,17 @@ Every element takes these. The element name gives the Gloss `type`.
 | `interior-color` | [`interiorColor`](https://gloss-format.org/reference/redact/) |  |
 | `overlay-text` | [`overlayText`](https://gloss-format.org/reference/redact/) |  |
 
+## Form fields
+
+The XFDF `<fields>` element holds the values of the form fields. Gloss writes them in the document's [`fields`](https://gloss-format.org/reference/document/) property: an object keyed by full dotted field name, in place of one `<field>` element per name. XFDF nests `<field>` elements for a field hierarchy; Gloss joins the nested names with `.`, so a `<field name="b">` inside `<field name="a">` becomes `"a.b"`. A field that is absent from `fields` differs from one set to an empty string: absent means no value is carried, while an empty string clears the field. A string fills a text, checkbox, radio, combo or single-select list field. An array of strings fills a multi-select list. An object with a `signature` key names a signature annotation in the same document.
+
+| XFDF | Gloss |
+| --- | --- |
+| `<field name="a.b"><value>x</value></field>` | `"a.b": "x"` |
+| `<field name="c"><value>x</value><value>y</value></field>` | `"c": ["x", "y"]` |
+
+See [`Fields`](https://gloss-format.org/reference/fields/), [`FieldValue`](https://gloss-format.org/reference/field-value/) and [`SignatureFieldValue`](https://gloss-format.org/reference/signature-field-value/).
+
 ---
 
 # Annotation
@@ -701,9 +712,9 @@ number[]; at least 1 item; each ≥ 0
 
 # Document
 
-> A Gloss document: the annotations on one PDF. Reference for Document in Gloss, a JSON format for PDF annotations.
+> A Gloss document: the annotations on one PDF and, optionally, the values of its form fields. Reference for Document in Gloss, a JSON format for PDF annotations.
 
-A Gloss document: the annotations on one PDF.
+A Gloss document: the annotations on one PDF and, optionally, the values of its form fields.
 
 ## Use it
 
@@ -723,8 +734,9 @@ A field marked (required) must be present.
 | `version` (required) | number; always `1` |  | — | The Gloss format version the document follows. Always 1 for this schema. |
 | `documentKey` | string |  | — | Optional. Identifies the PDF the annotations belong to, in whatever form the writer and reader agree on. |
 | `annotations` (required) | ([Annotation](https://gloss-format.org/reference/annotation/) or [UnknownAnnotation](https://gloss-format.org/reference/unknown-annotation/))[] |  | — | The annotations, in drawing order. Each is a type Gloss defines or one it doesn't. |
+| `fields` | [Fields](https://gloss-format.org/reference/fields/) |  | `fields` | Optional. The values of the PDF form fields, keyed by full dotted field name. It maps to the fields element of XFDF. |
 
-## Example
+## Examples
 
 ```json
 {
@@ -765,6 +777,110 @@ A field marked (required) must be present.
   ]
 }
 ```
+
+```json
+{
+  "format": "gloss",
+  "version": 1,
+  "annotations": [],
+  "fields": {
+    "applicant.name": "Ada",
+    "interests": [
+      "maths",
+      "engines"
+    ]
+  }
+}
+```
+
+---
+
+# FieldValue
+
+> The value of one form field. Reference for FieldValue in Gloss, a JSON format for PDF annotations.
+
+The value of one form field. A string fills a text, checkbox, radio, combo or single-select list field. Checkbox and radio values are appearance-state names, and "Off" is the unchecked state. An array of strings fills a multi-select list field, in option order. An object names a signature annotation. An empty string means the field is empty.
+
+## Use it
+
+```json
+{
+  "$ref": "https://gloss-format.org/schema/v1.json#/$defs/FieldValue"
+}
+```
+
+## Type
+
+string or string[] or [SignatureFieldValue](https://gloss-format.org/reference/signature-field-value/)
+
+## Examples
+
+```json
+"Ada"
+```
+
+```json
+"Off"
+```
+
+```json
+[
+  "maths",
+  "engines"
+]
+```
+
+```json
+{
+  "signature": "a7"
+}
+```
+
+## Used by
+
+- [Fields](https://gloss-format.org/reference/fields/)
+
+---
+
+# Fields
+
+> Form field values, keyed by full dotted field name, such as applicant.name. Reference for Fields in Gloss, a JSON format for PDF annotations.
+
+Form field values, keyed by full dotted field name, such as applicant.name. A key that is absent means the document does not state that field. An empty string means the field is empty.
+
+## Use it
+
+```json
+{
+  "$ref": "https://gloss-format.org/schema/v1.json#/$defs/Fields"
+}
+```
+
+XFDF element: `fields/field`
+
+## Type
+
+object
+
+## Example
+
+```json
+{
+  "applicant.name": "Ada",
+  "applicant.newsletter": "Yes",
+  "interests": [
+    "maths",
+    "engines"
+  ],
+  "applicant.signature": {
+    "signature": "a7"
+  }
+}
+```
+
+## Used by
+
+- [Document](https://gloss-format.org/reference/document/)
 
 ---
 
@@ -1663,6 +1779,42 @@ A field marked (required) must be present.
 ## Used by
 
 - [Annotation](https://gloss-format.org/reference/annotation/)
+
+---
+
+# SignatureFieldValue
+
+> The value of a signature field. Reference for SignatureFieldValue in Gloss, a JSON format for PDF annotations.
+
+The value of a signature field. It names a stamp or ink annotation with subject Signature in the same document, rather than holding the signature itself.
+
+## Use it
+
+```json
+{
+  "$ref": "https://gloss-format.org/schema/v1.json#/$defs/SignatureFieldValue"
+}
+```
+
+## Fields
+
+A field marked (required) must be present.
+
+| Field | Type | Default | XFDF | Description |
+| --- | --- | --- | --- | --- |
+| `signature` (required) | string; at least 1 character |  | — | The id of a stamp or ink annotation in the same document whose subject is Signature. That annotation is the signature's appearance. |
+
+## Example
+
+```json
+{
+  "signature": "a7"
+}
+```
+
+## Used by
+
+- [FieldValue](https://gloss-format.org/reference/field-value/)
 
 ---
 

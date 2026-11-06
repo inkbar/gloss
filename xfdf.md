@@ -155,3 +155,14 @@ Every element takes these. The element name gives the Gloss `type`.
 | `coords` | [`quads`](https://gloss-format.org/reference/redact/) |  |
 | `interior-color` | [`interiorColor`](https://gloss-format.org/reference/redact/) |  |
 | `overlay-text` | [`overlayText`](https://gloss-format.org/reference/redact/) |  |
+
+## Form fields
+
+The XFDF `<fields>` element holds the values of the form fields. Gloss writes them in the document's [`fields`](https://gloss-format.org/reference/document/) property: an object keyed by full dotted field name, in place of one `<field>` element per name. XFDF nests `<field>` elements for a field hierarchy; Gloss joins the nested names with `.`, so a `<field name="b">` inside `<field name="a">` becomes `"a.b"`. A field that is absent from `fields` differs from one set to an empty string: absent means no value is carried, while an empty string clears the field. A string fills a text, checkbox, radio, combo or single-select list field. An array of strings fills a multi-select list. An object with a `signature` key names a signature annotation in the same document.
+
+| XFDF | Gloss |
+| --- | --- |
+| `<field name="a.b"><value>x</value></field>` | `"a.b": "x"` |
+| `<field name="c"><value>x</value><value>y</value></field>` | `"c": ["x", "y"]` |
+
+See [`Fields`](https://gloss-format.org/reference/fields/), [`FieldValue`](https://gloss-format.org/reference/field-value/) and [`SignatureFieldValue`](https://gloss-format.org/reference/signature-field-value/).

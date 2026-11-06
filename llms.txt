@@ -12,9 +12,12 @@
 
 ## Reference: Document
 
-- [Document](https://gloss-format.org/reference/document/): A Gloss document: the annotations on one PDF.
+- [Document](https://gloss-format.org/reference/document/): A Gloss document: the annotations on one PDF and, optionally, the values of its form fields.
 - [Annotation](https://gloss-format.org/reference/annotation/): Any annotation type Gloss defines, chosen by its type field.
 - [UnknownAnnotation](https://gloss-format.org/reference/unknown-annotation/): An annotation of a type this version of Gloss does not define, such as one from a newer writer.
+- [FieldValue](https://gloss-format.org/reference/field-value/): The value of one form field.
+- [SignatureFieldValue](https://gloss-format.org/reference/signature-field-value/): The value of a signature field.
+- [Fields](https://gloss-format.org/reference/fields/): Form field values, keyed by full dotted field name, such as applicant.name.
 
 ## Reference: Annotation types
 
